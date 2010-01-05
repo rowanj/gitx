@@ -79,7 +79,7 @@
 
 	// Check if it exists globally. In that case, write it as a global
 
-	NSArray *arguments = [NSArray arrayWithObjects:@"config", @"--global", @"--get", path];
+	NSArray *arguments = [NSArray arrayWithObjects:@"config", @"--global", @"--get", path, nil];
 	int ret;
 	[PBEasyPipe outputForCommand:[PBGitBinary path] withArgs:arguments inDir:nil retValue:&ret];
 	if (!ret) // It exists globally

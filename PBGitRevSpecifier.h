@@ -10,8 +10,9 @@
 #import <PBGitRef.h>
 
 @interface PBGitRevSpecifier : NSObject {
-	NSString* description;
-	NSArray* parameters;
+	NSString *description;
+	NSArray *parameters;
+	NSURL *workingDirectory;
 }
 
 - (id) initWithParameters:(NSArray*) params;
@@ -27,6 +28,8 @@
 + (PBGitRevSpecifier *)allBranchesRevSpec;
 + (PBGitRevSpecifier *)localBranchesRevSpec;
 
-@property(copy) NSString* description;
-@property(readonly) NSArray* parameters;
+@property(retain)   NSString *description;
+@property(readonly) NSArray *parameters;
+@property(retain)   NSURL *workingDirectory;
+
 @end

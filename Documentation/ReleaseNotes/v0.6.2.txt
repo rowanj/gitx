@@ -16,3 +16,4 @@ In addition, the following features have been added:
 * The 'Gist It' feature now asks for confirmation by default. This can be changed in the preferences
 * GitX can now open any directory by dragging it on the icon
 * GitX now asks for confirmation before deleting a branch
+

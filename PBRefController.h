@@ -20,6 +20,7 @@
 
 	IBOutlet NSWindow *newBranchSheet;
 	IBOutlet NSTextField *newBranchName;
+	IBOutlet NSTextField *errorMessage;
 
 	IBOutlet NSPopUpButton *branchPopUp;
 }

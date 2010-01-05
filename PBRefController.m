@@ -21,12 +21,12 @@
 	[self selectCurrentBranch];
 }
 
-- (void) observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(id)context
+- (void) observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
 {
-    if ([context isEqualToString: @"branchChange"]) {
+    if ([(NSString *)context isEqualToString: @"branchChange"]) {
 		[self updateBranchMenu];
 	}
-	else if ([context isEqualToString:@"currentBranchChange"]) {
+	else if ([(NSString *)context isEqualToString:@"currentBranchChange"]) {
 		[self selectCurrentBranch];
 	}
 	else {
@@ -49,7 +49,7 @@
 			NSLog(@"Removing ref failed!");
 			return;
 		}
-
+		[historyController.repository removeBranch:[[PBGitRevSpecifier alloc] initWithRef:[sender ref]]];
 		[[sender commit] removeRef:[sender ref]];
 		[commitController rearrangeObjects];
 	}
@@ -60,15 +60,24 @@
 	int ret = 1;
 	[historyController.repository outputInWorkdirForArguments:[NSArray arrayWithObjects:@"checkout", [[sender ref] shortName], nil] retValue: &ret];
 	if (ret) {
-		[[NSAlert alertWithMessageText:@"Checking out branch failed"
-						 defaultButton:@"OK"
-					   alternateButton:nil
-						   otherButton:nil
-			 informativeTextWithFormat:@"There was an error checking out the branch. Perhaps your working directory is not clean?"] runModal];
+		[[historyController.repository windowController] showMessageSheet:@"Checking out branch failed" infoText:@"There was an error checking out the branch. Perhaps your working directory is not clean?"];
 		return;
 	}
 	[historyController.repository reloadRefs];
 	[commitController rearrangeObjects];
+}
+
+- (void) tagInfo:(PBRefMenuItem *)sender
+{
+    NSString *message = [NSString stringWithFormat:@"Info for tag: %@", [[sender ref] shortName]];
+
+    int ret = 1;
+    NSString *info = [historyController.repository outputInWorkdirForArguments:[NSArray arrayWithObjects:@"tag", @"-n50", @"-l", [[sender ref] shortName], nil] retValue: &ret];
+
+    if (!ret) {
+	    [[historyController.repository windowController] showMessageSheet:message infoText:info];
+    }
+    return;
 }
 
 - (NSArray *) menuItemsForRef:(PBGitRef *)ref commit:(PBGitCommit *)commit
@@ -102,7 +111,7 @@
 
 - (NSDragOperation)tableView:(NSTableView*)tv
 				validateDrop:(id <NSDraggingInfo>)info
-				 proposedRow:(int)row
+				 proposedRow:(NSInteger)row
 	   proposedDropOperation:(NSTableViewDropOperation)operation
 {
 	if (operation == NSTableViewDropAbove)
@@ -117,7 +126,7 @@
 
 - (BOOL)tableView:(NSTableView *)aTableView
 	   acceptDrop:(id <NSDraggingInfo>)info
-			  row:(int)row
+			  row:(NSInteger)row
 	dropOperation:(NSTableViewDropOperation)operation
 {
 	if (operation != NSTableViewDropOn)
@@ -160,6 +169,7 @@
 # pragma mark Add ref methods
 -(void)addRef:(id)sender
 {
+	[errorMessage setStringValue:@""];
 	[NSApp beginSheet:newBranchSheet
 	   modalForWindow:[[historyController view] window]
 		modalDelegate:NULL
@@ -170,20 +180,28 @@
 -(void)saveSheet:(id) sender
 {
 	NSString *branchName = [@"refs/heads/" stringByAppendingString:[newBranchName stringValue]];
-	[self closeSheet:sender];
 	
 	if ([[commitController selectedObjects] count] == 0)
 		return;
-	
+
 	PBGitCommit *commit = [[commitController selectedObjects] objectAtIndex:0];
+
 	int retValue = 1;
-	[historyController.repository outputForArguments:[NSArray arrayWithObjects:@"update-ref", @"-mCreate branch from GitX", branchName, [commit realSha], NULL] retValue:&retValue];
-	if (retValue)
-	{
-		NSLog(@"Creating ref failed!");
+	[historyController.repository outputForArguments:[NSArray arrayWithObjects:@"check-ref-format", branchName, nil] retValue:&retValue];
+	if (retValue != 0) {
+		[errorMessage setStringValue:@"Invalid name"];
 		return;
 	}
 
+	retValue = 1;
+	[historyController.repository outputForArguments:[NSArray arrayWithObjects:@"update-ref", @"-mCreate branch from GitX", branchName, [commit realSha], @"0000000000000000000000000000000000000000", NULL] retValue:&retValue];
+	if (retValue)
+	{
+		[errorMessage setStringValue:@"Branch exists"];
+		return;
+	}
+	[historyController.repository addBranch:[[PBGitRevSpecifier alloc] initWithRef:[PBGitRef refFromString:branchName]]];
+	[self closeSheet:sender];
 	[commit addRef:[PBGitRef refFromString:branchName]];
 	[commitController rearrangeObjects];
 }

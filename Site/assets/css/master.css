@@ -3,7 +3,7 @@
 body
 {
 	background-color: #abc;
-	font-family: 'Lucida Grande' Arial;
+	font-family: 'Lucida Grande', Arial;
 	background: url('../images/bg.png') repeat;
 }
 
@@ -63,15 +63,16 @@ h3, h4
 
 #header
 {
-	height: 100px;
+	height: 90px;
 	font-size: 400%;
 	color: white;
 	
 	text-align: center;
+	padding-top: 10px;
 	
 	background-image: url('../images/header.jpg');
 	background-repeat: no-repeat;
-	background-position:center;
+	background-position:absolute;
 }
 
 #content
@@ -156,12 +157,8 @@ h3, h4
 	margin-left: 10px;
 	margin-top: 10px;
 }
-h2.noclear
-{
-	clear: none;
-}
 
-p.noclear
+.noclear
 {
 	clear: none;
 }
@@ -176,7 +173,7 @@ p.noclear
 #nav a
 {
 	display: block;
-	width: 90px;
+	width: 100px;
 	padding: 2px;
 	margin: 4px 4px 0px 4px;
 	

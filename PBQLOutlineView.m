@@ -58,15 +58,34 @@
 	return fileNames;
 }
 
+- (NSMenu *)menuForEvent:(NSEvent *)theEvent
+{
+	if ([theEvent type] == NSRightMouseDown)
+	{
+		// get the current selections for the outline view.
+		NSIndexSet *selectedRowIndexes = [self selectedRowIndexes];
+
+		// select the row that was clicked before showing the menu for the event
+		NSPoint mousePoint = [self convertPoint:[theEvent locationInWindow] fromView:nil];
+		int row = [self rowAtPoint:mousePoint];
+
+		// figure out if the row that was just clicked on is currently selected
+		if ([selectedRowIndexes containsIndex:row] == NO)
+			[self selectRow:row byExtendingSelection:NO];
+	}
+
+	return [controller contextMenuForTreeView];
+}
+
 /* Implemented to satisfy datasourcee protocol */
 - (BOOL) outlineView: (NSOutlineView *)ov
          isItemExpandable: (id)item { return NO; }
 
-- (int)  outlineView: (NSOutlineView *)ov
+- (NSInteger)  outlineView: (NSOutlineView *)ov
          numberOfChildrenOfItem:(id)item { return 0; }
 
 - (id)   outlineView: (NSOutlineView *)ov
-         child:(int)index
+         child:(NSInteger)index
          ofItem:(id)item { return nil; }
 
 - (id)   outlineView: (NSOutlineView *)ov

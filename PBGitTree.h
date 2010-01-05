@@ -10,13 +10,15 @@
 #import "PBGitRepository.h"
 
 @interface PBGitTree : NSObject {
+	long long _fileSize;
+
 	NSString* sha;
 	NSString* path;
 	PBGitRepository* repository;
 	__weak PBGitTree* parent;
 	NSArray* children;
 	BOOL leaf;
-	
+
 	NSString* localFileName;
 	NSDate* localMtime;
 }
@@ -26,6 +28,7 @@
 - (void) saveToFolder: (NSString *) directory;
 
 - (NSString*) tmpFileNameForContents;
+- (long long)fileSize;
 
 @property(copy) NSString* sha;
 @property(copy) NSString* path;

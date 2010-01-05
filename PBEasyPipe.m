@@ -51,17 +51,33 @@
 						 inDir:(NSString *) dir
 				      retValue:(int *)      ret
 {
-	return [self outputForCommand:cmd withArgs:args inDir:dir inputString:NULL retValue:ret];
+	return [self outputForCommand:cmd withArgs:args inDir:dir byExtendingEnvironment:nil inputString:nil retValue:ret];
 }	
 
-// TODO: Refactor this to use the function above
 + (NSString*) outputForCommand:(NSString *) cmd
 					  withArgs:(NSArray *)  args
 						 inDir:(NSString *) dir
-				   inputString:(NSString *)input
+				   inputString:(NSString *) input
 				      retValue:(int *)      ret
 {
+	return [self outputForCommand:cmd withArgs:args inDir:dir byExtendingEnvironment:nil inputString:input retValue:ret];
+}
+
++ (NSString*) outputForCommand:(NSString *)    cmd
+					  withArgs:(NSArray *)     args
+						 inDir:(NSString *)    dir
+		byExtendingEnvironment:(NSDictionary *)dict
+				   inputString:(NSString *)    input
+					  retValue:(int *)         ret
+{
 	NSTask *task = [self taskForCommand:cmd withArgs:args inDir:dir];
+
+	if (dict) {
+		NSMutableDictionary *env = [[[NSProcessInfo processInfo] environment] mutableCopy];
+		[env addEntriesFromDictionary:dict];
+		task.environment = env;
+	}
+
 	NSFileHandle* handle = [task.standardOutput fileHandleForReading];
 
 	if (input) {

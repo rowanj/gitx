@@ -13,6 +13,7 @@ body {
 	background-color: #ECF3FD;
 	font-size: 100%;
 	position: fixed;
+	z-index: 2;
 	top: 0px;
 	width: 100%;
 }
@@ -60,11 +61,14 @@ table.diff {
 	float: right;
 }
 
-.diff a.stagebutton {
+.diff .hunkbutton {
 	width: 40px;
 	padding: 0 2px 0 2px;
 	margin-bottom: 4px;
-	margin-right: 10px;
+	margin-right: 1px;
+	float: right;
+	position: relative;
+	z-index: 1;
 
 	border: 1px solid #3465a4;
 	background-color: #cce5ff;
@@ -76,6 +80,26 @@ table.diff {
 	text-align: center;
 
 	-webkit-border-radius: 2px;
+}
+#selected {
+    background-color: #B5D5FE !important;
+}
+#selected div {
+    background-color: #B5D5FE;
+}
+
+#selected #stagelines {
+    padding-left: 2px;
+    width: auto;
+    padding-right: 2px;
+    margin-right: 2px;
+    margin-top: 1px;
+    clear: right;
+    background-color: #FFF;
+}
+
+.disabled {
+    display: none;
 }
 
 #multiselect {

@@ -11,7 +11,7 @@
 
 @implementation PBGitRevSpecifier
 
-@synthesize parameters, description;
+@synthesize parameters, description, workingDirectory;
 
 - (id) initWithParameters:(NSArray*) params
 {

@@ -14,6 +14,9 @@
 #define kEnableGravatar @"PBEnableGravatar"
 #define kConfirmPublicGists @"PBConfirmPublicGists"
 #define kPublicGist @"PBGistPublic"
+#define kShowWhitespaceDifferences @"PBShowWhitespaceDifferences"
+#define kOpenCurDirOnLaunch @"PBOpenCurDirOnLaunch"
+#define kShowOpenPanelOnLaunch @"PBShowOpenPanelOnLaunch"
 
 @implementation PBGitDefaults
 
@@ -30,6 +33,12 @@
 			  forKey:kConfirmPublicGists];
 	[defaultValues setObject:[NSNumber numberWithBool:NO]
 			  forKey:kPublicGist];
+	[defaultValues setObject:[NSNumber numberWithBool:YES]
+			  forKey:kShowWhitespaceDifferences];
+	[defaultValues setObject:[NSNumber numberWithBool:YES]
+			  forKey:kOpenCurDirOnLaunch];
+	[defaultValues setObject:[NSNumber numberWithBool:YES]
+			  forKey:kShowOpenPanelOnLaunch];
 	[[NSUserDefaults standardUserDefaults] registerDefaults:defaultValues];
 }
 
@@ -57,4 +66,20 @@
 {
 	return [[NSUserDefaults standardUserDefaults] boolForKey:kPublicGist];
 }
+
++ (BOOL)showWhitespaceDifferences
+{
+	return [[NSUserDefaults standardUserDefaults] boolForKey:kShowWhitespaceDifferences];
+}
+
++ (BOOL)openCurDirOnLaunch
+{
+	return [[NSUserDefaults standardUserDefaults] boolForKey:kOpenCurDirOnLaunch];
+}
+
++ (BOOL)showOpenPanelOnLaunch
+{
+	return [[NSUserDefaults standardUserDefaults] boolForKey:kShowOpenPanelOnLaunch];
+}
+
 @end

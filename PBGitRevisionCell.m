@@ -108,20 +108,14 @@
 	[path stroke];
 }
 
-- (NSMutableDictionary*) attributesForRefLabelSelected: (BOOL) selected isCurrentBranch: (BOOL) curBranch
+- (NSMutableDictionary*) attributesForRefLabelSelected: (BOOL) selected
 {
 	NSMutableDictionary *attributes = [[[NSMutableDictionary alloc] initWithCapacity:2] autorelease];
 	NSMutableParagraphStyle* style = [[[NSParagraphStyle defaultParagraphStyle] mutableCopy] autorelease];
-	NSString *fontName;
-
-	if(curBranch)
-		fontName = @"Helvetica-Bold";
-	else
-		fontName = @"Helvetica";
 	
 	[style setAlignment:NSCenterTextAlignment];
 	[attributes setObject:style forKey:NSParagraphStyleAttributeName];
-	[attributes setObject:[NSFont fontWithName:fontName size:9] forKey:NSFontAttributeName];
+	[attributes setObject:[NSFont fontWithName:@"Helvetica" size:9] forKey:NSFontAttributeName];
 
 	//if (selected)
 	//	[attributes setObject:[NSColor alternateSelectedControlTextColor] forKey:NSForegroundColorAttributeName];
@@ -131,6 +125,11 @@
 
 - (NSColor*) colorForRef: (PBGitRef*) ref
 {
+	BOOL isHEAD = [ref.ref isEqualToString:[[[controller repository] headRef] simpleRef]];
+
+	if (isHEAD)
+		return [NSColor colorWithCalibratedRed: 0Xfc/256.0 green:0Xa6/256.0 blue: 0X4f/256.0 alpha: 1.0];
+
 	NSString* type = [ref type];
 	if ([type isEqualToString:@"head"])
 		return [NSColor colorWithCalibratedRed: 0Xaa/256.0 green:0Xf2/256.0 blue: 0X54/256.0 alpha: 1.0];
@@ -154,7 +153,7 @@
 	lastRect.origin.y = round(lastRect.origin.y) - 0.5;
 	
 	for (PBGitRef *ref in self.objectValue.refs) {
-		NSMutableDictionary* attributes = [self attributesForRefLabelSelected:NO isCurrentBranch:NO];
+		NSMutableDictionary* attributes = [self attributesForRefLabelSelected:NO];
 		NSSize textSize = [[ref shortName] sizeWithAttributes:attributes];
 		
 		NSRect newRect = lastRect;
@@ -174,10 +173,8 @@
 {
 	NSArray *refs = self.objectValue.refs;
 	PBGitRef *ref = [refs objectAtIndex:index];
-	BOOL isCurBranch = [ref.ref isEqualToString:[[[controller repository] headRef] simpleRef]];
 	
-	NSMutableDictionary* attributes = [self attributesForRefLabelSelected:[self isHighlighted]
-														  isCurrentBranch:isCurBranch];
+	NSMutableDictionary* attributes = [self attributesForRefLabelSelected:[self isHighlighted]];
 	NSBezierPath *border = [NSBezierPath bezierPathWithRoundedRect:rect cornerRadius: 2.0];
 	[[self colorForRef:ref] set];
 	[border fill];

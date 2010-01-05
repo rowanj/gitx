@@ -60,7 +60,7 @@
 	if ([op runModal] == NSFileHandlingPanelOKButton)
 	{
 		NSString *path = [op filename];
-		NSInteger terminationStatus;
+		int terminationStatus;
 		NSString *result = [PBEasyPipe outputForCommand:[PBGitBinary path] withArgs:[NSArray arrayWithObjects:@"init", @"-q", nil] inDir:path inputString:nil retValue:&terminationStatus];
 
 		if (terminationStatus == 0)

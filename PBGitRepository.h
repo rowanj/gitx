@@ -13,6 +13,8 @@
 
 extern NSString* PBGitRepositoryErrorDomain;
 
+@class PBGitWindowController;
+
 @interface PBGitRepository : NSDocument {
 	PBGitRevList* revisionList;
 	PBGitConfig *config;
@@ -31,10 +33,15 @@ extern NSString* PBGitRepositoryErrorDomain;
 - (NSString*) outputForCommand:(NSString*) cmd;
 - (NSString *)outputForCommand:(NSString *)str retValue:(int *)ret;
 - (NSString *)outputForArguments:(NSArray *)arguments inputString:(NSString *)input retValue:(int *)ret;
+- (NSString *)outputForArguments:(NSArray *)arguments inputString:(NSString *)input byExtendingEnvironment:(NSDictionary *)dict retValue:(int *)ret;
+
+
 - (NSString*) outputForArguments:(NSArray*) args;
 - (NSString*) outputForArguments:(NSArray*) args retValue:(int *)ret;
 - (NSString *)outputInWorkdirForArguments:(NSArray*) arguments;
 - (NSString *)outputInWorkdirForArguments:(NSArray*) arguments retValue:(int *)ret;
+- (BOOL)executeHook:(NSString *)name output:(NSString **)output;
+- (BOOL)executeHook:(NSString *)name withArgs:(NSArray*) arguments output:(NSString **)output;
 
 - (NSString *)workingDirectory;
 - (NSString *)gitIgnoreFilename;
@@ -47,6 +54,7 @@ extern NSString* PBGitRepositoryErrorDomain;
 
 - (void) readCurrentBranch;
 - (PBGitRevSpecifier*) addBranch: (PBGitRevSpecifier*) rev;
+- (BOOL)removeBranch:(PBGitRevSpecifier *)rev;
 
 - (NSString*) parseSymbolicReference:(NSString*) ref;
 - (NSString*) parseReference:(NSString*) ref;
@@ -58,7 +66,7 @@ extern NSString* PBGitRepositoryErrorDomain;
 - (void) setup;
 
 @property (assign) BOOL hasChanged;
-@property (readonly) NSWindowController *windowController;
+@property (readonly) PBGitWindowController *windowController;
 @property (readonly) PBGitConfig *config;
 @property (retain) PBGitRevList* revisionList;
 @property (assign) NSMutableArray* branches;

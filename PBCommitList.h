@@ -10,9 +10,11 @@
 #import <WebKit/WebView.h>
 #import "PBGitHistoryController.h"
 
+@class PBWebHistoryController;
+
 @interface PBCommitList : NSTableView {
 	IBOutlet WebView* webView;
-	IBOutlet id webController;
+	IBOutlet PBWebHistoryController *webController;
 	IBOutlet PBGitHistoryController *controller;
 
 	NSPoint mouseDownPoint;

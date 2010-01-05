@@ -1,4 +1,7 @@
 var commit;
+
+// Create a new Commit object
+// obj: PBGitCommit object
 var Commit = function(obj) {
 	this.object = obj;
 
@@ -7,12 +10,14 @@ var Commit = function(obj) {
 	this.sha = obj.realSha();
 	this.parents = obj.parents;
 	this.subject = obj.subject;
+	this.notificationID = null;
 
 	// TODO:
 	// this.author_date instant
 
-	// This all needs to be async
-	this.loadedRaw = function(details) {
+	// This can be called later with the output of
+	// 'git show' to fill in missing commit details (such as a diff)
+	this.parseDetails = function(details) {
 		this.raw = details;
 
 		var diffStart = this.raw.indexOf("\ndiff ");
@@ -138,6 +143,7 @@ var selectCommit = function(a) {
 	Controller.selectCommit_(a);
 }
 
+// Relead only refs
 var reload = function() {
 	$("notification").style.display = "none";
 	commit.reloadRefs();
@@ -159,13 +165,15 @@ var showRefs = function() {
 
 var loadCommit = function(commitObject, currentRef) {
 	// These are only the things we can do instantly.
-	// Other information will be loaded later by loadExtendedCommit
-	commit = new Commit(commitObject);
-	Controller.callSelector_onObject_callBack_("details", commitObject,
-		function(data) { commit.loadedRaw(data); loadExtendedCommit(commit); });
-	commit.currentRef = currentRef;
+	// Other information will be loaded later by loadCommitDetails,
+	// Which will be called from the controller once
+	// the commit details are in.
 
-	notify("Loading commit…", 0);
+	if (commit && commit.notificationID)
+		clearTimeout(commit.notificationID);
+
+	commit = new Commit(commitObject);
+	commit.currentRef = currentRef;
 
 	$("commitID").innerHTML = commit.sha;
 	$("authorID").innerHTML = commit.author_name;
@@ -184,6 +192,12 @@ var loadCommit = function(commitObject, currentRef) {
 		}
 	}
 
+	// Scroll to top
+	scroll(0, 0);
+
+	if (!commit.parents)
+		return;
+
 	for (var i = 0; i < commit.parents.length; i++) {
 		var newRow = $("commit_header").insertRow(-1);
 		newRow.innerHTML = "<td class='property_name'>Parent:</td><td>" +
@@ -191,24 +205,53 @@ var loadCommit = function(commitObject, currentRef) {
 			commit.parents[i] + "</a></td>";
 	}
 
-	// Scroll to top
-	scroll(0, 0);
+	commit.notificationID = setTimeout(function() { 
+		if (!commit.fullyLoaded)
+			notify("Loading commit…", 0);
+		commit.notificationID = null;
+	}, 500);
+
 }
 
 var showDiff = function() {
+
+	// Callback for the diff highlighter. Used to generate a filelist
 	var newfile = function(name1, name2, id, mode_change, old_mode, new_mode) {
+		var button = document.createElement("div");
+		var p = document.createElement("p");
+		var link = document.createElement("a");
+		link.setAttribute("href", "#" + id);
+		p.appendChild(link);
+		var buttonType = "";
+		var finalFile = "";
 		if (name1 == name2) {
+			buttonType = "changed"
+			finalFile = name1;
 			if (mode_change)
-				$("files").innerHTML += "<div class='button changed'>mode changed</div><p><a href='#" + id + "'>" + name1 + "</a> mode " + old_mode + " &#8594; " + new_mode + "</p>";
-			else
-				$("files").innerHTML += "<div class='button changed'>changed</div><p><a href='#" + id + "'>" + name1 + "</a></p>";
+				p.appendChild(document.createTextNode(" mode " + old_mode + " -> " + new_mode));
 		}
-		else if (name1 == "/dev/null")
-			$("files").innerHTML += "<div class='button created'>created</div><p><a href='#" + id + "'>" + name2 + "</a></p>";
-		else if (name2 == "/dev/null")
-			$("files").innerHTML += "<div class='button deleted'>deleted</div><p><a href='#" + id + "'>" + name1 + "</a></p>";
-		else
-			$("files").innerHTML += "<div class='button renamed' alt='renamed''>renamed</div><p>" + name1 + " &#8594; <a href='#" + id + "'>" + name2 + "</a></p>";
+		else if (name1 == "/dev/null") {
+			buttonType = "created";
+			finalFile = name2;
+		}
+		else if (name2 == "/dev/null") {
+			buttonType = "deleted";
+			finalFile = name1;
+		}
+		else {
+			buttonType = "renamed";
+			finalFile = name2;
+			p.insertBefore(document.createTextNode(name1 + " -> "), link);
+		}
+
+		link.appendChild(document.createTextNode(finalFile));
+		button.setAttribute("representedFile", finalFile);
+		link.setAttribute("representedFile", finalFile);
+
+		button.setAttribute("class", "button " + buttonType);
+		button.appendChild(document.createTextNode(buttonType));
+		$("files").appendChild(button);
+		$("files").appendChild(p);
 	}
 
 	var binaryDiff = function(filename) {
@@ -244,8 +287,15 @@ var enableFeatures = function()
 	enableFeature("gravatar", $("gravatar"))
 }
 
-var loadExtendedCommit = function(commit)
+var loadCommitDetails = function(data)
 {
+	commit.parseDetails(data);
+
+	if (commit.notificationID)
+		clearTimeout(commit.notificationID)
+	else
+		$("notification").style.display = "none";
+
 	var formatEmail = function(name, email) {
 		return email ? name + " &lt;<a href='mailto:" + email + "'>" + email + "</a>&gt;" : name;
 	}

@@ -42,7 +42,7 @@
 <h3 id="screencasts">Screencasts</h3>
 <div id="episodediv">
 	<div id="video_display">
-		<div id="video"><img src="images/qtime.png" width="568"></div>
+		<div id="video"><img src="images/qtime.png" alt="Screencast" width="568"></div>
 		<div id="video_description"></div>
 	</div>
 	<div id="episodebar">

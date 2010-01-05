@@ -29,6 +29,8 @@
 
 - (void)changeViewController:(NSInteger)whichViewTag;
 - (void)useToolbar:(NSToolbar *)toolbar;
+- (void)showMessageSheet:(NSString *)messageText infoText:(NSString *)infoText;
+- (void)showErrorSheet:(NSError *)error;
 
 - (IBAction) showCommitView:(id)sender;
 - (IBAction) showHistoryView:(id)sender;

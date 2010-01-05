@@ -28,6 +28,11 @@
 		[array addObject:[[PBRefMenuItem alloc] initWithTitle:@"Checkout branch"
 													   action:@selector(checkoutRef:)
 												keyEquivalent: @""]];
+
+    if ([type isEqualToString:@"tag"])
+		[array addObject:[[PBRefMenuItem alloc] initWithTitle:@"View tag info"
+													   action:@selector(tagInfo:)
+												keyEquivalent: @""]];    
 	
 	for (PBRefMenuItem *item in array)
 	{

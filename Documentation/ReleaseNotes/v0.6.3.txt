@@ -1,0 +1,9 @@
+v0.6.3
+===
+
+This is a maintenance release. The following bugs have been fixed:
+
+* Fixed a problem where GitX could not open some directories, for example those that include a . [Johannes Gilger]
+* Fixed a performance issue when staging or unstaging a lot of files
+* Various buildfixes (Benjamin Kramer, Arjen Laarhoven)
+

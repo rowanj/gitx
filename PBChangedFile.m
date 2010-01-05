@@ -11,7 +11,7 @@
 
 @implementation PBChangedFile
 
-@synthesize path, status, hasCachedChanges, hasUnstagedChanges, commitBlobSHA, commitBlobMode, shouldBeDeleted;
+@synthesize path, status, hasStagedChanges, hasUnstagedChanges, commitBlobSHA, commitBlobMode;
 
 - (id) initWithPath:(NSString *)p
 {
@@ -24,6 +24,7 @@
 
 - (NSString *)indexInfo
 {
+	NSAssert(status == NEW || self.commitBlobSHA, @"File is not new, but doesn't have an index entry!");
 	if (!self.commitBlobSHA)
 		return [NSString stringWithFormat:@"0 0000000000000000000000000000000000000000\t%@\0", self.path];
 	else

@@ -9,14 +9,14 @@
 	<key>CFBundleDocumentTypes</key>
 	<array>
 		<dict>
-			<key>CFBundleTypeExtensions</key>
+			<key>CFBundleTypeName</key>
+			<string>Folder</string>
+			<key>CFBundleTypeOSTypes</key>
 			<array>
-				<string>*</string>
+				<string>fold</string>
 			</array>
 			<key>CFBundleTypeRole</key>
-			<string>None</string>
-			<key>CFBundleTypeName</key>
-			<string>Standard folder</string>
+			<string>Viewer</string>
 		</dict>
 		<dict>
 			<key>CFBundleTypeExtensions</key>
@@ -50,6 +50,8 @@
 	<string>????</string>
 	<key>CFBundleVersion</key>
 	<string>LONG_VERSION</string>
+	<key>CFBundleGitVersion</key>
+	<string>GIT_VERSION</string>
 	<key>CFBundleShortVersionString</key>
 	<string>SHORT_VERSION</string>
 	<key>NSMainNibFile</key>

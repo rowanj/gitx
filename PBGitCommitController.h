@@ -9,40 +9,29 @@
 #import <Cocoa/Cocoa.h>
 #import "PBViewController.h"
 
-@class PBIconAndTextCell;
+@class PBGitIndexController, PBIconAndTextCell, PBWebChangesController, PBGitIndex;
 
 @interface PBGitCommitController : PBViewController {
-	NSMutableArray *files;
+	// This might have to transfer over to the PBGitRepository
+	// object sometime
+	PBGitIndex *index;
 	
 	IBOutlet NSTextView *commitMessageView;
 	IBOutlet NSArrayController *unstagedFilesController;
 	IBOutlet NSArrayController *cachedFilesController;
 
-	IBOutlet id indexController;
-	IBOutlet id webController;
+	IBOutlet PBGitIndexController *indexController;
+	IBOutlet PBWebChangesController *webController;
 
 	NSString *status;
-
-	// We use busy as a count of active processes. 
-	// You can increase it when your process start
-	// And decrease it after you have finished.
-	int busy;
-	BOOL amend;
-
+	BOOL busy;
 }
 
-@property (retain) NSMutableArray *files;
-@property (copy) NSString *status;
-@property (assign) int busy;
-@property (assign) BOOL amend;
-
-- (void) readCachedFiles:(NSNotification *)notification;
-- (void) readOtherFiles:(NSNotification *)notification;
-- (void) readUnstagedFiles:(NSNotification *)notification;
-- (void) stageHunk: (NSString *)hunk reverse:(BOOL)reverse;
-
-- (NSString *)parentTree;
+@property(copy) NSString *status;
+@property(readonly) PBGitIndex *index;
+@property(assign) BOOL busy;
 
 - (IBAction) refresh:(id) sender;
 - (IBAction) commit:(id) sender;
+- (IBAction)signOff:(id)sender;
 @end

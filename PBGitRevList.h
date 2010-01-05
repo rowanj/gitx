@@ -8,14 +8,15 @@
 
 #import <Cocoa/Cocoa.h>
 
+@class PBGitRepository;
 
 @interface PBGitRevList : NSObject {
 	NSArray* commits;
-	id repository;
+	PBGitRepository *repository;
 	NSString* lastSha;
 }
 
-- initWithRepository:(id)repo;
+- initWithRepository:(PBGitRepository *)repo;
 - (void) readCommitsForce: (BOOL) force;
 - (void) reload;
 

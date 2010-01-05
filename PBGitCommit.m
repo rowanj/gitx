@@ -7,7 +7,7 @@
 //
 
 #import "PBGitCommit.h"
-
+#import "PBGitDefaults.h"
 
 @implementation PBGitCommit
 
@@ -66,16 +66,10 @@
 	return str;
 }
 
-// NOTE: This method should remain threadsafe, as we load it in async
-// from the web view.
+// FIXME: Remove this method once it's unused.
 - (NSString*) details
 {
-	if (details != nil)
-		return details;
-
-	details = [self.repository outputForArguments:[NSArray arrayWithObjects:@"show", @"--pretty=raw", @"-M", [self realSha], nil]];
-	
-	return details;
+	return @"";
 }
 
 - (NSString *) patch

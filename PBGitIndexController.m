@@ -9,17 +9,18 @@
 #import "PBGitIndexController.h"
 #import "PBChangedFile.h"
 #import "PBGitRepository.h"
+#import "PBGitIndex.h"
 
 #define FileChangesTableViewType @"GitFileChangedType"
 
-@implementation PBGitIndexController
+@interface PBGitIndexController ()
+- (void)discardChangesForFiles:(NSArray *)files force:(BOOL)force;
+@end
 
-@synthesize contextSize;
+@implementation PBGitIndexController
 
 - (void)awakeFromNib
 {
-	contextSize = 3;
-
 	[unstagedTable setDoubleAction:@selector(tableClicked:)];
 	[stagedTable setDoubleAction:@selector(tableClicked:)];
 
@@ -28,60 +29,10 @@
 
 	[unstagedTable registerForDraggedTypes: [NSArray arrayWithObject:FileChangesTableViewType]];
 	[stagedTable registerForDraggedTypes: [NSArray arrayWithObject:FileChangesTableViewType]];
-
 }
 
-- (void) stageFiles:(NSArray *)files
-{
-	NSMutableString *input = [NSMutableString string];
-
-	for (PBChangedFile *file in files) {
-		[input appendFormat:@"%@\0", file.path];
-	}
-
-	int ret = 1;
-	[commitController.repository outputForArguments:[NSArray arrayWithObjects:@"update-index", @"--add", @"--remove", @"-z", @"--stdin", nil]
-	 inputString:input retValue:&ret];
-
-	if (ret)
-	{
-		NSLog(@"Error when updating index. Retvalue: %i", ret);
-		return;
-	}
-
-	for (PBChangedFile *file in files)
-	{
-		file.hasUnstagedChanges = NO;
-		file.hasCachedChanges = YES;
-	}
-}
-
-- (void) unstageFiles:(NSArray *)files
-{
-	NSMutableString *input = [NSMutableString string];
-	
-	for (PBChangedFile *file in files) {
-		[input appendString:[file indexInfo]];
-	}
-
-	int ret = 1;
-	[commitController.repository outputForArguments:[NSArray arrayWithObjects:@"update-index", @"-z", @"--index-info", nil]
-	 inputString:input retValue:&ret];
-	
-	if (ret)
-	{
-		NSLog(@"Error when updating index. Retvalue: %i", ret);
-		return;
-	}
-	
-	for (PBChangedFile *file in files)
-	{
-		file.hasUnstagedChanges = YES;
-		file.hasCachedChanges = NO;
-	}
-}
-
-- (void) ignoreFiles:(NSArray *)files
+// FIXME: Find a proper place for this method -- this is not it.
+- (void)ignoreFiles:(NSArray *)files
 {
 	// Build output string
 	NSMutableArray *fileList = [NSMutableArray array];
@@ -95,7 +46,7 @@
 	// Write to the file
 	NSString *gitIgnoreName = [commitController.repository gitIgnoreFilename];
 
-	NSStringEncoding enc;
+	NSStringEncoding enc = NSUTF8StringEncoding;
 	NSError *error = nil;
 	NSMutableString *ignoreFile;
 
@@ -104,7 +55,7 @@
 	} else {
 		ignoreFile = [NSMutableString stringWithContentsOfFile:gitIgnoreName usedEncoding:&enc error:&error];
 		if (error) {
-			[[NSAlert alertWithError:error] runModal];
+			[[commitController.repository windowController] showErrorSheet:error];
 			return;
 		}
 		// Add a newline if not yet present
@@ -115,72 +66,8 @@
 
 	[ignoreFile writeToFile:gitIgnoreName atomically:YES encoding:enc error:&error];
 	if (error)
-		[[NSAlert alertWithError:error] runModal];
+		[[commitController.repository windowController] showErrorSheet:error];
 }
-
-# pragma mark Displaying diffs
-
-- (NSString *) stagedChangesForFile:(PBChangedFile *)file
-{
-	NSString *indexPath = [@":0:" stringByAppendingString:file.path];
-
-	if (file.status == NEW)
-		return [commitController.repository outputForArguments:[NSArray arrayWithObjects:@"show", indexPath, nil]];
-
-	return [commitController.repository outputInWorkdirForArguments:[NSArray arrayWithObjects:@"diff-index", [self contextParameter], @"--cached", [commitController parentTree], @"--", file.path, nil]];
-}
-
-- (NSString *)unstagedChangesForFile:(PBChangedFile *)file
-{
-	if (file.status == NEW) {
-		NSStringEncoding encoding;
-		NSError *error = nil;
-		NSString *path = [[commitController.repository workingDirectory] stringByAppendingPathComponent:file.path];
-		NSString *contents = [NSString stringWithContentsOfFile:path
-												   usedEncoding:&encoding
-														  error:&error];
-		if (error)
-			return nil;
-
-		return contents;
-	}
-
-	return [commitController.repository outputInWorkdirForArguments:[NSArray arrayWithObjects:@"diff-files", [self contextParameter], @"--", file.path, nil]];
-}
-
-- (void) forceRevertChangesForFiles:(NSArray *)files
-{
-	NSArray *paths = [files valueForKey:@"path"];
-	NSString *input = [paths componentsJoinedByString:@"\0"];
-
-	NSArray *arguments = [NSArray arrayWithObjects:@"checkout-index", @"--index", @"--quiet", @"--force", @"-z", @"--stdin", nil];
-	int ret = 1;
-	[commitController.repository outputForArguments:arguments inputString:input retValue:&ret];
-	if (ret) {
-		[[NSAlert alertWithMessageText:@"Reverting changes failed"
-						 defaultButton:nil
-					   alternateButton:nil
-						   otherButton:nil
-			 informativeTextWithFormat:@"Reverting changes failed with error code %i", ret] runModal];
-		return;
-	}
-
-	for (PBChangedFile *file in files)
-		file.hasUnstagedChanges = NO;
-}
-
-- (void) revertChangesForFiles:(NSArray *)files
-{
-	int ret = [[NSAlert alertWithMessageText:@"Revert changes"
-					 defaultButton:nil
-				   alternateButton:@"Cancel"
-					   otherButton:nil
-		 informativeTextWithFormat:@"Are you sure you wish to revert changes?\n\n You cannot undo this operation."] runModal];
-
-	if (ret == NSAlertDefaultReturn)
-		[self forceRevertChangesForFiles:files];
-}
-
 
 # pragma mark Context Menu methods
 - (BOOL) allSelectedCanBeIgnored:(NSArray *)selectedFiles
@@ -228,35 +115,42 @@
 		[menu addItem:ignoreItem];
 	}
 
+	if ([selectedFiles count] == 1) {
+		NSMenuItem *showInFinderItem = [[NSMenuItem alloc] initWithTitle:@"Show in Finder" action:@selector(showInFinderAction:) keyEquivalent:@""];
+		[showInFinderItem setTarget:self];
+		[showInFinderItem setRepresentedObject:selectedFiles];
+		[menu addItem:showInFinderItem];
+    }
+
 	for (PBChangedFile *file in selectedFiles)
 		if (!file.hasUnstagedChanges)
 			return menu;
 
-	NSMenuItem *revertItem = [[NSMenuItem alloc] initWithTitle:@"Revert Changes…" action:@selector(revertFilesAction:) keyEquivalent:@""];
-	[revertItem setTarget:self];
-	[revertItem setAlternate:NO];
-	[revertItem setRepresentedObject:selectedFiles];
+	NSMenuItem *discardItem = [[NSMenuItem alloc] initWithTitle:@"Discard changes…" action:@selector(discardFilesAction:) keyEquivalent:@""];
+	[discardItem setTarget:self];
+	[discardItem setAlternate:NO];
+	[discardItem setRepresentedObject:selectedFiles];
 
-	[menu addItem:revertItem];
+	[menu addItem:discardItem];
 
-	NSMenuItem *revertForceItem = [[NSMenuItem alloc] initWithTitle:@"Revert Changes" action:@selector(forceRevertFilesAction:) keyEquivalent:@""];
-	[revertForceItem setTarget:self];
-	[revertForceItem setAlternate:YES];
-	[revertForceItem setRepresentedObject:selectedFiles];
-	[revertForceItem setKeyEquivalentModifierMask:NSAlternateKeyMask];
-	[menu addItem:revertForceItem];
+	NSMenuItem *discardForceItem = [[NSMenuItem alloc] initWithTitle:@"Discard changes" action:@selector(forceDiscardFilesAction:) keyEquivalent:@""];
+	[discardForceItem setTarget:self];
+	[discardForceItem setAlternate:YES];
+	[discardForceItem setRepresentedObject:selectedFiles];
+	[discardForceItem setKeyEquivalentModifierMask:NSAlternateKeyMask];
+	[menu addItem:discardForceItem];
 	
 	return menu;
 }
 
 - (void) stageFilesAction:(id) sender
 {
-	[self stageFiles:[sender representedObject]];
+	[commitController.index stageFiles:[sender representedObject]];
 }
 
 - (void) unstageFilesAction:(id) sender
 {
-	[self unstageFiles:[sender representedObject]];
+	[commitController.index unstageFiles:[sender representedObject]];
 }
 
 - (void) openFilesAction:(id) sender
@@ -270,29 +164,55 @@
 - (void) ignoreFilesAction:(id) sender
 {
 	NSArray *selectedFiles = [sender representedObject];
-	if ([selectedFiles count] > 0) {
-		[self ignoreFiles:selectedFiles];
+	if ([selectedFiles count] == 0)
+		return;
+
+	[self ignoreFiles:selectedFiles];
+	[commitController.index refresh];
+}
+
+- (void)discardFilesAction:(id) sender
+{
+	NSArray *selectedFiles = [sender representedObject];
+	if ([selectedFiles count] > 0)
+		[self discardChangesForFiles:selectedFiles force:FALSE];
+}
+
+- (void)forceDiscardFilesAction:(id) sender
+{
+	NSArray *selectedFiles = [sender representedObject];
+	if ([selectedFiles count] > 0)
+		[self discardChangesForFiles:selectedFiles force:TRUE];
+}
+
+- (void) showInFinderAction:(id) sender
+{
+	NSArray *selectedFiles = [sender representedObject];
+	if ([selectedFiles count] == 0)
+		return;
+	NSString *workingDirectory = [[commitController.repository workingDirectory] stringByAppendingString:@"/"];
+	NSString *path = [workingDirectory stringByAppendingPathComponent:[[selectedFiles objectAtIndex:0] path]];
+	NSWorkspace *ws = [NSWorkspace sharedWorkspace];
+	[ws selectFile: path inFileViewerRootedAtPath:nil];
+}
+
+- (void)discardChangesForFiles:(NSArray *)files force:(BOOL)force
+{
+	if (!force) {
+		int ret = [[NSAlert alertWithMessageText:@"Discard changes"
+								   defaultButton:nil
+								 alternateButton:@"Cancel"
+									 otherButton:nil
+					   informativeTextWithFormat:@"Are you sure you wish to discard the changes to this file?\n\nYou cannot undo this operation."] runModal];
+		if (ret != NSAlertDefaultReturn)
+			return;
 	}
-	[commitController refresh:NULL];
+	
+	[commitController.index discardChangesForFiles:files];
 }
-
-- (void) revertFilesAction:(id) sender
-{
-	NSArray *selectedFiles = [sender representedObject];
-	if ([selectedFiles count] > 0)
-		[self revertChangesForFiles:selectedFiles];
-}
-
-- (void) forceRevertFilesAction:(id) sender
-{
-	NSArray *selectedFiles = [sender representedObject];
-	if ([selectedFiles count] > 0)
-		[self forceRevertChangesForFiles:selectedFiles];
-}
-
 
 # pragma mark TableView icon delegate
-- (void)tableView:(NSTableView*)tableView willDisplayCell:(id)cell forTableColumn:(NSTableColumn*)tableColumn row:(int)rowIndex
+- (void)tableView:(NSTableView*)tableView willDisplayCell:(id)cell forTableColumn:(NSTableColumn*)tableColumn row:(NSInteger)rowIndex
 {
 	id controller = [tableView tag] == 0 ? unstagedFilesController : stagedFilesController;
 	[[tableColumn dataCell] setImage:[[[controller arrangedObjects] objectAtIndex:rowIndex] icon]];
@@ -305,9 +225,9 @@
 	NSIndexSet *selectionIndexes = [tableView selectedRowIndexes];
 	NSArray *files = [[controller arrangedObjects] objectsAtIndexes:selectionIndexes];
 	if ([tableView tag] == 0)
-		[self stageFiles:files];
+		[commitController.index stageFiles:files];
 	else
-		[self unstageFiles:files];
+		[commitController.index unstageFiles:files];
 }
 
 - (void) rowClicked:(NSCell *)sender
@@ -344,7 +264,7 @@ writeRowsWithIndexes:(NSIndexSet *)rowIndexes
 
 - (NSDragOperation)tableView:(NSTableView*)tableView
 				validateDrop:(id <NSDraggingInfo>)info
-				 proposedRow:(int)row
+				 proposedRow:(NSInteger)row
 	   proposedDropOperation:(NSTableViewDropOperation)operation
 {
 	if ([info draggingSource] == tableView)
@@ -356,7 +276,7 @@ writeRowsWithIndexes:(NSIndexSet *)rowIndexes
 
 - (BOOL)tableView:(NSTableView *)aTableView
 	   acceptDrop:(id <NSDraggingInfo>)info
-			  row:(int)row
+			  row:(NSInteger)row
 	dropOperation:(NSTableViewDropOperation)operation
 {
     NSPasteboard* pboard = [info draggingPasteboard];
@@ -367,23 +287,11 @@ writeRowsWithIndexes:(NSIndexSet *)rowIndexes
 	NSArray *files = [[controller arrangedObjects] objectsAtIndexes:rowIndexes];
 
 	if ([aTableView tag] == 0)
-		[self unstageFiles:files];
+		[commitController.index unstageFiles:files];
 	else
-		[self stageFiles:files];
+		[commitController.index stageFiles:files];
 
 	return YES;
-}
-
-- (NSString *) contextParameter
-{
-	return [[NSString alloc] initWithFormat:@"-U%i", contextSize];
-}
-
-# pragma mark WebKit Accessibility
-
-+ (BOOL)isSelectorExcludedFromWebScript:(SEL)aSelector
-{
-	return NO;
 }
 
 @end

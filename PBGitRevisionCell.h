@@ -13,7 +13,7 @@
 #import "PBRefContextDelegate.h"
 
 @interface PBGitRevisionCell : NSActionCell {
-	id objectValue;
+	PBGitCommit *objectValue;
 	PBGraphCellInfo *cellInfo;
 	NSTextFieldCell *textCell;
 	IBOutlet PBGitHistoryController *controller;

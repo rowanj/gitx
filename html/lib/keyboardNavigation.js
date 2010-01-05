@@ -17,10 +17,10 @@ var handleKeys = function(event) {
 		return changeFile(true);
 	else if (event.keyCode == 38 && event.ctrlKey == true) // ctrl-up_arrow
 		return changeFile(false);
-	else if (event.keyCode == 86) {// 'v'
-		showDiffs();
-		return false;
-	}
+	else if (event.keyCode == 86) // 'v'
+		showDiff();
+	else if (event.keyCode == 67) // 'c'
+		Controller.copySource();
 	return true;
 }
 
@@ -29,12 +29,8 @@ var handleKeyFromCocoa = function(key) {
 		changeHunk(true);
 	else if (key == 'k')
 		changeHunk(false);
-	else if (event.keyCode == 40 && event.ctrlKey == true) // ctrl-down_arrow
-		changeFile(true);
-	else if (event.keyCode == 38 && event.ctrlKey == true) // ctrl-up_arrow
-		changeFile(false);
 	else if (key == 'v')
-		showDiffs();
+		showDiff();
 	else if (key == 'c')
 		Controller.copySource();
 }

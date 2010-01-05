@@ -16,13 +16,14 @@
 #include <ext/stdio_filebuf.h>
 #include <iostream>
 #include <string>
+#include <map>
 
 using namespace std;
 
 @implementation PBGitRevList
 
 @synthesize commits;
-- initWithRepository: (id) repo
+- (id)initWithRepository:(PBGitRepository *)repo
 {
 	repository = repo;
 	[repository addObserver:self forKeyPath:@"currentBranch" options:0 context:nil];
@@ -71,24 +72,23 @@ using namespace std;
 	NSDate *start = [NSDate date];
 	NSMutableArray* revisions = [NSMutableArray array];
 	PBGitGrapher* g = [[PBGitGrapher alloc] initWithRepository: repository];
+	std::map<string, NSStringEncoding> encodingMap;
 
-	NSMutableArray* arguments;
+	NSString *formatString = @"--pretty=format:%H\01%e\01%an\01%s\01%P\01%at";
 	BOOL showSign = [rev hasLeftRight];
 
 	if (showSign)
-		arguments = [NSMutableArray arrayWithObjects:@"log", @"-z", @"--early-output", @"--topo-order", @"--pretty=format:%H\01%an\01%s\01%P\01%at\01%m", nil];
-	else
-		arguments = [NSMutableArray arrayWithObjects:@"log", @"-z", @"--early-output", @"--topo-order", @"--pretty=format:%H\01%an\01%s\01%P\01%at", nil];
+		formatString = [formatString stringByAppendingString:@"\01%m"];
+	
+	NSMutableArray *arguments = [NSMutableArray arrayWithObjects:@"log", @"-z", @"--early-output", @"--topo-order", @"--children", formatString, nil];
 
 	if (!rev)
 		[arguments addObject:@"HEAD"];
 	else
 		[arguments addObjectsFromArray:[rev parameters]];
 
-	if ([rev hasPathLimiter])
-		[arguments insertObject:@"--children" atIndex:1];
-
-	NSTask *task = [PBEasyPipe taskForCommand:[PBGitBinary path] withArgs:arguments inDir:[repository fileURL].path];
+	NSString *directory = rev.workingDirectory ? rev.workingDirectory.path : repository.fileURL.path;
+	NSTask *task = [PBEasyPipe taskForCommand:[PBGitBinary path] withArgs:arguments inDir:directory];
 	[task launch];
 	NSFileHandle* handle = [task.standardOutput fileHandleForReading];
 	
@@ -111,11 +111,28 @@ using namespace std;
 			[self performSelectorOnMainThread:@selector(setCommits:) withObject:revisions waitUntilDone:NO];
 			g = [[PBGitGrapher alloc] initWithRepository: repository];
 			revisions = [NSMutableArray array];
-			
+
+			// If the length is < 40, then there are no commits.. quit now
+			if (sha.length() < 40)
+				break;
+
 			sha = sha.substr(sha.length() - 40, 40);
 		}
 
 		// From now on, 1.2 seconds
+		string encoding_str;
+		getline(stream, encoding_str, '\1');
+		NSStringEncoding encoding = NSUTF8StringEncoding;
+		if (encoding_str.length())
+		{
+			if (encodingMap.find(encoding_str) != encodingMap.end()) {
+				encoding = encodingMap[encoding_str];
+			} else {
+				encoding = CFStringConvertEncodingToNSStringEncoding(CFStringConvertIANACharSetNameToEncoding((CFStringRef)[NSString stringWithUTF8String:encoding_str.c_str()]));
+				encodingMap[encoding_str] = encoding;
+			}
+		}
+
 		git_oid oid;
 		git_oid_mkstr(&oid, sha.c_str());
 		PBGitCommit* newCommit = [[PBGitCommit alloc] initWithRepository:repository andSha:oid];
@@ -148,8 +165,8 @@ using namespace std;
 		stream >> time;
 
 		
-		[newCommit setSubject:[NSString stringWithUTF8String:subject.c_str()]];
-		[newCommit setAuthor:[NSString stringWithUTF8String:author.c_str()]];
+		[newCommit setSubject:[NSString stringWithCString:subject.c_str() encoding:encoding]];
+		[newCommit setAuthor:[NSString stringWithCString:author.c_str() encoding:encoding]];
 		[newCommit setTimestamp:time];
 		
 		if (showSign)

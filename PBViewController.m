@@ -40,4 +40,9 @@
 - (void) updateView
 {
 }
+
+- (NSResponder *)firstResponder;
+{
+	return nil;
+}
 @end

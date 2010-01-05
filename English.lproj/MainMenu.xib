@@ -886,8 +886,8 @@
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
-						<string key="label">orderFrontStandardAboutPanel:</string>
-						<reference key="source" ref="519751875"/>
+						<string key="label">showAboutPanel:</string>
+						<reference key="source" ref="859235683"/>
 						<reference key="destination" ref="1039244063"/>
 					</object>
 					<int key="connectionID">142</int>
@@ -2278,11 +2278,13 @@
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>installCliTool:</string>
 							<string>openPreferencesWindow:</string>
+							<string>showAboutPanel:</string>
 							<string>saveAction:</string>
 							<string>showHelp:</string>
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>id</string>
 							<string>id</string>
 							<string>id</string>
 							<string>id</string>

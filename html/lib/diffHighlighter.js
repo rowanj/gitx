@@ -117,7 +117,7 @@ var highlightDiff = function(diff, element, callbacks) {
 		startname = "";
 		endname = "";
 	}
-	for (var lineno = 0; lineno < lines.length; lineno++) {
+	for (var lineno = 0, lindex = 0; lineno < lines.length; lineno++) {
 		var l = lines[lineno];
 
 		var firstChar = l.charAt(0);
@@ -205,6 +205,7 @@ var highlightDiff = function(diff, element, callbacks) {
 				continue;
 		}
 
+		sindex = "index=" + lindex.toString() + " ";
 		if (firstChar == "+") {
 			// Highlight trailing whitespace
 			if (m = l.match(/\s+$/))
@@ -212,11 +213,11 @@ var highlightDiff = function(diff, element, callbacks) {
 
 			line1 += "\n";
 			line2 += ++hunk_start_line_2 + "\n";
-			diffContent += "<div class='addline'>" + l + "</div>";
+			diffContent += "<div " + sindex + "class='addline'>" + l + "</div>";
 		} else if (firstChar == "-") {
 			line1 += ++hunk_start_line_1 + "\n";
 			line2 += "\n";
-			diffContent += "<div class='delline'>" + l + "</div>";
+			diffContent += "<div " + sindex + "class='delline'>" + l + "</div>";
 		} else if (firstChar == "@") {
 			if (header) {
 				header = false;
@@ -229,12 +230,13 @@ var highlightDiff = function(diff, element, callbacks) {
 			}
 			line1 += "...\n";
 			line2 += "...\n";
-			diffContent += "<div class='hunkheader'>" + l + "</div>";
+			diffContent += "<div " + sindex + "class='hunkheader'>" + l + "</div>";
 		} else if (firstChar == " ") {
 			line1 += ++hunk_start_line_1 + "\n";
 			line2 += ++hunk_start_line_2 + "\n";
-			diffContent += "<div class='noopline'>" + l + "</div>";
+			diffContent += "<div " + sindex + "class='noopline'>" + l + "</div>";
 		}
+		lindex++;
 	}
 
 	finishContent();

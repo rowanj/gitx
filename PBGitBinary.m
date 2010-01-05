@@ -37,7 +37,7 @@ static NSString* gitPath = nil;
 	if (!version)
 		return NO;
 
-	int c = [version compare:@"1.5.4"];
+	int c = [version compare:@"" MIN_GIT_VERSION];
 	if (c == NSOrderedSame || c == NSOrderedDescending) {
 		gitPath = path;
 		return YES;
@@ -60,13 +60,13 @@ static NSString* gitPath = nil;
 					  alternateButton:nil
 						  otherButton:nil
 			informativeTextWithFormat:@"You entered a custom git path in the Preferences pane, "
-		 "but this path is not a valid git v1.5.4 or higher binary. We're going to use the default "
+		 "but this path is not a valid git v" MIN_GIT_VERSION " or higher binary. We're going to use the default "
 		 "search paths instead"] runModal];
 	}
 
 	// Try to find the path of the Git binary
 	char* path = getenv("GIT_PATH");
-	if (path && [self acceptBinary:[NSString stringWithCString:path]])
+	if (path && [self acceptBinary:[NSString stringWithUTF8String:path]])
 		return;
 
 	// No explicit path. Try it with "which"
@@ -80,7 +80,7 @@ static NSString* gitPath = nil;
 			return;
 	}
 
-	NSLog(@"Could not find a git binary higher than version 1.5.4.");
+	NSLog(@"Could not find a git binary higher than version " MIN_GIT_VERSION);
 }
 
 + (NSString *) path;
@@ -109,7 +109,7 @@ static NSMutableArray *locations = nil;
 + (NSString *) notFoundError
 {
 	NSMutableString *error = [NSMutableString stringWithString:
-							  @"Could not find a git binary version 1.5.4 or higher.\n"
+							  @"Could not find a git binary version " MIN_GIT_VERSION " or higher.\n"
 							  "Please make sure there is a git binary in one of the following locations:\n\n"];
 	for (NSString *location in [PBGitBinary searchLocations]) {
 		[error appendFormat:@"\t%@\n", location];

@@ -63,25 +63,89 @@
 	return NO;
 }
 
+- (BOOL)hasBinaryHeader:(NSString*)contents
+{
+	if(!contents)
+		return NO;
+
+	return [contents rangeOfString:@"\0" options:0 range:NSMakeRange(0, ([contents length] >= 8000) ? 7999 : [contents length])].location != NSNotFound;
+}
+
+- (BOOL)hasBinaryAttributes
+{
+	// First ask git check-attr if the file has a binary attribute custom set
+	NSFileHandle *handle = [repository handleInWorkDirForArguments:[NSArray arrayWithObjects:@"check-attr", @"binary", [self fullPath], nil]];
+	NSData *data = [handle readDataToEndOfFile];
+	NSString *string = [[NSString alloc] initWithData:data encoding:NSISOLatin1StringEncoding];
+
+	if (!string)
+		return NO;
+	string = [string stringByTrimmingCharactersInSet:[NSCharacterSet newlineCharacterSet]];
+
+	if ([string hasSuffix:@"binary: set"])
+		return YES;
+
+	if ([string hasSuffix:@"binary: unset"])
+		return NO;
+
+	// Binary state unknown, do a check on common filename-extensions
+	for (NSString *extension in [NSArray arrayWithObjects:@".pdf", @".jpg", @".jpeg", @".png", @".bmp", @".gif", @".o", nil]) {
+		if ([[self fullPath] hasSuffix:extension])
+			return YES;
+	}
+
+	return NO;
+}
+
 - (NSString*) contents
 {
 	if (!leaf)
-		return [NSString stringWithFormat:@"This is a tree with path %@", self];
+		return [NSString stringWithFormat:@"This is a tree with path %@", [self fullPath]];
 
-	NSData* data = nil;
-	
-	if ([self isLocallyCached])
-		data = [NSData dataWithContentsOfFile: localFileName];
-	else {
-		NSFileHandle* handle = [repository handleForArguments:[NSArray arrayWithObjects:@"show", [self refSpec], nil]];
-		data = [handle readDataToEndOfFile];
+	if ([self isLocallyCached]) {
+		NSData *data = [NSData dataWithContentsOfFile:localFileName];
+		NSString *string = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+		if (!string)
+			string = [[NSString alloc] initWithData:data encoding:NSISOLatin1StringEncoding];
+		return string;
 	}
 	
-	NSString* string = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-	if (!string) {
-		string = [[NSString alloc] initWithData:data encoding:NSISOLatin1StringEncoding];
-	}
-	return string;
+	return [repository outputForArguments:[NSArray arrayWithObjects:@"show", [self refSpec], nil]];
+}
+
+- (long long)fileSize
+{
+	if (_fileSize)
+		return _fileSize;
+
+	NSFileHandle *handle = [repository handleForArguments:[NSArray arrayWithObjects:@"cat-file", @"-s", [self refSpec], nil]];
+	NSString *sizeString = [[NSString alloc] initWithData:[handle readDataToEndOfFile] encoding:NSISOLatin1StringEncoding];
+
+	if (!sizeString)
+		_fileSize = -1;
+	else
+		_fileSize = [sizeString longLongValue];
+
+	return _fileSize;
+}
+
+- (NSString *)textContents
+{
+	if (!leaf)
+		return [NSString stringWithFormat:@"This is a tree with path %@", [self fullPath]];
+
+	if ([self hasBinaryAttributes])
+		return [NSString stringWithFormat:@"%@ appears to be a binary file of %d bytes", [self fullPath], [self fileSize]];
+
+	if ([self fileSize] > 52428800) // ~50MB
+		return [NSString stringWithFormat:@"%@ is too big to be displayed (%d bytes)", [self fullPath], [self fileSize]];
+
+	NSString* contents = [self contents];
+
+	if ([self hasBinaryHeader:contents])
+		return [NSString stringWithFormat:@"%@ appears to be a binary file of %d bytes", [self fullPath], [self fileSize]];
+
+	return contents;
 }
 
 - (void) saveToFolder: (NSString *) dir

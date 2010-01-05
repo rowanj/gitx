@@ -28,6 +28,7 @@
 - (NSManagedObjectContext *)managedObjectContext;
 
 - (IBAction)openPreferencesWindow:(id)sender;
+- (IBAction)showAboutPanel:(id)sender;
 
 - (IBAction)installCliTool:(id)sender;
 

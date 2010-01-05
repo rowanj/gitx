@@ -1,0 +1,195 @@
+<html>
+	<head>
+		
+		<link rel="stylesheet" href="css/GitX.css" type="text/css" media="screen" title="no title" charset="utf-8">
+		<link rel="stylesheet" href="css/diff.css" type="text/css" media="screen" title="no title" charset="utf-8">
+		<script src="lib/GitX.js" type="text/javascript" charset="utf-8"></script>
+		<script src="lib/diffHighlighter.js" type="text/javascript" charset="utf-8"></script>
+		
+		<style type="text/css" media="screen">
+			#lijstmetdingen {
+				font-size: 50%;
+			}
+			.line {
+			}
+			#selected {
+				background-color: #B5D5FE !important;
+				-webkit-border-radius: 3px;
+				-webkit-box-sizing: border-box;
+				width: 100%;
+/*				border: 1px solid red;*/
+				padding-left: 3px !important;
+				padding-right: 3px !important;
+/*				margin-left: -3px !important;
+				margin-right: -3px !important;
+*/			}
+			
+			#selected div {
+				background-color: #B5D5FE;
+			}
+
+			#stageButton {
+				float: right;
+
+				display: block;
+				height: 12px;
+				padding: 4px;
+				-webkit-border-radius: 4px;
+				background-color: white !important;
+				border: 1px solid blue;
+				margin-top: 4px;
+				z-index: -100;
+			}
+			
+		</style>
+
+		<script type="text/javascript" charset="utf-8">
+			var nodeIndex = function(list, element)
+			{
+				for (i = 0; i < list.childNodes.length; ++i)
+					if (list.childNodes[i] == element)
+						return i;
+				return -1
+			}
+
+			var deselect = function()
+			{
+				var selection = document.getElementById("selected");
+				if (selection) {
+					while (selection.childNodes[1])
+						selection.parentNode.insertBefore(selection.childNodes[1], selection);
+					selection.parentNode.removeChild(selection);
+				}
+			}
+
+			var showSelection = function(list, from, to)
+			{
+				deselect();
+				var startIndex = nodeIndex(list, from);
+				var endIndex = nodeIndex(list, to);
+				
+				if (startIndex == -1 || endIndex == -1)
+					return;
+
+				if (startIndex > endIndex)
+				{
+					var tmp = endIndex;
+					endIndex = startIndex;
+					startIndex = tmp;
+					tmp = to;
+					to = from;
+					from = tmp;
+				}
+
+				// new Array().slice() doesn't work with elementnodes :(
+				// So we create an array ourselves
+				var elementList = [];
+				for (i = startIndex; i <= endIndex; ++i)
+					elementList.push(from.parentNode.childNodes[i]);
+
+				var selection = document.createElement("div");
+				selection.setAttribute("id", "selected");
+				var button = document.createElement("div");
+				button.setAttribute("id", "stageButton");
+				button.appendChild(document.createTextNode("Stage lines"));
+				button.onmousedown = function() {
+					while (selection.firstChild)
+						selection.removeChild(selection.firstChild);
+					return false;
+				}
+				selection.appendChild(button);
+				list.insertBefore(selection, from);
+
+				var element;
+				for (i = 0; i < elementList.length; i++)
+					selection.appendChild(elementList[i]);
+			}
+
+			var load = function()
+			{
+				document.onmousedown = function(event) {
+					var cur = event.target;
+					while (cur) {
+						if (cur.getAttribute && cur.getAttribute("class") && cur.getAttribute("class").indexOf("lines") != -1)
+							return;
+						cur = cur.parentNode;
+					}
+					deselect();
+				}
+
+				highlightDiff($("orig_diff").value,
+					$("lijstmetdingen"),
+					{ }
+				);
+
+				var list = document.getElementsByClassName("lines");
+				
+				for (i = 0; i < list.length; ++i) {
+					file = list[i];
+					file.onmousedown = function(event) {
+						file.onmouseover = function(event2) {
+							showSelection(file, event.srcElement, event2.target);
+							return false;
+						};
+
+						file.onmouseup = function(event2) {
+							file.onmouseover = null;
+							file.onmouseup = null;
+						};
+
+						showSelection(file, event.srcElement, event.srcElement);
+						return false;
+					}
+				}
+			}
+		</script>
+	</head>
+	<body onload="load()">
+			<textarea style='display:none' id="orig_diff" rows="8" cols="40">
+diff --git a/.gitignore b/.gitignore
+index b89b7b7..3367a4e 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -1,4 +1,5 @@
+ build
++build/revision
+ *.xcodeproj/*.pbxuser
+ *.xcodeproj/*.perspectivev3
+ *.xcodeproj/*.mode1v3
+diff --git a/ApplicationController.m b/ApplicationController.m
+index 86252cd..3a86d38 100644
+--- a/ApplicationController.m
++++ b/ApplicationController.m
+@@ -21,7 +21,7 @@ @implementation ApplicationController
+
+ - (ApplicationController*)init
+ {
+-#ifndef NDEBUG
++#ifdef DEBUG_BUILD
+ 	[NSApp activateIgnoringOtherApps:YES];
+ #endif
+
+@@ -92,12 +92,16 @@ - (IBAction)openPreferencesWindow:(id)sender
+ - (IBAction)installCliTool:(id)sender;
+ {
+ 	BOOL success               = NO;
+-	NSString* installationPath = @"/usr/local/bin/gitx";
++	NSString* installationPath = @"/usr/local/bin/";
++	NSString* installationName = @"gitx";
+ 	NSString* toolPath         = [[NSBundle mainBundle] pathForResource:@"gitx" ofType:@""];
+ 	if (toolPath) {
+ 		AuthorizationRef auth;
+ 		if (AuthorizationCreate(NULL, kAuthorizationEmptyEnvironment, kAuthorizationFlagDefaults, &auth) == errAuthorizationSuccess) {
+-			char const* arguments[] = { "-f", "-s", [toolPath UTF8String], [installationPath UTF8String], NULL };
++			char const* mkdir_arg[] = { "-p", [installationPath UTF8String], NULL};
++			char const* mkdir	= "/bin/mkdir";
++			AuthorizationExecuteWithPrivileges(auth, mkdir, kAuthorizationFlagDefaults, (char**)mkdir_arg, NULL);
++			char const* arguments[] = { "-f", "-s", [toolPath UTF8String], [[installationPath stringByAppendingString: installationName] UTF8String],  NULL };
+ 			char const* helperTool  = "/bin/ln";
+ 			if (AuthorizationExecuteWithPrivileges(auth, helperTool, kAuthorizationFlagDefaults, (char**)arguments, NULL) == errAuthorizationSuccess) {
+ 				int status;
+			</textarea>
+			<div id='lijstmetdingen'></div>
+		</body>
+	</body>
+</html>

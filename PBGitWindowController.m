@@ -100,6 +100,7 @@
 	[self setNextResponder: viewController];
 	[self didChangeValueForKey:@"viewController"];	// this will trigger the NSTextField's value binding to change
 
+	[[self window] makeFirstResponder:[viewController firstResponder]];
 }
 
 - (void)awakeFromNib
@@ -121,6 +122,21 @@
 	if (self.selectedViewIndex != 0)
 		self.selectedViewIndex = 0;
 }
+
+- (void)showMessageSheet:(NSString *)messageText infoText:(NSString *)infoText
+{
+	[[NSAlert alertWithMessageText:messageText
+			 defaultButton:nil
+		       alternateButton:nil
+			   otherButton:nil
+	     informativeTextWithFormat:infoText] beginSheetModalForWindow: [self window] modalDelegate:self didEndSelector:nil contextInfo:nil];
+}
+
+- (void)showErrorSheet:(NSError *)error
+{
+	[[NSAlert alertWithError:error] beginSheetModalForWindow: [self window] modalDelegate:self didEndSelector:nil contextInfo:nil];
+}
+
 
 #pragma mark -
 #pragma mark Toolbar Delegates

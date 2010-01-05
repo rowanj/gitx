@@ -133,7 +133,7 @@ int main(int argc, const char** argv)
 	NSMutableArray* arguments = [NSMutableArray arrayWithCapacity:argc];
 	int i = 0;
 	for (i = 0; i < argc; i++)
-		[arguments addObject: [NSString stringWithCString:argv[i]]];
+		[arguments addObject: [NSString stringWithUTF8String:argv[i]]];
 
 	if (!isatty(STDIN_FILENO) && fdopen(STDIN_FILENO, "r"))
 		handleSTDINDiff(proxy);

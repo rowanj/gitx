@@ -27,5 +27,4 @@
 - (void) setStateMessage:(NSString *)state;
 
 - (void) showMultiple:(NSArray *)files;
-- (void) setContextSize:(int)size;
 @end

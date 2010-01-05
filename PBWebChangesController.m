@@ -8,6 +8,7 @@
 
 #import "PBWebChangesController.h"
 #import "PBGitIndexController.h"
+#import "PBGitIndex.h"
 
 @implementation PBWebChangesController
 
@@ -25,13 +26,8 @@
 
 - (void) didLoad
 {
-	[[self script] setValue:indexController forKey:@"IndexController"];
+	[[self script] setValue:controller.index forKey:@"Index"];
 	[self refresh];
-}
-
-- (BOOL) amend
-{
-	return controller.amend;
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath
@@ -81,10 +77,29 @@
 				     [NSNumber numberWithBool:selectedFileIsCached], nil]];
 }
 
-- (void) stageHunk:(NSString *)hunk reverse:(BOOL)reverse
+- (void)stageHunk:(NSString *)hunk reverse:(BOOL)reverse
 {
-	[controller stageHunk: hunk reverse:reverse];
+	[controller.index applyPatch:hunk stage:YES reverse:reverse];
+	// FIXME: Don't need a hard refresh
+
 	[self refresh];
+}
+
+- (void)discardHunk:(NSString *)hunk altKey:(BOOL)altKey
+{
+	int ret = NSAlertDefaultReturn;
+	if (!altKey) {
+		ret = [[NSAlert alertWithMessageText:@"Discard hunk"
+			defaultButton:nil
+			alternateButton:@"Cancel"
+			otherButton:nil
+			informativeTextWithFormat:@"Are you sure you wish to discard the changes in this hunk?\n\nYou cannot undo this operation."] runModal];
+	}
+
+	if (ret == NSAlertDefaultReturn) {
+		[controller.index applyPatch:hunk stage:NO reverse:YES];
+		[self refresh];
+	}
 }
 
 - (void) setStateMessage:(NSString *)state
@@ -93,12 +108,4 @@
 	[script callWebScriptMethod:@"setState" withArguments: [NSArray arrayWithObject:state]];
 }
 
-- (void) setContextSize:(int)size
-{
-	if (size == indexController.contextSize)
-		return;
-
-	indexController.contextSize = size;
-	[self refresh];
-}
 @end

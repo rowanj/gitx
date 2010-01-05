@@ -39,7 +39,10 @@
 	// Set a sort descriptor for the subject column in the history list, as
 	// It can't be sorted by default (because it's bound to a PBGitCommit)
 	[[commitList tableColumnWithIdentifier:@"subject"] setSortDescriptorPrototype:[[NSSortDescriptor alloc] initWithKey:@"subject" ascending:YES]];
-
+	// Add a menu that allows a user to select which columns to view
+	[[commitList headerView] setMenu:[self tableColumnMenu]];
+	[historySplitView setTopMin:33.0 andBottomMin:100.0];
+	[historySplitView uncollapse];
 	[super awakeFromNib];
 }
 
@@ -63,8 +66,7 @@
 	
 	switch (self.selectedTab) {
 		case 0:	self.webCommit = realCommit;			break;
-		case 1:	self.rawCommit = realCommit;			break;
-		case 2:	self.gitTree   = realCommit.tree;	break;
+		case 1:	self.gitTree   = realCommit.tree;	break;
 	}
 }	
 
@@ -178,6 +180,11 @@
 	[self refresh:nil];
 }
 
+- (NSResponder *)firstResponder;
+{
+	return commitList;
+}
+
 - (void) selectCommit: (NSString*) commit
 {
 	NSPredicate* selection = [NSPredicate predicateWithFormat:@"realSha == %@", commit];
@@ -200,6 +207,118 @@
 	[repository removeObserver:self forKeyPath:@"currentBranch"];
 
 	[super removeView];
+}
+
+#pragma mark Table Column Methods
+- (NSMenu *)tableColumnMenu
+{
+	NSMenu *menu = [[NSMenu alloc] initWithTitle:@"Table columns menu"];
+	for (NSTableColumn *column in [commitList tableColumns]) {
+		NSMenuItem *item = [[NSMenuItem alloc] init];
+		[item setTitle:[[column headerCell] stringValue]];
+		[item bind:@"value"
+		  toObject:column
+	   withKeyPath:@"hidden"
+		   options:[NSDictionary dictionaryWithObject:@"NSNegateBoolean" forKey:NSValueTransformerNameBindingOption]];
+		[menu addItem:item];
+	}
+	return menu;
+}
+
+#pragma mark Tree Context Menu Methods
+
+- (void)showCommitsFromTree:(id)sender
+{
+	// TODO: Enable this from webview as well!
+
+	NSMutableArray *filePaths = [NSMutableArray arrayWithObjects:@"HEAD", @"--", NULL];
+	[filePaths addObjectsFromArray:[sender representedObject]];
+
+	PBGitRevSpecifier *revSpec = [[PBGitRevSpecifier alloc] initWithParameters:filePaths];
+
+	repository.currentBranch = [repository addBranch:revSpec];
+}
+
+- (void)showInFinderAction:(id)sender
+{
+	NSString *workingDirectory = [[repository workingDirectory] stringByAppendingString:@"/"];
+	NSString *path;
+	NSWorkspace *ws = [NSWorkspace sharedWorkspace];
+
+	for (NSString *filePath in [sender representedObject]) {
+		path = [workingDirectory stringByAppendingPathComponent:filePath];
+		[ws selectFile: path inFileViewerRootedAtPath:path];
+	}
+
+}
+
+- (void)openFilesAction:(id)sender
+{
+	NSString *workingDirectory = [[repository workingDirectory] stringByAppendingString:@"/"];
+	NSString *path;
+	NSWorkspace *ws = [NSWorkspace sharedWorkspace];
+
+	for (NSString *filePath in [sender representedObject]) {
+		path = [workingDirectory stringByAppendingPathComponent:filePath];
+		[ws openFile:path];
+	}
+}
+
+
+- (NSMenu *)contextMenuForTreeView
+{
+	NSArray *filePaths = [[treeController selectedObjects] valueForKey:@"fullPath"];
+
+	NSMenu *menu = [[NSMenu alloc] init];
+	for (NSMenuItem *item in [self menuItemsForPaths:filePaths])
+		[menu addItem:item];
+	return menu;
+}
+
+- (NSArray *)menuItemsForPaths:(NSArray *)paths
+{
+	BOOL multiple = [paths count] != 1;
+	NSMenuItem *historyItem = [[NSMenuItem alloc] initWithTitle:multiple? @"Show history of files" : @"Show history of file"
+														 action:@selector(showCommitsFromTree:)
+												 keyEquivalent:@""];
+	NSMenuItem *finderItem = [[NSMenuItem alloc] initWithTitle:@"Show in Finder"
+														action:@selector(showInFinderAction:)
+												 keyEquivalent:@""];
+	NSMenuItem *openFilesItem = [[NSMenuItem alloc] initWithTitle:multiple? @"Open Files" : @"Open File"
+														   action:@selector(openFilesAction:)
+													keyEquivalent:@""];
+
+	NSArray *menuItems = [NSArray arrayWithObjects:historyItem, finderItem, openFilesItem, nil];
+	for (NSMenuItem *item in menuItems) {
+		[item setTarget:self];
+		[item setRepresentedObject:paths];
+	}
+
+	return menuItems;
+}
+
+- (BOOL)splitView:(NSSplitView *)sender canCollapseSubview:(NSView *)subview {
+	return TRUE;
+}
+
+- (BOOL)splitView:(NSSplitView *)splitView shouldCollapseSubview:(NSView *)subview forDoubleClickOnDividerAtIndex:(NSInteger)dividerIndex {
+	int index = [[splitView subviews] indexOfObject:subview];
+	// this method (and canCollapse) are called by the splitView to decide how to collapse on double-click
+	// we compare our two subviews, so that always the smaller one is collapsed.
+	if([[[splitView subviews] objectAtIndex:index] frame].size.height < [[[splitView subviews] objectAtIndex:((index+1)%2)] frame].size.height) {
+		return TRUE;
+	}
+	return FALSE;
+}
+
+- (CGFloat)splitView:(NSSplitView *)sender constrainMinCoordinate:(CGFloat)proposedMin ofSubviewAt:(NSInteger)offset {
+	return proposedMin + historySplitView.topViewMin;
+}
+
+- (CGFloat)splitView:(NSSplitView *)sender constrainMaxCoordinate:(CGFloat)proposedMax ofSubviewAt:(NSInteger)offset {
+	if(offset == 1)
+		return proposedMax - historySplitView.bottomViewMin;
+	return [sender frame].size.height;
 }
 
 @end

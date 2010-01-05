@@ -135,7 +135,7 @@ a.showdiff {
 }
 
 .refs.currentBranch {
-	font-weight: bold;
+	background-color: #fca64f;
 }
 
 div.button
