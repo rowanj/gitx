@@ -71,6 +71,36 @@
 	// but this caused some funny behaviour because NSTask's and NSThread's don't really
 	// like each other. Instead, just do it async.
 
+	NSMutableArray *taskArguments = [NSMutableArray arrayWithObjects:@"show", @"--numstat", @"-M", @"--summary", @"--pretty=raw", [currentSha SHA], nil];
+	if (![PBGitDefaults showWhitespaceDifferences])
+		[taskArguments insertObject:@"-w" atIndex:1];
+
+	NSFileHandle *handle = [repository handleForArguments:taskArguments];
+	NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+	// Remove notification, in case we have another one running
+	[nc removeObserver:self name:NSFileHandleReadToEndOfFileCompletionNotification object:nil];
+	[nc addObserver:self selector:@selector(commitSummaryLoaded:) name:NSFileHandleReadToEndOfFileCompletionNotification object:handle]; 
+	[handle readToEndOfFileInBackgroundAndNotify];
+}
+
+- (void)commitSummaryLoaded:(NSNotification *)notification
+{
+	[[NSNotificationCenter defaultCenter] removeObserver:self name:NSFileHandleReadToEndOfFileCompletionNotification object:nil];
+
+	NSData *data = [[notification userInfo] valueForKey:NSFileHandleNotificationDataItem];
+	if (!data)
+		return;
+
+	NSString *summary = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+	if (!summary)
+		summary = [[NSString alloc] initWithData:data encoding:NSISOLatin1StringEncoding];
+
+	if (!summary)
+		return;
+
+	[[view windowScriptObject] callWebScriptMethod:@"loadCommitSummary" withArguments:[NSArray arrayWithObject:summary]];
+
+    // Now load the full diff
 	NSMutableArray *taskArguments = [NSMutableArray arrayWithObjects:@"show", @"--pretty=raw", @"-M", @"--no-color", [currentSha SHA], nil];
 	if (![PBGitDefaults showWhitespaceDifferences])
 		[taskArguments insertObject:@"-w" atIndex:1];
@@ -79,11 +109,11 @@
 	NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
 	// Remove notification, in case we have another one running
 	[nc removeObserver:self name:NSFileHandleReadToEndOfFileCompletionNotification object:nil];
-	[nc addObserver:self selector:@selector(commitDetailsLoaded:) name:NSFileHandleReadToEndOfFileCompletionNotification object:handle]; 
+	[nc addObserver:self selector:@selector(commitFullDiffLoaded:) name:NSFileHandleReadToEndOfFileCompletionNotification object:handle]; 
 	[handle readToEndOfFileInBackgroundAndNotify];
 }
 
-- (void)commitDetailsLoaded:(NSNotification *)notification
+- (void)commitFullDiffLoaded:(NSNotification *)notification
 {
 	[[NSNotificationCenter defaultCenter] removeObserver:self name:NSFileHandleReadToEndOfFileCompletionNotification object:nil];
 
@@ -91,14 +121,14 @@
 	if (!data)
 		return;
 
-	NSString *details = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-	if (!details)
-		details = [[NSString alloc] initWithData:data encoding:NSISOLatin1StringEncoding];
+	NSString *fullDiff = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+	if (!fullDiff)
+		fullDiff = [[NSString alloc] initWithData:data encoding:NSISOLatin1StringEncoding];
 
-	if (!details)
+	if (!fullDiff)
 		return;
 
-	[[view windowScriptObject] callWebScriptMethod:@"loadCommitDetails" withArguments:[NSArray arrayWithObject:details]];
+	[[view windowScriptObject] callWebScriptMethod:@"loadCommitFullDiff" withArguments:[NSArray arrayWithObject:fullDiff]];
 }
 
 - (void)selectCommit:(NSString *)sha

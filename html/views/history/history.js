@@ -1,4 +1,5 @@
-var commit;
+var commit,
+    fileElementPrototype;
 
 // Create a new Commit object
 // obj: PBGitCommit object
@@ -16,39 +17,110 @@ var Commit = function(obj) {
 	// TODO:
 	// this.author_date instant
 
-	// This can be called later with the output of
-	// 'git show' to fill in missing commit details (such as a diff)
-	this.parseDetails = function(details) {
-		this.raw = details;
-
-		var diffStart = this.raw.indexOf("\ndiff ");
-		var messageStart = this.raw.indexOf("\n\n") + 2;
-
-		if (diffStart > 0) {
-			this.message = this.raw.substring(messageStart, diffStart).replace(/^    /gm, "").escapeHTML();
-			this.diff = this.raw.substring(diffStart);
-		} else {
-			this.message = this.raw.substring(messageStart).replace(/^    /gm, "").escapeHTML();
-			this.diff = "";
+	this.parseSummary = function(summaryString) {
+		this.summaryRaw = summaryString;
+		
+		// Get the header info and the full commit message
+		var messageStart = this.summaryRaw.indexOf("\n\n") + 2;
+		this.header = this.summaryRaw.substring(0, messageStart);
+		var afterHeader = this.summaryRaw.substring(messageStart);
+		var numstatStart = afterHeader.indexOf("\n\n") + 2;
+		if (numstatStart > 1) {
+			this.message = afterHeader.substring(0, numstatStart).replace(/^    /gm, "").escapeHTML();;
+			var afterMessage = afterHeader.substring(numstatStart);
+			var filechangeStart = afterMessage.indexOf("\n ") + 1;
+			if (filechangeStart > 1) {
+				this.numstatRaw = afterMessage.substring(0, filechangeStart);
+				this.filechangeRaw = afterMessage.substring(filechangeStart);
+			}
+			else {
+				this.numstatRaw = afterMessage;
+				this.filechangeRaw = "";
+			}
 		}
-		this.header = this.raw.substring(0, messageStart);
-
+		else {
+			this.message = afterHeader;
+			this.numstatRaw = "";
+			this.filechangeRaw = "";
+		}
+		
+		
         if (typeof this.header !== 'undefined') {
-            var match = this.header.match(/\nauthor (.*) <(.*@.*|.*)> ([0-9].*)/);
-            if (typeof match !== 'undefined' && typeof match[2] !== 'undefined') {
-                if (!(match[2].match(/@[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/)))
-                    this.author_email = match[2];
-
-				if (typeof match[3] !== 'undefined')
-                	this.author_date = new Date(parseInt(match[3]) * 1000);
-
-                match = this.header.match(/\ncommitter (.*) <(.*@.*|.*)> ([0-9].*)/);
-				if (typeof match[2] !== 'undefined')
-					this.committer_email = match[2];
-				if (typeof match[3] !== 'undefined')
-					this.committer_date = new Date(parseInt(match[3]) * 1000);
+            var matches = this.header.match(/\nauthor (.*) <(.*@.*|.*)> ([0-9].*)/);
+            if (matches !== null && matches[2] !== null) {
+                if (!(matches[2].match(/@[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/)))
+                    this.author_email = matches[2];
+				
+				if (typeof matches[3] !== 'undefined')
+                	this.author_date = new Date(parseInt(matches[3]) * 1000);
+				
+                matches = this.header.match(/\ncommitter (.*) <(.*@.*|.*)> ([0-9].*)/);
+				if (typeof matches[2] !== 'undefined')
+					this.committer_email = matches[2];
+				if (typeof matches[3] !== 'undefined')
+					this.committer_date = new Date(parseInt(matches[3]) * 1000);
             } 
         }
+		
+		// Parse the --numstat part to get the list of files and lines changed.
+		this.filesInfo = [];
+		var lines = this.numstatRaw.split('\n');
+		for (var lineno=0; lineno < lines.length; lineno++) {
+			var columns = lines[lineno].split('\t');
+			if (columns.length >= 2) {
+				if (columns[0] == "-" && columns[1] == "-") {
+					this.filesInfo.push({"filename": columns[2],
+										"changeType": "modified",
+										"binary": true});
+				}
+				else {
+					this.filesInfo.push({"numLinesAdded": parseInt(columns[0]),
+										"numLinesRemoved": parseInt(columns[1]),
+										"filename": columns[2],
+										"changeType": "modified",
+										"binary": false});
+				}
+			}
+		}
+		
+		// Parse the filechange part (from --summary) to get info about files
+		// that were added/deleted/etc.
+		var lines = this.filechangeRaw.split('\n');
+		for (var lineno=0; lineno < lines.length; lineno++) {
+			var line = lines[lineno];
+			var filename="", changeType="";
+			if (line.indexOf("delete") == 1) {
+				filename = line.match(/\S+/g).pop();
+				changeType = "removed";
+			}
+			else if (line.indexOf("create") == 1) {
+				filename = line.match(/\S+/g).pop();
+				changeType = "added";
+			}
+			
+			if (filename != "") {
+				// Update the appropriate filesInfo with the actual changeType.
+				for (var i=0; i < commit.filesInfo.length; i+=1) {
+					if (commit.filesInfo[i].filename == filename) {
+						commit.filesInfo[i].changeType = changeType;
+						break;
+					}
+				}
+			}
+		}
+	}
+
+	// This can be called later with the output of
+	// 'git show' to get the full diff
+	this.parseFullDiff = function(fullDiff) {
+		this.fullDiffRaw = fullDiff;
+
+		var diffStart = this.fullDiffRaw.indexOf("\ndiff ");
+		if (diffStart > 0) {
+			this.diff = this.fullDiffRaw.substring(diffStart);
+		} else {
+			this.diff = "";
+		}
 	}
 
 	this.reloadRefs = function() {
@@ -57,6 +129,13 @@ var Commit = function(obj) {
 
 };
 
+var extractPrototypes = function() {
+	// Grab an element from the DOM, save it in a global variable (with its
+	// id removed) so it can be copied later, and remove it from the DOM.
+	fileElementPrototype = $('file_prototype');
+	fileElementPrototype.removeAttribute('id');
+	fileElementPrototype.parentNode.removeChild(fileElementPrototype);
+}
 
 var confirm_gist = function(confirmation_message) {
 	if (!Controller.isFeatureEnabled_("confirmGist")) {
@@ -161,9 +240,9 @@ var showRefs = function() {
 
 var loadCommit = function(commitObject, currentRef) {
 	// These are only the things we can do instantly.
-	// Other information will be loaded later by loadCommitDetails,
-	// Which will be called from the controller once
-	// the commit details are in.
+	// Other information will be loaded later by loadCommitSummary
+	// and loadCommitFullDiff, which will be called from the
+	// controller once the commit details are in.
 
 	if (commit && commit.notificationID)
 		clearTimeout(commit.notificationID);
@@ -174,10 +253,13 @@ var loadCommit = function(commitObject, currentRef) {
 	$("commitID").innerHTML = commit.sha;
 	$("authorID").innerHTML = commit.author_name;
 	$("subjectID").innerHTML = commit.subject.escapeHTML();
-	$("diff").innerHTML = ""
-	$("message").innerHTML = ""
-	$("files").innerHTML = ""
-	$("date").innerHTML = ""
+	$("diff").innerHTML = "";
+	$("message").innerHTML = "";
+	$("date").innerHTML = "";
+	$("files").style.display = "none";
+	var filelist = $("filelist");
+	while (filelist.hasChildNodes())
+		filelist.removeChild(filelist.lastChild);
 	showRefs();
 
 	for (var i = 0; i < $("commit_header").rows.length; ++i) {
@@ -245,67 +327,7 @@ var formatRenameDiff = function(d) {
 
 var showDiff = function() {
 
-	$("files").innerHTML = "";
-
 	// Callback for the diff highlighter. Used to generate a filelist
-	var newfile = function(name1, name2, id, mode_change, old_mode, new_mode) {
-		var img = document.createElement("img");
-		var p = document.createElement("p");
-		var link = document.createElement("a");
-		link.setAttribute("href", "#" + id);
-		p.appendChild(link);
-		var finalFile = "";
-		var renamed = false;
-		if (name1 == name2) {
-			finalFile = name1;
-			img.src = "../../images/modified.svg";
-			img.title = "Modified file";
-			p.title = "Modified file";
-			if (mode_change)
-				p.appendChild(document.createTextNode(" mode " + old_mode + " → " + new_mode));
-		}
-		else if (name1 == "/dev/null") {
-			img.src = "../../images/added.svg";
-			img.title = "Added file";
-			p.title = "Added file";
-			finalFile = name2;
-		}
-		else if (name2 == "/dev/null") {
-			img.src = "../../images/removed.svg";
-			img.title = "Removed file";
-			p.title = "Removed file";
-			finalFile = name1;
-		}
-		else {
-			renamed = true;
-		}
-		if (renamed) {
-			img.src = "../../images/renamed.svg";
-			img.title = "Renamed file";
-			p.title = "Renamed file";
-			finalFile = name2;
-			var rfd = renameDiff(name1.unEscapeHTML(), name2.unEscapeHTML());
-			var html = [
-					'<span class="renamed">',
-					rfd[0].escapeHTML(),
-					'<span class="meta"> { </span>',
-					'<span class="old">', rfd[1].escapeHTML(), '</span>',
-					'<span class="meta"> -&gt; </span>',
-					'<span class="new">', rfd[2].escapeHTML(), '</span>',
-					'<span class="meta"> } </span>',
-					rfd[3].escapeHTML(),
-                    '</span>'
-				].join("");
-			link.innerHTML = html;
-		} else {
-			link.appendChild(document.createTextNode(finalFile.unEscapeHTML()));
-		}
-		link.setAttribute("representedFile", finalFile);
-
-		p.insertBefore(img, link);
-		$("files").appendChild(p);
-	}
-
 	var binaryDiff = function(filename) {
 		if (filename.match(/\.(png|jpg|icns|psd)$/i))
 			return '<a href="#" onclick="return showImage(this, \'' + filename + '\')">Display image</a>';
@@ -313,7 +335,7 @@ var showDiff = function() {
 			return "Binary file differs";
 	}
 	
-	highlightDiff(commit.diff, $("diff"), { "newfile" : newfile, "binaryFile" : binaryDiff });
+	highlightDiff(commit.diff, $("diff"), { "binaryFile" : binaryDiff });
 }
 
 var showImage = function(element, filename)
@@ -338,27 +360,27 @@ var enableFeatures = function()
 	enableFeature("gravatar", $("committer_gravatar").parentNode)
 }
 
-var loadCommitDetails = function(data)
+var loadCommitSummary = function(data)
 {
-	commit.parseDetails(data);
-
+	commit.parseSummary(data);
+	
 	if (commit.notificationID)
 		clearTimeout(commit.notificationID)
-	else
-		$("notification").style.display = "none";
-
+		else
+			$("notification").style.display = "none";
+	
 	var formatEmail = function(name, email) {
 		return email ? name + " &lt;<a href='mailto:" + email + "'>" + email + "</a>&gt;" : name;
 	}
-
+	
 	$("authorID").innerHTML = formatEmail(commit.author_name, commit.author_email);
 	$("date").innerHTML = commit.author_date;
 	setGravatar(commit.author_email, $("author_gravatar"));
-
+	
 	if (commit.committer_name != commit.author_name) {
 		$("committerID").parentNode.style.display = "";
 		$("committerID").innerHTML = formatEmail(commit.committer_name, commit.committer_email);
-
+		
 		$("committerDate").parentNode.style.display = "";
 		$("committerDate").innerHTML = commit.committer_date;
 		setGravatar(commit.committer_email, $("committer_gravatar"));
@@ -368,6 +390,92 @@ var loadCommitDetails = function(data)
 	}
 
 	$("message").innerHTML = commit.message.replace(/\b(https?:\/\/[^\s<]*)/ig, "<a href=\"$1\">$1</a>").replace(/\n/g,"<br>");
+
+	if (commit.filesInfo.length > 0) {
+		// Create the file list
+		for (var i=0; i < commit.filesInfo.length; i+=1) {
+			var fileInfo = commit.filesInfo[i];
+			var fileElem = fileElementPrototype.cloneNode(true); // this is a <li>
+			fileElem.targetFileId = "file_index_"+i;
+			if (i % 2)
+				fileElem.className += "even";
+			else
+				fileElem.className += "odd";
+			fileElem.onclick = function () {
+				// Show the full diff in case it's not already visisble.
+				showDiff();
+				// Scroll to that file.
+				$(this.targetFileId).scrollIntoView(true);
+			}
+			fileElem.title = fileInfo.changeType + ": " + fileInfo.filename;
+			
+			// Start with a modified icon, and update it later when the
+			// `diff --summary` info comes back.
+			var imgElement = fileElem.getElementsByClassName("changetype-icon")[0];
+			imgElement.src = "../../images/"+fileInfo.changeType+".svg";
+			
+			var filenameElement = fileElem.getElementsByClassName("filename")[0];
+			filenameElement.innerText = fileInfo.filename;
+			
+			var diffstatElem = fileElem.getElementsByClassName("diffstat-info")[0];
+			var binaryElem = fileElem.getElementsByClassName("binary")[0]
+			if (fileInfo.binary) {
+				// remove the diffstat-info element
+				diffstatElem.parentNode.removeChild(diffstatElem);
+			}
+			else {
+				// remove the binary element
+				binaryElem.parentNode.removeChild(binaryElem);
+				
+				// Show the num of lines added/removed
+				var addedWidth = 2 * fileInfo.numLinesAdded;
+				var removedWidth = 2 * fileInfo.numLinesRemoved;
+				// Scale them down proportionally if they're too wide.
+				var maxWidth = 350;
+				var minWidth = 5;
+				if (addedWidth+removedWidth > maxWidth) {
+					var scaleBy = maxWidth/(addedWidth+removedWidth);
+					addedWidth *= scaleBy;
+					removedWidth *= scaleBy;
+				}
+				if (addedWidth > 0 && addedWidth < minWidth) addedWidth = minWidth;
+				if (removedWidth > 0 && removedWidth < minWidth) removedWidth = minWidth;
+				
+				// show lines changed info
+				var numLinesAdded = fileInfo.numLinesAdded;
+				var numLinesRemoved = fileInfo.numLinesRemoved;
+				var numLinesChanged = numLinesAdded + numLinesRemoved;
+				// summarize large numbers
+				if (numLinesChanged > 999) numLinesChanged = "~" + Math.round(numLinesChanged / 1000) + "k";
+				// fill in numbers
+				var diffstatSummary = diffstatElem.getElementsByClassName("diffstat-numbers")[1];
+				diffstatSummary.innerText = numLinesChanged;
+				var diffstatDetails = diffstatElem.getElementsByClassName("diffstat-numbers")[0];
+				diffstatDetails.getElementsByClassName("added")[0].innerText = "+"+numLinesAdded;
+				diffstatDetails.getElementsByClassName("removed")[0].innerText = "-"+numLinesRemoved;
+				
+				// Size the bars
+				var addedBar = diffstatElem.getElementsByClassName("changes-bar")[0];
+				if (addedWidth >= minWidth)
+					addedBar.style.width = addedWidth;
+				else
+					addedBar.style.visibility = "hidden";
+			
+				var removedBar = diffstatElem.getElementsByClassName("changes-bar")[1];
+				if (removedWidth >= minWidth)
+					removedBar.style.width = removedWidth;
+				else
+					removedBar.style.visibility = "hidden";
+			}
+			$("filelist").appendChild(fileElem);
+		}
+		$("files").style.display = "";
+	}
+}
+
+var loadCommitFullDiff = function(data)
+{
+	commit.parseFullDiff(data);
 
 	if (commit.diff.length < 200000)
 		showDiff();

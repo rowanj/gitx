@@ -10,9 +10,38 @@
 
 	<link rel="stylesheet" href="history.css" type="text/css" media="screen" title="no title" charset="utf-8">
 	<script src="history.js" type="text/javascript" charset="utf-8"></script>
+	<script type="text/javascript">
+	Array.prototype.contains = function(obj) {
+	  var i = this.length;
+	  while (i--) {
+	    if (this[i] === obj) {
+	      return true;
+	    }
+	  }
+	  return false;
+	}
+	function expandDiffstatDetails(obj) {
+	  var children = obj.parentNode.childNodes;
+	  for (i in children) {
+	    var c = children[i];
+	    if (c.className && c.className.split(" ").contains("details"))
+	      c.style.display = "";
+	  }
+	  return true;
+	}
+	function collapseDiffstatDetails(obj) {
+	  var children = obj.parentNode.childNodes;
+	  for (i in children) {
+	    var c = children[i];
+	    if (c.className && c.className.split(" ").contains("details"))
+	      c.style.display = "none";
+	  }
+	  return true;
+	}
+	</script>
 </head>
 
-<body style="padding: 0px; border: 0px">
+<body style="padding: 0px; border: 0px" onLoad="extractPrototypes()">
 	<div id="rightcontent">
 		<div id="buttons">
 			<a class="servicebutton" id="gist" onclick="confirm_gist();return false" href="#">
@@ -81,7 +110,25 @@
 	<hr>
 	<pre id="message"></pre>
 	<div id="message_files">
-		<div id="files"></div>
+		<div id="zzzmessage"></div>
+		<div id="files">
+			<ul id="filelist">
+				<li id="file_prototype">
+					<img class="changetype-icon">
+					<span class="filename"></span>
+					<div class="diffstat-numbers binary">binary</div>
+					<div class="diffstat-info">
+						<div class="changes-bar added"></div>
+						<div class="changes-bar removed"></div>
+						<span style="display:none;" class="diffstat-numbers details">
+							<span class="added"></span>
+							<span class="removed"></span>
+						</span>
+						<div class="diffstat-numbers summary" onmouseover="expandDiffstatDetails(this)" onmouseout="collapseDiffstatDetails(this)"></div>
+					</div>
+				</li>
+			</ul>
+		</div>
 	</div>
 
 	<div id="diff"></div>

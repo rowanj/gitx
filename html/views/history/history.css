@@ -86,44 +86,6 @@ a.servicebutton:hover {
 	padding: 10px;
 }
 
-#files {
-	margin-top: 1em;
-	margin-left: 0.5em;
-}
-
-#files a {
-	color: #666666;
-	text-decoration: none;
-}
-
-#files a:hover {
-	color: #4444ff;
-	border-bottom: 1px solid #4444ff;
-}
-
-#files img {
-	float: left;
-	margin-right: 0.5em;
-	margin-top: 1px;
-  width: 12px;
-  height: 12px;
-}
-
-#files p {
-	margin-top: 0.25em;
-	margin-bottom: 0.25em;
-}
-
-#files a .renamed .meta,
-#files a .renamed .old {
-	color: #888888;
-	border-bottom: 1px solid #ffffff;
-}
-
-#files a .renamed .meta {
-	font-weight: bold;
-}
-
 .clear_both {
 	clear:both;
 	display:block;
@@ -192,12 +154,124 @@ a.showdiff:hover {
 .refs.currentBranch {
 	background-color: #fca64f;
 }
+#message_files {
+	margin: 0;
+	padding: 0;
+}
+#message {
+	padding: 10px;
+}
+#files {
+	margin: 10px;
+	padding: 10px 0;
+	background-color: #eee;
+	-webkit-border-radius: 10px;
+	border: 1px solid #999;
+	-webkit-box-shadow: 1px 1px 2px #DDD;
+}
+#files ul {
+	margin: 0;
+	padding: 0;
+}
+#files li {
+	list-style-type: none;
+	padding: 4px 10px;
+	color: #000;
+	height: 18px;
+}
+#files li.odd {
+	background-color: #f0f0f0;
+}
+#files li.even {
+	background-color: #e9e9e9;
+}
+#files li:hover {
+	background-color: #d4e4ff;
+	cursor: pointer;
+}
+#files img.changetype-icon {
+	float: left;
+	margin: 3px 7px;
+}
+#files li .filename {
+	position: relative;
+	top: 2px;
+	color: #646464;
+	font-size: 12px;
+	text-shadow: #fff 0 1px 1px;
+	z-index: 100;
+}
 
 .top-link {
     text-align: right;
     margin-right: 20px;
     padding-bottom: 5px;
     font-size: 90%;
+}
+
+#files .diffstat-info {
+	padding: 0;
+	position: absolute;
+	right: 30px;
+	display: inline-block;
+}
+#files .changes-bar {
+	height: 6px;
+	display: inline-block;
+	right: 46px;
+	position: absolute;
+	-webkit-border-top-left-radius: 5px;
+	-webkit-border-bottom-left-radius: 5px;
+	-webkit-box-shadow: 0 1px 1px #fff;
+}
+#files .changes-bar.added {
+	background-color: #1a843d;
+	border: 1px solid #164b27;
+}
+#files .changes-bar.removed {
+	top: 10px;
+	background-color: #ce2e2b;
+	border: 1px solid #8c1815;
+}
+
+#files .diffstat-numbers {
+	background-color: rgba(0,0,0,.75);
+	color: #e3e3e3;
+	font-size: 12px;
+	font-weight: bold;
+	text-shadow: #000 0 1px 1px;
+	white-space: nowrap;
+	padding: 1px 5px;
+	position: absolute;
+	height: 14px;
+	border: 1px solid black;
+	-webkit-box-shadow: 0 1px 1px white;
+}
+
+#files .diffstat-numbers.summary {
+	-webkit-border-top-right-radius: 12px;
+	-webkit-border-bottom-right-radius: 12px;
+	right: 0px;
+	width: 35px;
+}
+#files .diffstat-numbers.details {
+	-webkit-border-top-left-radius: 12px;
+	-webkit-border-bottom-left-radius: 12px;
+	right: 46px;
+	text-align: right;
+}
+#files .diffstat-numbers.details .added {
+	color: #5db15d;
+}
+#files .diffstat-numbers.details .removed {
+	color: #f34b4e;
+}
+
+#files .diffstat-numbers.binary {
+	display: inline-block;
+	right: 30px;
+	-webkit-border-radius: 12px;
+	background-color: #a7681f;
 }
 
 /*
