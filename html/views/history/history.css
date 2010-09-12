@@ -153,7 +153,19 @@ a {
 
 a.showdiff {
 	text-decoration: none;
+	text-align: center;
 	font-size: 1.3em;
+    background-color: #d5d5d5;
+	display: block;
+	padding: 5px 10px;
+	width: 400px;
+	margin: 25px auto 25px auto;
+	-webkit-border-radius: 10px;
+	border: 1px solid #999;
+	-webkit-box-shadow: 1px 1px 2px #DDD;
+}
+a.showdiff:hover {
+	background-color: #c4daff;
 }
 
 .refs {

@@ -372,7 +372,7 @@ var loadCommitDetails = function(data)
 	if (commit.diff.length < 200000)
 		showDiff();
 	else
-		$("diff").innerHTML = "<a class='showdiff' href='' onclick='showDiff(); return false;'>This is a large commit. Click here or press 'v' to view.</a>";
+		$("diff").innerHTML = "<a class='showdiff' href='' onclick='showDiff(); return false;'>This is a large commit.<br>Click here or press 'v' to view.</a>";
 
 	hideNotification();
 	enableFeatures();
