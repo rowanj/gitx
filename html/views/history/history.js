@@ -85,17 +85,26 @@ var Commit = function(obj) {
 		
 		// Parse the filechange part (from --summary) to get info about files
 		// that were added/deleted/etc.
+		// Sample text:
+		//  create mode 100644 GitXTextFieldCell.h
+		//  delete mode 100644 someDir/filename with spaces.txt
+		//  rename fielname with spaces.txt => filename_without_spaces.txt (98%)
 		var lines = this.filechangeRaw.split('\n');
 		for (var lineno=0; lineno < lines.length; lineno++) {
 			var line = lines[lineno];
 			var filename="", changeType="";
 			if (line.indexOf("delete") == 1) {
-				filename = line.match(/\S+/g).pop();
+				filename = line.match(/ delete mode \d+ (.*)$/)[0];
 				changeType = "removed";
 			}
 			else if (line.indexOf("create") == 1) {
-				filename = line.match(/\S+/g).pop();
+				filename = line.match(/ create mode \d+ (.*)/)[0];
 				changeType = "added";
+			}
+			else if (line.indexOf("rename") == 1) {
+				// get the new name of the file (the part after the " => ")
+				filename = line.match(/ rename (.*) \(.+\)$/)[0];
+				changeType = "renamed";
 			}
 			
 			if (filename != "") {
@@ -103,6 +112,11 @@ var Commit = function(obj) {
 				for (var i=0; i < commit.filesInfo.length; i+=1) {
 					if (commit.filesInfo[i].filename == filename) {
 						commit.filesInfo[i].changeType = changeType;
+						if (changeType == "renamed") {
+							var names = filename.split(" => ");
+							commit.filesInfo[i].oldFilename = names[0];
+							commit.filesInfo[i].newFilename = names[1];
+						}
 						break;
 					}
 				}
@@ -397,6 +411,19 @@ var loadCommitSummary = function(data)
 			var fileInfo = commit.filesInfo[i];
 			var fileElem = fileElementPrototype.cloneNode(true); // this is a <li>
 			fileElem.targetFileId = "file_index_"+i;
+			
+			var displayName, representedFile;
+			if (fileInfo.changeType == "renamed") {
+				displayName = fileInfo.filename;
+				representedFile = fileInfo.newFilename;
+			}
+			else {
+				displayName = fileInfo.filename;
+				representedFile = fileInfo.filename;
+			}
+			fileElem.title = fileInfo.changeType + ": " + displayName; // set tooltip
+			fileElem.setAttribute("representedFile", representedFile);
+			
 			if (i % 2)
 				fileElem.className += "even";
 			else
@@ -407,7 +434,6 @@ var loadCommitSummary = function(data)
 				// Scroll to that file.
 				$(this.targetFileId).scrollIntoView(true);
 			}
-			fileElem.title = fileInfo.changeType + ": " + fileInfo.filename;
 			
 			// Start with a modified icon, and update it later when the
 			// `diff --summary` info comes back.
@@ -415,7 +441,7 @@ var loadCommitSummary = function(data)
 			imgElement.src = "../../images/"+fileInfo.changeType+".svg";
 			
 			var filenameElement = fileElem.getElementsByClassName("filename")[0];
-			filenameElement.innerText = fileInfo.filename;
+			filenameElement.innerText = displayName;
 			
 			var diffstatElem = fileElem.getElementsByClassName("diffstat-info")[0];
 			var binaryElem = fileElem.getElementsByClassName("binary")[0]
