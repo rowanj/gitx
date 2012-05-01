@@ -291,10 +291,9 @@ void handleGitXSearch(NSURL *repositoryURL, NSMutableArray *arguments)
 
 NSURL *workingDirectoryURL(NSMutableArray *arguments)
 {
-	NSString *path = nil;
-
+    // path to git repository has been explicitly passed?
 	if ([arguments count] && [[arguments objectAtIndex:0] hasPrefix:kGitDirPrefix]) {
-		path = [[[arguments objectAtIndex:0] substringFromIndex:[kGitDirPrefix length]] stringByStandardizingPath];
+		NSString *path = [[[arguments objectAtIndex:0] substringFromIndex:[kGitDirPrefix length]] stringByStandardizingPath];
 
 		// the path must exist and point to a directory
 		BOOL isDirectory = YES;
@@ -309,17 +308,42 @@ NSURL *workingDirectoryURL(NSMutableArray *arguments)
 
 		// remove the git-dir argument
 		[arguments removeObjectAtIndex:0];
-	} else {
-		path = [[[NSProcessInfo processInfo] environment] objectForKey:@"PWD"];
+
+        // create and return corresponding NSURL
+        NSURL *url = [NSURL fileURLWithPath:path isDirectory:YES];
+        if (!url) {
+            printf("Unable to create url to path: %s\n", [path UTF8String]);
+            exit(2);
+        }
+
+        return url;
 	}
 
-	NSURL *url = [NSURL fileURLWithPath:path isDirectory:YES];
-	if (!url) {
-		printf("Unable to create url to path: %s\n", [path UTF8String]);
-		exit(2);
-	}
+    // otherwise, determine current working directory
+    NSString *path = [[[NSProcessInfo processInfo] environment] objectForKey:@"PWD"];
+    NSURL *url = [NSURL fileURLWithPath:path isDirectory:YES];
 
-	return url;
+    // try to find git repository that contains the current working directory
+    NSURL *rootURL = [NSURL fileURLWithPath:@"/"];
+    while (1) {
+        // return if there exists a .git subdirectory
+        NSString *gitDir = [[url URLByAppendingPathComponent:@".git" isDirectory:YES] path];
+		BOOL isDirectory;
+		if ([[NSFileManager defaultManager] fileExistsAtPath:gitDir isDirectory:&isDirectory] && isDirectory) {
+            return url;
+        }
+
+        // otherwise, if current path ends with .git, guess that we found a bare repository
+        if ([[url lastPathComponent] hasSuffix:@".git"]) {
+            return url;
+        }
+
+        if ([url isEqual:rootURL]) {
+            printf("Cannot determine git repository containing path: '%s'\n", [path UTF8String]);
+            exit(3);
+        }
+        url = [url URLByDeletingLastPathComponent];
+    }
 }
 
 NSMutableArray *argumentsArray()
