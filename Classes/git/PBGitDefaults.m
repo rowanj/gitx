@@ -11,6 +11,8 @@
 
 #define kDefaultVerticalLineLength 50
 #define kCommitMessageViewVerticalLineLength @"PBCommitMessageViewVerticalLineLength"
+#define kDefaultVerticalBodyLineLength 72
+#define kCommitMessageViewVerticalBodyLineLength @"PBCommitMessageViewVerticalBodyLineLength"
 #define kCommitMessageViewHasVerticalLine @"PBCommitMessageViewHasVerticalLine"
 #define kEnableGist @"PBEnableGist"
 #define kEnableGravatar @"PBEnableGravatar"
@@ -36,6 +38,8 @@
 	NSMutableDictionary *defaultValues = [NSMutableDictionary dictionary];
 	[defaultValues setObject:[NSNumber numberWithInt:kDefaultVerticalLineLength]
                       forKey:kCommitMessageViewVerticalLineLength];
+    [defaultValues setObject:[NSNumber numberWithInt:kDefaultVerticalBodyLineLength]
+                      forKey:kCommitMessageViewVerticalBodyLineLength];
     [defaultValues setObject:[NSNumber numberWithBool:YES]
                       forKey:kCommitMessageViewHasVerticalLine];
 	[defaultValues setObject:[NSNumber numberWithBool:YES]
@@ -71,6 +75,11 @@
 + (BOOL) commitMessageViewHasVerticalLine
 {
 	return [[NSUserDefaults standardUserDefaults] boolForKey:kCommitMessageViewHasVerticalLine];
+}
+
++ (int) commitMessageViewVerticalBodyLineLength
+{
+	return [[NSUserDefaults standardUserDefaults] integerForKey:kCommitMessageViewVerticalBodyLineLength];
 }
 
 + (BOOL) isGistEnabled

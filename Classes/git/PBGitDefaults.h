@@ -12,6 +12,7 @@
 }
 
 + (int) commitMessageViewVerticalLineLength;
++ (int) commitMessageViewVerticalBodyLineLength;
 + (BOOL) commitMessageViewHasVerticalLine;
 + (BOOL) isGistEnabled;
 + (BOOL) isGravatarEnabled;
