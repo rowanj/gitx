@@ -218,8 +218,13 @@
 		lastRect = rect;
 		++index;
 	}
-	refRect->size.width -= lastRect.origin.x - refRect->origin.x + lastRect.size.width;
-	refRect->origin.x    = lastRect.origin.x + lastRect.size.width;
+
+    // Only update rect to account for drawn refs if necessary to push
+    // subsequent content to the right.
+    if (index > 0) {
+        refRect->size.width -= lastRect.origin.x - refRect->origin.x + lastRect.size.width;
+        refRect->origin.x    = lastRect.origin.x + lastRect.size.width;
+    }
 }
 
 - (void) drawWithFrame: (NSRect) rect inView:(NSView *)view
