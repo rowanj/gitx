@@ -2,13 +2,13 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="8.00">
 	<data>
 		<int key="IBDocument.SystemTarget">1060</int>
-		<string key="IBDocument.SystemVersion">11C74</string>
-		<string key="IBDocument.InterfaceBuilderVersion">2148</string>
-		<string key="IBDocument.AppKitVersion">1138.23</string>
-		<string key="IBDocument.HIToolboxVersion">567.00</string>
+		<string key="IBDocument.SystemVersion">11D50d</string>
+		<string key="IBDocument.InterfaceBuilderVersion">2182</string>
+		<string key="IBDocument.AppKitVersion">1138.32</string>
+		<string key="IBDocument.HIToolboxVersion">568.00</string>
 		<dictionary class="NSMutableDictionary" key="IBDocument.PluginVersions">
-			<string key="com.apple.InterfaceBuilder.CocoaPlugin">2148</string>
-			<string key="com.apple.WebKitIBPlugin">1113</string>
+			<string key="com.apple.InterfaceBuilder.CocoaPlugin">2182</string>
+			<string key="com.apple.WebKitIBPlugin">1117</string>
 		</dictionary>
 		<array key="IBDocument.IntegratedClassDependencies">
 			<string>WebView</string>
@@ -122,6 +122,7 @@
 								<int key="NSvFlags">292</int>
 								<string key="NSFrame">{{267, 3}, {71, 25}}</string>
 								<reference key="NSSuperview" ref="172148644"/>
+								<reference key="NSWindow"/>
 								<bool key="NSEnabled">YES</bool>
 								<object class="NSSegmentedCell" key="NSCell" id="534046869">
 									<int key="NSCellFlags">-2080244224</int>
@@ -163,6 +164,7 @@
 								<int key="NSvFlags">268</int>
 								<string key="NSFrame">{{206, 3}, {37, 25}}</string>
 								<reference key="NSSuperview" ref="172148644"/>
+								<reference key="NSWindow"/>
 								<bool key="NSEnabled">YES</bool>
 								<object class="NSButtonCell" key="NSCell" id="760195759">
 									<int key="NSCellFlags">-2080244224</int>
@@ -187,6 +189,7 @@
 								<int key="NSvFlags">268</int>
 								<string key="NSFrame">{{161, 3}, {37, 25}}</string>
 								<reference key="NSSuperview" ref="172148644"/>
+								<reference key="NSWindow"/>
 								<bool key="NSEnabled">YES</bool>
 								<object class="NSButtonCell" key="NSCell" id="772225018">
 									<int key="NSCellFlags">-2080244224</int>
@@ -211,6 +214,7 @@
 								<int key="NSvFlags">268</int>
 								<string key="NSFrame">{{116, 3}, {37, 25}}</string>
 								<reference key="NSSuperview" ref="172148644"/>
+								<reference key="NSWindow"/>
 								<bool key="NSEnabled">YES</bool>
 								<object class="NSButtonCell" key="NSCell" id="934102630">
 									<int key="NSCellFlags">-2080244224</int>
@@ -235,6 +239,7 @@
 								<int key="NSvFlags">268</int>
 								<string key="NSFrame">{{55, 3}, {37, 25}}</string>
 								<reference key="NSSuperview" ref="172148644"/>
+								<reference key="NSWindow"/>
 								<bool key="NSEnabled">YES</bool>
 								<object class="NSButtonCell" key="NSCell" id="794901717">
 									<int key="NSCellFlags">-2080244224</int>
@@ -259,6 +264,7 @@
 								<int key="NSvFlags">268</int>
 								<string key="NSFrame">{{10, 3}, {37, 25}}</string>
 								<reference key="NSSuperview" ref="172148644"/>
+								<reference key="NSWindow"/>
 								<bool key="NSEnabled">YES</bool>
 								<object class="NSButtonCell" key="NSCell" id="870128015">
 									<int key="NSCellFlags">-2080244224</int>
@@ -283,6 +289,7 @@
 								<int key="NSvFlags">10</int>
 								<string key="NSFrame">{{0, -2}, {955, 5}}</string>
 								<reference key="NSSuperview" ref="172148644"/>
+								<reference key="NSWindow"/>
 								<string key="NSOffsets">{0, 0}</string>
 								<object class="NSTextFieldCell" key="NSTitleCell">
 									<int key="NSCellFlags">67239424</int>
@@ -311,6 +318,7 @@
 						</array>
 						<string key="NSFrame">{{0, 404}, {955, 30}}</string>
 						<reference key="NSSuperview" ref="319362431"/>
+						<reference key="NSWindow"/>
 						<string key="NSClassName">PBGitGradientBarView</string>
 					</object>
 					<object class="NSSplitView" id="202620420">
@@ -326,6 +334,7 @@
 										<int key="NSvFlags">10</int>
 										<string key="NSFrame">{{0, 144}, {955, 5}}</string>
 										<reference key="NSSuperview" ref="24227530"/>
+										<reference key="NSWindow"/>
 										<string key="NSOffsets">{0, 0}</string>
 										<object class="NSTextFieldCell" key="NSTitleCell">
 											<int key="NSCellFlags">67239424</int>
@@ -356,37 +365,43 @@
 														<int key="NSvFlags">4352</int>
 														<string key="NSFrameSize">{955, 130}</string>
 														<reference key="NSSuperview" ref="546023969"/>
+														<reference key="NSWindow"/>
 														<bool key="NSEnabled">YES</bool>
 														<object class="NSTableHeaderView" key="NSHeaderView" id="942510576">
 															<reference key="NSNextResponder" ref="906093892"/>
 															<int key="NSvFlags">256</int>
 															<string key="NSFrameSize">{955, 17}</string>
 															<reference key="NSSuperview" ref="906093892"/>
+															<reference key="NSWindow"/>
 															<reference key="NSTableView" ref="254268962"/>
 														</object>
-														<object class="_NSCornerView" key="NSCornerView">
-															<nil key="NSNextResponder"/>
+														<object class="_NSCornerView" key="NSCornerView" id="688592759">
+															<reference key="NSNextResponder" ref="663765878"/>
 															<int key="NSvFlags">-2147483392</int>
 															<string key="NSFrame">{{-26, 0}, {16, 17}}</string>
+															<reference key="NSSuperview" ref="663765878"/>
+															<reference key="NSWindow"/>
 														</object>
 														<array class="NSMutableArray" key="NSTableColumns">
-															<object class="NSTableColumn" id="1025472344">
-																<string key="NSIdentifier">SubjectColumn</string>
-																<double key="NSWidth">652</double>
-																<double key="NSMinWidth">40</double>
-																<double key="NSMaxWidth">1000</double>
+															<object class="NSTableColumn" id="760984800">
+																<string key="NSIdentifier">ShortSHAColumn</string>
+																<double key="NSWidth">73</double>
+																<double key="NSMinWidth">10</double>
+																<double key="NSMaxWidth">73</double>
 																<object class="NSTableHeaderCell" key="NSHeaderCell">
 																	<int key="NSCellFlags">75628096</int>
 																	<int key="NSCellFlags2">2048</int>
-																	<string key="NSContents">Subject</string>
+																	<string key="NSContents">Short SHA</string>
 																	<object class="NSFont" key="NSSupport" id="26">
 																		<string key="NSName">LucidaGrande</string>
 																		<double key="NSSize">11</double>
 																		<int key="NSfFlags">3100</int>
 																	</object>
-																	<object class="NSColor" key="NSBackgroundColor" id="703711204">
-																		<int key="NSColorSpace">3</int>
-																		<bytes key="NSWhite">MC4zMzMzMzI5ODU2AA</bytes>
+																	<object class="NSColor" key="NSBackgroundColor" id="216155638">
+																		<int key="NSColorSpace">6</int>
+																		<string key="NSCatalogName">System</string>
+																		<string key="NSColorName">headerColor</string>
+																		<reference key="NSColor" ref="965176493"/>
 																	</object>
 																	<object class="NSColor" key="NSTextColor" id="160578461">
 																		<int key="NSColorSpace">6</int>
@@ -398,12 +413,12 @@
 																		</object>
 																	</object>
 																</object>
-																<object class="NSTextFieldCell" key="NSDataCell" id="977219207">
-																	<int key="NSCellFlags">337772096</int>
-																	<int key="NSCellFlags2">2048</int>
-																	<string key="NSContents">Text Cell</string>
-																	<object class="NSFont" key="NSSupport" id="324419606">
-																		<string key="NSName">LucidaGrande</string>
+																<object class="NSTextFieldCell" key="NSDataCell" id="493129112">
+																	<int key="NSCellFlags">338820672</int>
+																	<int key="NSCellFlags2">1024</int>
+																	<string key="NSContents"/>
+																	<object class="NSFont" key="NSSupport" id="475005913">
+																		<string key="NSName">Menlo-Regular</string>
 																		<double key="NSSize">12</double>
 																		<int key="NSfFlags">16</int>
 																	</object>
@@ -423,6 +438,39 @@
 																		<string key="NSColorName">controlTextColor</string>
 																		<reference key="NSColor" ref="381686569"/>
 																	</object>
+																</object>
+																<int key="NSResizingMask">3</int>
+																<bool key="NSIsResizeable">YES</bool>
+																<reference key="NSTableView" ref="254268962"/>
+															</object>
+															<object class="NSTableColumn" id="1025472344">
+																<string key="NSIdentifier">SubjectColumn</string>
+																<double key="NSWidth">576</double>
+																<double key="NSMinWidth">40</double>
+																<double key="NSMaxWidth">1000</double>
+																<object class="NSTableHeaderCell" key="NSHeaderCell">
+																	<int key="NSCellFlags">75628096</int>
+																	<int key="NSCellFlags2">2048</int>
+																	<string key="NSContents">Subject</string>
+																	<reference key="NSSupport" ref="26"/>
+																	<object class="NSColor" key="NSBackgroundColor" id="703711204">
+																		<int key="NSColorSpace">3</int>
+																		<bytes key="NSWhite">MC4zMzMzMzI5ODU2AA</bytes>
+																	</object>
+																	<reference key="NSTextColor" ref="160578461"/>
+																</object>
+																<object class="NSTextFieldCell" key="NSDataCell" id="977219207">
+																	<int key="NSCellFlags">337772096</int>
+																	<int key="NSCellFlags2">2048</int>
+																	<string key="NSContents">Text Cell</string>
+																	<object class="NSFont" key="NSSupport" id="324419606">
+																		<string key="NSName">LucidaGrande</string>
+																		<double key="NSSize">12</double>
+																		<int key="NSfFlags">16</int>
+																	</object>
+																	<reference key="NSControlView" ref="254268962"/>
+																	<reference key="NSBackgroundColor" ref="827363147"/>
+																	<reference key="NSTextColor" ref="57062640"/>
 																</object>
 																<int key="NSResizingMask">3</int>
 																<bool key="NSIsResizeable">YES</bool>
@@ -464,12 +512,7 @@
 																	<int key="NSCellFlags2">2048</int>
 																	<string key="NSContents">Date</string>
 																	<reference key="NSSupport" ref="26"/>
-																	<object class="NSColor" key="NSBackgroundColor" id="216155638">
-																		<int key="NSColorSpace">6</int>
-																		<string key="NSCatalogName">System</string>
-																		<string key="NSColorName">headerColor</string>
-																		<reference key="NSColor" ref="965176493"/>
-																	</object>
+																	<reference key="NSBackgroundColor" ref="216155638"/>
 																	<reference key="NSTextColor" ref="160578461"/>
 																</object>
 																<object class="NSTextFieldCell" key="NSDataCell" id="853819733">
@@ -483,7 +526,7 @@
 																			<integer value="1040" key="formatterBehavior"/>
 																			<integer value="1" key="timeStyle"/>
 																		</dictionary>
-																		<string key="NS.format">d MMMM y HH:mm</string>
+																		<string key="NS.format">MMMM d, y h:mm a</string>
 																		<bool key="NS.natural">NO</bool>
 																	</object>
 																	<reference key="NSControlView" ref="254268962"/>
@@ -534,8 +577,8 @@
 															<object class="NSTableColumn" id="456964926">
 																<string key="NSIdentifier">SHAColumn</string>
 																<double key="NSWidth">30</double>
-																<double key="NSMinWidth">10</double>
-																<double key="NSMaxWidth">1000</double>
+																<double key="NSMinWidth">30</double>
+																<double key="NSMaxWidth">290</double>
 																<object class="NSTableHeaderCell" key="NSHeaderCell">
 																	<int key="NSCellFlags">75628096</int>
 																	<int key="NSCellFlags2">2048</int>
@@ -548,34 +591,7 @@
 																	<int key="NSCellFlags">338820672</int>
 																	<int key="NSCellFlags2">1024</int>
 																	<string key="NSContents">Text Cell</string>
-																	<reference key="NSSupport" ref="324419606"/>
-																	<reference key="NSControlView" ref="254268962"/>
-																	<reference key="NSBackgroundColor" ref="827363147"/>
-																	<reference key="NSTextColor" ref="57062640"/>
-																</object>
-																<int key="NSResizingMask">3</int>
-																<bool key="NSIsResizeable">YES</bool>
-																<reference key="NSTableView" ref="254268962"/>
-																<bool key="NSHidden">YES</bool>
-															</object>
-															<object class="NSTableColumn" id="760984800">
-																<string key="NSIdentifier">ShortSHAColumn</string>
-																<double key="NSWidth">30</double>
-																<double key="NSMinWidth">10</double>
-																<double key="NSMaxWidth">1000</double>
-																<object class="NSTableHeaderCell" key="NSHeaderCell">
-																	<int key="NSCellFlags">75628096</int>
-																	<int key="NSCellFlags2">2048</int>
-																	<string key="NSContents">Short SHA</string>
-																	<reference key="NSSupport" ref="26"/>
-																	<reference key="NSBackgroundColor" ref="216155638"/>
-																	<reference key="NSTextColor" ref="160578461"/>
-																</object>
-																<object class="NSTextFieldCell" key="NSDataCell" id="493129112">
-																	<int key="NSCellFlags">338820672</int>
-																	<int key="NSCellFlags2">1024</int>
-																	<string key="NSContents"/>
-																	<reference key="NSSupport" ref="324419606"/>
+																	<reference key="NSSupport" ref="475005913"/>
 																	<reference key="NSControlView" ref="254268962"/>
 																	<reference key="NSBackgroundColor" ref="827363147"/>
 																	<reference key="NSTextColor" ref="57062640"/>
@@ -613,6 +629,7 @@
 												</array>
 												<string key="NSFrame">{{0, 17}, {955, 130}}</string>
 												<reference key="NSSuperview" ref="663765878"/>
+												<reference key="NSWindow"/>
 												<reference key="NSNextKeyView" ref="254268962"/>
 												<reference key="NSDocView" ref="254268962"/>
 												<reference key="NSBGColor" ref="827363147"/>
@@ -623,6 +640,7 @@
 												<int key="NSvFlags">-2147483392</int>
 												<string key="NSFrame">{{837, 17}, {15, 179}}</string>
 												<reference key="NSSuperview" ref="663765878"/>
+												<reference key="NSWindow"/>
 												<reference key="NSTarget" ref="663765878"/>
 												<string key="NSAction">_doScroller:</string>
 												<double key="NSPercent">0.87603306770324707</double>
@@ -632,6 +650,7 @@
 												<int key="NSvFlags">-2147483392</int>
 												<string key="NSFrame">{{0, 123}, {852, 15}}</string>
 												<reference key="NSSuperview" ref="663765878"/>
+												<reference key="NSWindow"/>
 												<int key="NSsFlags">1</int>
 												<reference key="NSTarget" ref="663765878"/>
 												<string key="NSAction">_doScroller:</string>
@@ -646,20 +665,24 @@
 												</array>
 												<string key="NSFrameSize">{955, 17}</string>
 												<reference key="NSSuperview" ref="663765878"/>
+												<reference key="NSWindow"/>
 												<reference key="NSNextKeyView" ref="942510576"/>
 												<reference key="NSDocView" ref="942510576"/>
 												<reference key="NSBGColor" ref="827363147"/>
 												<int key="NScvFlags">4</int>
 											</object>
+											<reference ref="688592759"/>
 										</array>
 										<string key="NSFrameSize">{955, 147}</string>
 										<reference key="NSSuperview" ref="24227530"/>
+										<reference key="NSWindow"/>
 										<reference key="NSNextKeyView" ref="546023969"/>
 										<int key="NSsFlags">133680</int>
 										<reference key="NSVScroller" ref="152625445"/>
 										<reference key="NSHScroller" ref="452331733"/>
 										<reference key="NSContentView" ref="546023969"/>
 										<reference key="NSHeaderClipView" ref="906093892"/>
+										<reference key="NSCornerView" ref="688592759"/>
 										<bytes key="NSScrollAmts">QSAAAEEgAABBmAAAQZgAAA</bytes>
 									</object>
 									<object class="NSCustomView" id="428755155">
@@ -672,6 +695,7 @@
 												<object class="NSPSMatrix" key="NSDrawMatrix"/>
 												<string key="NSFrame">{{740, 3}, {16, 16}}</string>
 												<reference key="NSSuperview" ref="428755155"/>
+												<reference key="NSWindow"/>
 												<int key="NSpiFlags">20746</int>
 												<double key="NSMaxValue">100</double>
 											</object>
@@ -680,6 +704,7 @@
 												<int key="NSvFlags">265</int>
 												<string key="NSFrame">{{765, 2}, {180, 19}}</string>
 												<reference key="NSSuperview" ref="428755155"/>
+												<reference key="NSWindow"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="NSSearchFieldCell" key="NSCell" id="1022125543">
 													<int key="NSCellFlags">343014976</int>
@@ -731,6 +756,7 @@
 												<int key="NSvFlags">265</int>
 												<string key="NSFrame">{{714, 3}, {43, 18}}</string>
 												<reference key="NSSuperview" ref="428755155"/>
+												<reference key="NSWindow"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="NSSegmentedCell" key="NSCell" id="657989793">
 													<int key="NSCellFlags">67239424</int>
@@ -766,6 +792,7 @@
 												<int key="NSvFlags">265</int>
 												<string key="NSFrame">{{630, 5}, {80, 14}}</string>
 												<reference key="NSSuperview" ref="428755155"/>
+												<reference key="NSWindow"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="NSTextFieldCell" key="NSCell" id="349876124">
 													<int key="NSCellFlags">68288064</int>
@@ -787,6 +814,7 @@
 												<int key="NSvFlags">268</int>
 												<string key="NSFrame">{{49, 2}, {57, 17}}</string>
 												<reference key="NSSuperview" ref="428755155"/>
+												<reference key="NSWindow"/>
 												<int key="NSTag">1</int>
 												<bool key="NSEnabled">YES</bool>
 												<object class="NSButtonCell" key="NSCell" id="819755658">
@@ -812,6 +840,7 @@
 												<int key="NSvFlags">268</int>
 												<string key="NSFrame">{{114, 2}, {103, 17}}</string>
 												<reference key="NSSuperview" ref="428755155"/>
+												<reference key="NSWindow"/>
 												<int key="NSTag">2</int>
 												<bool key="NSEnabled">YES</bool>
 												<object class="NSButtonCell" key="NSCell" id="670683219">
@@ -833,6 +862,7 @@
 												<int key="NSvFlags">268</int>
 												<string key="NSFrame">{{11, 2}, {30, 17}}</string>
 												<reference key="NSSuperview" ref="428755155"/>
+												<reference key="NSWindow"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="NSButtonCell" key="NSCell" id="291056109">
 													<int key="NSCellFlags">67239424</int>
@@ -851,11 +881,13 @@
 										</array>
 										<string key="NSFrame">{{0, 147}, {955, 24}}</string>
 										<reference key="NSSuperview" ref="24227530"/>
+										<reference key="NSWindow"/>
 										<string key="NSClassName">PBGitGradientBarView</string>
 									</object>
 								</array>
 								<string key="NSFrameSize">{955, 171}</string>
 								<reference key="NSSuperview" ref="202620420"/>
+								<reference key="NSWindow"/>
 								<string key="NSClassName">NSView</string>
 							</object>
 							<object class="NSCustomView" id="560436169">
@@ -867,6 +899,7 @@
 										<int key="NSvFlags">18</int>
 										<string key="NSFrameSize">{955, 233}</string>
 										<reference key="NSSuperview" ref="560436169"/>
+										<reference key="NSWindow"/>
 										<array class="NSMutableArray" key="NSTabViewItems">
 											<object class="NSTabViewItem" id="375889551">
 												<string key="NSIdentifier">1</string>
@@ -938,8 +971,9 @@
 																				<object class="NSOutlineView" id="216928480">
 																					<reference key="NSNextResponder" ref="859661469"/>
 																					<int key="NSvFlags">4368</int>
-																					<string key="NSFrameSize">{231, 233}</string>
+																					<string key="NSFrameSize">{216, 233}</string>
 																					<reference key="NSSuperview" ref="859661469"/>
+																					<reference key="NSWindow"/>
 																					<bool key="NSEnabled">YES</bool>
 																					<object class="_NSCornerView" key="NSCornerView">
 																						<nil key="NSNextResponder"/>
@@ -948,7 +982,7 @@
 																					</object>
 																					<array class="NSMutableArray" key="NSTableColumns">
 																						<object class="NSTableColumn" id="728334291">
-																							<double key="NSWidth">228</double>
+																							<double key="NSWidth">213</double>
 																							<double key="NSMinWidth">16</double>
 																							<double key="NSMaxWidth">1000</double>
 																							<object class="NSTableHeaderCell" key="NSHeaderCell">
@@ -992,8 +1026,9 @@
 																					<int key="NSTableViewGroupRowStyle">1</int>
 																				</object>
 																			</array>
-																			<string key="NSFrame">{{1, 1}, {231, 233}}</string>
+																			<string key="NSFrame">{{1, 1}, {216, 233}}</string>
 																			<reference key="NSSuperview" ref="776605770"/>
+																			<reference key="NSWindow"/>
 																			<reference key="NSNextKeyView" ref="216928480"/>
 																			<reference key="NSDocView" ref="216928480"/>
 																			<reference key="NSBGColor" ref="827363147"/>
@@ -1004,6 +1039,7 @@
 																			<int key="NSvFlags">256</int>
 																			<string key="NSFrame">{{217, 1}, {15, 233}}</string>
 																			<reference key="NSSuperview" ref="776605770"/>
+																			<reference key="NSWindow"/>
 																			<reference key="NSTarget" ref="776605770"/>
 																			<string key="NSAction">_doScroller:</string>
 																			<double key="NSPercent">0.99481862783432007</double>
@@ -1013,6 +1049,7 @@
 																			<int key="NSvFlags">-2147483392</int>
 																			<string key="NSFrame">{{-100, -100}, {502, 15}}</string>
 																			<reference key="NSSuperview" ref="776605770"/>
+																			<reference key="NSWindow"/>
 																			<int key="NSsFlags">1</int>
 																			<reference key="NSTarget" ref="776605770"/>
 																			<string key="NSAction">_doScroller:</string>
@@ -1022,6 +1059,7 @@
 																	</array>
 																	<string key="NSFrameSize">{233, 235}</string>
 																	<reference key="NSSuperview" ref="626906425"/>
+																	<reference key="NSWindow"/>
 																	<reference key="NSNextKeyView" ref="859661469"/>
 																	<int key="NSsFlags">133138</int>
 																	<reference key="NSVScroller" ref="692013536"/>
@@ -1046,6 +1084,7 @@
 																							<int key="NSvFlags">289</int>
 																							<string key="NSFrame">{{41, 1.5}, {29, 19}}</string>
 																							<reference key="NSSuperview" ref="951933530"/>
+																							<reference key="NSWindow"/>
 																							<bool key="NSEnabled">YES</bool>
 																							<object class="NSButtonCell" key="NSCell" id="102056827">
 																								<int key="NSCellFlags">-2080244224</int>
@@ -1072,11 +1111,13 @@
 																					</array>
 																					<string key="NSFrame">{{639, 0}, {84, 24}}</string>
 																					<reference key="NSSuperview" ref="375746871"/>
+																					<reference key="NSWindow"/>
 																					<string key="NSClassName">NSView</string>
 																				</object>
 																			</array>
 																			<string key="NSFrame">{{0, 211}, {723, 24}}</string>
 																			<reference key="NSSuperview" ref="891500945"/>
+																			<reference key="NSWindow"/>
 																			<string key="NSClassName">MGScopeBar</string>
 																		</object>
 																		<object class="WebView" id="979575572">
@@ -1101,6 +1142,7 @@
 																			</set>
 																			<string key="NSFrameSize">{723, 210}</string>
 																			<reference key="NSSuperview" ref="891500945"/>
+																			<reference key="NSWindow"/>
 																			<reference key="NSNextKeyView"/>
 																			<string key="FrameName"/>
 																			<string key="GroupName"/>
@@ -1111,17 +1153,20 @@
 																	</array>
 																	<string key="NSFrame">{{234, 0}, {723, 235}}</string>
 																	<reference key="NSSuperview" ref="626906425"/>
+																	<reference key="NSWindow"/>
 																	<string key="NSClassName">NSView</string>
 																</object>
 															</array>
 															<string key="NSFrame">{{-1, -1}, {957, 235}}</string>
 															<reference key="NSSuperview" ref="657042048"/>
+															<reference key="NSWindow"/>
 															<bool key="NSIsVertical">YES</bool>
 															<int key="NSDividerStyle">2</int>
 														</object>
 													</array>
 													<string key="NSFrameSize">{955, 233}</string>
 													<reference key="NSSuperview" ref="135073984"/>
+													<reference key="NSWindow"/>
 												</object>
 												<string key="NSLabel">Tree</string>
 												<reference key="NSColor" ref="457244339"/>
@@ -1140,16 +1185,19 @@
 								</array>
 								<string key="NSFrame">{{0, 172}, {955, 233}}</string>
 								<reference key="NSSuperview" ref="202620420"/>
+								<reference key="NSWindow"/>
 								<string key="NSClassName">NSView</string>
 							</object>
 						</array>
 						<string key="NSFrameSize">{955, 405}</string>
 						<reference key="NSSuperview" ref="319362431"/>
+						<reference key="NSWindow"/>
 						<int key="NSDividerStyle">2</int>
 					</object>
 				</array>
 				<string key="NSFrameSize">{955, 434}</string>
 				<reference key="NSSuperview"/>
+				<reference key="NSWindow"/>
 				<string key="NSClassName">NSView</string>
 			</object>
 			<object class="NSCustomObject" id="892732705">
@@ -2708,7 +2756,512 @@
 			<nil key="sourceID"/>
 			<int key="maxID">490</int>
 		</object>
-		<object class="IBClassDescriber" key="IBDocument.Classes"/>
+		<object class="IBClassDescriber" key="IBDocument.Classes">
+			<array class="NSMutableArray" key="referencedPartialClassDescriptions">
+				<object class="IBPartialClassDescription">
+					<string key="className">GLFileView</string>
+					<string key="superclassName">PBWebController</string>
+					<dictionary class="NSMutableDictionary" key="outlets">
+						<string key="accessoryView">NSView</string>
+						<string key="fileListSplitView">NSSplitView</string>
+						<string key="historyController">PBGitHistoryController</string>
+						<string key="typeBar">MGScopeBar</string>
+					</dictionary>
+					<dictionary class="NSMutableDictionary" key="toOneOutletInfosByName">
+						<object class="IBToOneOutletInfo" key="accessoryView">
+							<string key="name">accessoryView</string>
+							<string key="candidateClassName">NSView</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="fileListSplitView">
+							<string key="name">fileListSplitView</string>
+							<string key="candidateClassName">NSSplitView</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="historyController">
+							<string key="name">historyController</string>
+							<string key="candidateClassName">PBGitHistoryController</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="typeBar">
+							<string key="name">typeBar</string>
+							<string key="candidateClassName">MGScopeBar</string>
+						</object>
+					</dictionary>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">./Classes/GLFileView.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">GitXRelativeDateFormatter</string>
+					<string key="superclassName">NSFormatter</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">./Classes/GitXRelativeDateFormatter.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">GitXTextFieldCell</string>
+					<string key="superclassName">NSTextFieldCell</string>
+					<object class="NSMutableDictionary" key="outlets">
+						<string key="NS.key.0">contextMenuDelegate</string>
+						<string key="NS.object.0">id</string>
+					</object>
+					<object class="NSMutableDictionary" key="toOneOutletInfosByName">
+						<string key="NS.key.0">contextMenuDelegate</string>
+						<object class="IBToOneOutletInfo" key="NS.object.0">
+							<string key="name">contextMenuDelegate</string>
+							<string key="candidateClassName">id</string>
+						</object>
+					</object>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">./Classes/GitXTextFieldCell.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">PBCollapsibleSplitView</string>
+					<string key="superclassName">PBNiceSplitView</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">./Classes/PBCollapsibleSplitView.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">PBCommitList</string>
+					<string key="superclassName">NSTableView</string>
+					<dictionary class="NSMutableDictionary" key="outlets">
+						<string key="controller">PBGitHistoryController</string>
+						<string key="searchController">PBHistorySearchController</string>
+						<string key="webController">PBWebHistoryController</string>
+						<string key="webView">WebView</string>
+					</dictionary>
+					<dictionary class="NSMutableDictionary" key="toOneOutletInfosByName">
+						<object class="IBToOneOutletInfo" key="controller">
+							<string key="name">controller</string>
+							<string key="candidateClassName">PBGitHistoryController</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="searchController">
+							<string key="name">searchController</string>
+							<string key="candidateClassName">PBHistorySearchController</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="webController">
+							<string key="name">webController</string>
+							<string key="candidateClassName">PBWebHistoryController</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="webView">
+							<string key="name">webView</string>
+							<string key="candidateClassName">WebView</string>
+						</object>
+					</dictionary>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">./Classes/PBCommitList.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">PBGitGradientBarView</string>
+					<string key="superclassName">NSView</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">./Classes/PBGitGradientBarView.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">PBGitHistoryController</string>
+					<string key="superclassName">PBViewController</string>
+					<dictionary class="NSMutableDictionary" key="actions">
+						<string key="cherryPick:">id</string>
+						<string key="createBranch:">id</string>
+						<string key="createTag:">id</string>
+						<string key="merge:">id</string>
+						<string key="openSelectedFile:">id</string>
+						<string key="rebase:">id</string>
+						<string key="refresh:">id</string>
+						<string key="selectNext:">id</string>
+						<string key="selectPrevious:">id</string>
+						<string key="setBranchFilter:">id</string>
+						<string key="setDetailedView:">id</string>
+						<string key="setTreeView:">id</string>
+						<string key="showAddRemoteSheet:">id</string>
+						<string key="toggleQLPreviewPanel:">id</string>
+					</dictionary>
+					<dictionary class="NSMutableDictionary" key="actionInfosByName">
+						<object class="IBActionInfo" key="cherryPick:">
+							<string key="name">cherryPick:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="createBranch:">
+							<string key="name">createBranch:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="createTag:">
+							<string key="name">createTag:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="merge:">
+							<string key="name">merge:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="openSelectedFile:">
+							<string key="name">openSelectedFile:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="rebase:">
+							<string key="name">rebase:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="refresh:">
+							<string key="name">refresh:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="selectNext:">
+							<string key="name">selectNext:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="selectPrevious:">
+							<string key="name">selectPrevious:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="setBranchFilter:">
+							<string key="name">setBranchFilter:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="setDetailedView:">
+							<string key="name">setDetailedView:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="setTreeView:">
+							<string key="name">setTreeView:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="showAddRemoteSheet:">
+							<string key="name">showAddRemoteSheet:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="toggleQLPreviewPanel:">
+							<string key="name">toggleQLPreviewPanel:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+					</dictionary>
+					<dictionary class="NSMutableDictionary" key="outlets">
+						<string key="allBranchesFilterItem">NSButton</string>
+						<string key="cherryPickButton">NSButton</string>
+						<string key="commitController">NSArrayController</string>
+						<string key="commitList">PBCommitList</string>
+						<string key="fileBrowser">NSOutlineView</string>
+						<string key="fileView">GLFileView</string>
+						<string key="historySplitView">PBCollapsibleSplitView</string>
+						<string key="localRemoteBranchesFilterItem">NSButton</string>
+						<string key="mergeButton">NSButton</string>
+						<string key="rebaseButton">NSButton</string>
+						<string key="refController">PBRefController</string>
+						<string key="scopeBarView">PBGitGradientBarView</string>
+						<string key="searchController">PBHistorySearchController</string>
+						<string key="searchField">NSSearchField</string>
+						<string key="selectedBranchFilterItem">NSButton</string>
+						<string key="treeController">NSTreeController</string>
+						<string key="upperToolbarView">PBGitGradientBarView</string>
+						<string key="webHistoryController">PBWebHistoryController</string>
+						<string key="webView">id</string>
+					</dictionary>
+					<dictionary class="NSMutableDictionary" key="toOneOutletInfosByName">
+						<object class="IBToOneOutletInfo" key="allBranchesFilterItem">
+							<string key="name">allBranchesFilterItem</string>
+							<string key="candidateClassName">NSButton</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="cherryPickButton">
+							<string key="name">cherryPickButton</string>
+							<string key="candidateClassName">NSButton</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="commitController">
+							<string key="name">commitController</string>
+							<string key="candidateClassName">NSArrayController</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="commitList">
+							<string key="name">commitList</string>
+							<string key="candidateClassName">PBCommitList</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="fileBrowser">
+							<string key="name">fileBrowser</string>
+							<string key="candidateClassName">NSOutlineView</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="fileView">
+							<string key="name">fileView</string>
+							<string key="candidateClassName">GLFileView</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="historySplitView">
+							<string key="name">historySplitView</string>
+							<string key="candidateClassName">PBCollapsibleSplitView</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="localRemoteBranchesFilterItem">
+							<string key="name">localRemoteBranchesFilterItem</string>
+							<string key="candidateClassName">NSButton</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="mergeButton">
+							<string key="name">mergeButton</string>
+							<string key="candidateClassName">NSButton</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="rebaseButton">
+							<string key="name">rebaseButton</string>
+							<string key="candidateClassName">NSButton</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="refController">
+							<string key="name">refController</string>
+							<string key="candidateClassName">PBRefController</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="scopeBarView">
+							<string key="name">scopeBarView</string>
+							<string key="candidateClassName">PBGitGradientBarView</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="searchController">
+							<string key="name">searchController</string>
+							<string key="candidateClassName">PBHistorySearchController</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="searchField">
+							<string key="name">searchField</string>
+							<string key="candidateClassName">NSSearchField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="selectedBranchFilterItem">
+							<string key="name">selectedBranchFilterItem</string>
+							<string key="candidateClassName">NSButton</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="treeController">
+							<string key="name">treeController</string>
+							<string key="candidateClassName">NSTreeController</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="upperToolbarView">
+							<string key="name">upperToolbarView</string>
+							<string key="candidateClassName">PBGitGradientBarView</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="webHistoryController">
+							<string key="name">webHistoryController</string>
+							<string key="candidateClassName">PBWebHistoryController</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="webView">
+							<string key="name">webView</string>
+							<string key="candidateClassName">id</string>
+						</object>
+					</dictionary>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">./Classes/PBGitHistoryController.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">PBGitRevisionCell</string>
+					<string key="superclassName">NSActionCell</string>
+					<dictionary class="NSMutableDictionary" key="outlets">
+						<string key="contextMenuDelegate">id</string>
+						<string key="controller">PBGitHistoryController</string>
+					</dictionary>
+					<dictionary class="NSMutableDictionary" key="toOneOutletInfosByName">
+						<object class="IBToOneOutletInfo" key="contextMenuDelegate">
+							<string key="name">contextMenuDelegate</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="controller">
+							<string key="name">controller</string>
+							<string key="candidateClassName">PBGitHistoryController</string>
+						</object>
+					</dictionary>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">./Classes/PBGitRevisionCell.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">PBHistorySearchController</string>
+					<string key="superclassName">NSObject</string>
+					<dictionary class="NSMutableDictionary" key="actions">
+						<string key="stepperPressed:">id</string>
+						<string key="updateSearch:">id</string>
+					</dictionary>
+					<dictionary class="NSMutableDictionary" key="actionInfosByName">
+						<object class="IBActionInfo" key="stepperPressed:">
+							<string key="name">stepperPressed:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="updateSearch:">
+							<string key="name">updateSearch:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+					</dictionary>
+					<dictionary class="NSMutableDictionary" key="outlets">
+						<string key="commitController">NSArrayController</string>
+						<string key="historyController">PBGitHistoryController</string>
+						<string key="numberOfMatchesField">NSTextField</string>
+						<string key="progressIndicator">NSProgressIndicator</string>
+						<string key="searchField">NSSearchField</string>
+						<string key="stepper">NSSegmentedControl</string>
+					</dictionary>
+					<dictionary class="NSMutableDictionary" key="toOneOutletInfosByName">
+						<object class="IBToOneOutletInfo" key="commitController">
+							<string key="name">commitController</string>
+							<string key="candidateClassName">NSArrayController</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="historyController">
+							<string key="name">historyController</string>
+							<string key="candidateClassName">PBGitHistoryController</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="numberOfMatchesField">
+							<string key="name">numberOfMatchesField</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="progressIndicator">
+							<string key="name">progressIndicator</string>
+							<string key="candidateClassName">NSProgressIndicator</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="searchField">
+							<string key="name">searchField</string>
+							<string key="candidateClassName">NSSearchField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="stepper">
+							<string key="name">stepper</string>
+							<string key="candidateClassName">NSSegmentedControl</string>
+						</object>
+					</dictionary>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">./Classes/PBHistorySearchController.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">PBNiceSplitView</string>
+					<string key="superclassName">NSSplitView</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">./Classes/PBNiceSplitView.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">PBQLOutlineView</string>
+					<string key="superclassName">NSOutlineView</string>
+					<object class="NSMutableDictionary" key="outlets">
+						<string key="NS.key.0">controller</string>
+						<string key="NS.object.0">PBGitHistoryController</string>
+					</object>
+					<object class="NSMutableDictionary" key="toOneOutletInfosByName">
+						<string key="NS.key.0">controller</string>
+						<object class="IBToOneOutletInfo" key="NS.object.0">
+							<string key="name">controller</string>
+							<string key="candidateClassName">PBGitHistoryController</string>
+						</object>
+					</object>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">./Classes/PBQLOutlineView.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">PBRefController</string>
+					<string key="superclassName">NSObject</string>
+					<dictionary class="NSMutableDictionary" key="outlets">
+						<string key="branchPopUp">NSPopUpButton</string>
+						<string key="commitController">NSArrayController</string>
+						<string key="commitList">PBCommitList</string>
+					</dictionary>
+					<dictionary class="NSMutableDictionary" key="toOneOutletInfosByName">
+						<object class="IBToOneOutletInfo" key="branchPopUp">
+							<string key="name">branchPopUp</string>
+							<string key="candidateClassName">NSPopUpButton</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="commitController">
+							<string key="name">commitController</string>
+							<string key="candidateClassName">NSArrayController</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="commitList">
+							<string key="name">commitList</string>
+							<string key="candidateClassName">PBCommitList</string>
+						</object>
+					</dictionary>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">./Classes/PBRefController.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">PBUnsortableTableHeader</string>
+					<string key="superclassName">NSTableHeaderView</string>
+					<object class="NSMutableDictionary" key="outlets">
+						<string key="NS.key.0">controller</string>
+						<string key="NS.object.0">NSArrayController</string>
+					</object>
+					<object class="NSMutableDictionary" key="toOneOutletInfosByName">
+						<string key="NS.key.0">controller</string>
+						<object class="IBToOneOutletInfo" key="NS.object.0">
+							<string key="name">controller</string>
+							<string key="candidateClassName">NSArrayController</string>
+						</object>
+					</object>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">./Classes/PBUnsortableTableHeader.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">PBViewController</string>
+					<string key="superclassName">NSViewController</string>
+					<object class="NSMutableDictionary" key="actions">
+						<string key="NS.key.0">refresh:</string>
+						<string key="NS.object.0">id</string>
+					</object>
+					<object class="NSMutableDictionary" key="actionInfosByName">
+						<string key="NS.key.0">refresh:</string>
+						<object class="IBActionInfo" key="NS.object.0">
+							<string key="name">refresh:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+					</object>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">./Classes/PBViewController.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">PBWebController</string>
+					<string key="superclassName">NSObject</string>
+					<dictionary class="NSMutableDictionary" key="outlets">
+						<string key="repository">id</string>
+						<string key="view">WebView</string>
+					</dictionary>
+					<dictionary class="NSMutableDictionary" key="toOneOutletInfosByName">
+						<object class="IBToOneOutletInfo" key="repository">
+							<string key="name">repository</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="view">
+							<string key="name">view</string>
+							<string key="candidateClassName">WebView</string>
+						</object>
+					</dictionary>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">./Classes/PBWebController.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">PBWebHistoryController</string>
+					<string key="superclassName">PBWebController</string>
+					<dictionary class="NSMutableDictionary" key="outlets">
+						<string key="contextMenuDelegate">id</string>
+						<string key="historyController">PBGitHistoryController</string>
+					</dictionary>
+					<dictionary class="NSMutableDictionary" key="toOneOutletInfosByName">
+						<object class="IBToOneOutletInfo" key="contextMenuDelegate">
+							<string key="name">contextMenuDelegate</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="historyController">
+							<string key="name">historyController</string>
+							<string key="candidateClassName">PBGitHistoryController</string>
+						</object>
+					</dictionary>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">./Classes/PBWebHistoryController.h</string>
+					</object>
+				</object>
+			</array>
+		</object>
 		<int key="IBDocument.localizationMode">0</int>
 		<string key="IBDocument.TargetRuntimeIdentifier">IBCocoaFramework</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginDeclaredDependencies">
