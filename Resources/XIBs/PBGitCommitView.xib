@@ -301,7 +301,7 @@
 															</object>
 															<reference key="NSControlView" ref="792511503"/>
 															<int key="NSButtonFlags">-2038284033</int>
-															<int key="NSButtonFlags2">301990017</int>
+															<int key="NSButtonFlags2">268435585</int>
 															<string key="NSAlternateContents"/>
 															<string type="base64-UTF8" key="NSKeyEquivalent">DQ</string>
 															<int key="NSPeriodicDelay">200</int>
