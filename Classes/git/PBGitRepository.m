@@ -60,7 +60,7 @@
 	NSError* repoInitError;
 	GTRepository* objgRepo = [[GTRepository alloc] initWithURL:repositoryURL error:&repoInitError];
 	if (objgRepo != NULL) {
-		NSURL* repoPath = [objgRepo fileURL];
+		NSURL* repoPath = [objgRepo gitDirectoryURL];
 		return repoPath;
 	}
 	return nil;
@@ -117,12 +117,14 @@
 		return NO;
 	}
 
-	[self setFileURL:gitDirURL];
 	[self setup];
   watcher = [[PBGitRepositoryWatcher alloc] initWithRepository:self];
 	return YES;
 }
 
+- (NSURL *) gitURL {
+    return self.gtRepo.gitDirectoryURL;
+}
 - (void) setup
 {
 	self->configuration = self.gtRepo.configuration;
@@ -149,7 +151,9 @@
 		return nil;
 
 	self = [self init];
-	[self setFileURL: gitDirURL];
+    
+    //TODO: IS THIS CORRECT???
+	[self setFileURL: path];
 
 	[self setup];
 	
@@ -176,8 +180,7 @@
 	return NO;
 }
 
-// The fileURL the document keeps is to the .git dir, but that’s pretty
-// useless for display in the window title bar, so we show the directory above
+// The fileURL the document keeps is to the working dir
 - (NSString *) displayName
 {
 	if (![[PBGitRef refFromString:[[self headRef] simpleRef]] type])
@@ -540,8 +543,10 @@
 {
 	if ([self.fileURL.path hasSuffix:@"/.git"])
 		return [self.fileURL.path substringToIndex:[self.fileURL.path length] - 5];
-	else if ([[self outputForCommand:@"rev-parse --is-inside-work-tree"] isEqualToString:@"true"])
-		return [PBGitBinary path];
+    else
+        return self.fileURL.path;
+//	else if ([[self outputForCommand:@"rev-parse --is-inside-work-tree"] isEqualToString:@"true"])
+//		return [PBGitBinary path];
 	
 	return nil;
 }
@@ -1060,7 +1065,7 @@
 
 - (NSFileHandle*) handleForArguments:(NSArray *)args
 {
-	NSString* gitDirArg = [@"--git-dir=" stringByAppendingString:self.fileURL.path];
+	NSString* gitDirArg = [@"--git-dir=" stringByAppendingString:self.gitURL.path];
 	NSMutableArray* arguments =  [NSMutableArray arrayWithObject: gitDirArg];
 	[arguments addObjectsFromArray: args];
 	return [PBEasyPipe handleForCommand:[PBGitBinary path] withArgs:arguments];
@@ -1068,7 +1073,7 @@
 
 - (NSFileHandle*) handleInWorkDirForArguments:(NSArray *)args
 {
-	NSString* gitDirArg = [@"--git-dir=" stringByAppendingString:self.fileURL.path];
+	NSString* gitDirArg = [@"--git-dir=" stringByAppendingString:self.gitURL.path];
 	NSMutableArray* arguments =  [NSMutableArray arrayWithObject: gitDirArg];
 	[arguments addObjectsFromArray: args];
 	return [PBEasyPipe handleForCommand:[PBGitBinary path] withArgs:arguments inDir:[self workingDirectory]];
@@ -1138,13 +1143,13 @@
 
 - (BOOL)executeHook:(NSString *)name withArgs:(NSArray *)arguments output:(NSString **)output
 {
-	NSString *hookPath = [[[[self fileURL] path] stringByAppendingPathComponent:@"hooks"] stringByAppendingPathComponent:name];
+	NSString *hookPath = [[[[self gitURL] path] stringByAppendingPathComponent:@"hooks"] stringByAppendingPathComponent:name];
 	if (![[NSFileManager defaultManager] isExecutableFileAtPath:hookPath])
 		return TRUE;
 
 	NSDictionary *info = [NSDictionary dictionaryWithObjectsAndKeys:
-		[self fileURL].path, @"GIT_DIR",
-		[[self fileURL].path stringByAppendingPathComponent:@"index"], @"GIT_INDEX_FILE",
+		[self gitURL].path, @"GIT_DIR",
+		[[self gitURL].path stringByAppendingPathComponent:@"index"], @"GIT_INDEX_FILE",
 		nil
 	];
 

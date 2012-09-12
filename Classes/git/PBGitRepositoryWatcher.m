@@ -53,7 +53,7 @@ void PBGitRepositoryWatcherCallback(ConstFSEventStreamRef streamRef,
 	repository = theRepository;
 	FSEventStreamContext context = {0, (__bridge void *)(self), NULL, NULL, NULL};
 
-	NSString *path = [repository isBareRepository] ? repository.fileURL.path : [repository workingDirectory];
+	NSString *path = [repository.gitURL path];
 	NSArray *paths = [NSArray arrayWithObject: path];
 
 	// Create and activate event stream
@@ -81,7 +81,7 @@ void PBGitRepositoryWatcherCallback(ConstFSEventStreamRef streamRef,
 }
 
 - (BOOL) _indexChanged {
-    NSDate *newTouchDate = [self _fileModificationDateAtPath:[repository.fileURL.path stringByAppendingPathComponent:@"index"]];
+    NSDate *newTouchDate = [self _fileModificationDateAtPath:[repository.gitURL.path stringByAppendingPathComponent:@"index"]];
 	if (![newTouchDate isEqual:indexTouchDate]) {
 		indexTouchDate = newTouchDate;
 		return YES;
@@ -92,7 +92,7 @@ void PBGitRepositoryWatcherCallback(ConstFSEventStreamRef streamRef,
 
 - (BOOL) _gitDirectoryChanged {
 
-	for (NSURL* fileURL in [[NSFileManager defaultManager] contentsOfDirectoryAtURL:repository.fileURL
+	for (NSURL* fileURL in [[NSFileManager defaultManager] contentsOfDirectoryAtURL:repository.gitURL
 														 includingPropertiesForKeys:[NSArray arrayWithObject:NSURLContentModificationDateKey]
 																			options:0
 						
@@ -127,7 +127,7 @@ void PBGitRepositoryWatcherCallback(ConstFSEventStreamRef streamRef,
 		event |= PBGitRepositoryWatcherEventTypeIndex;
 	}
 	
-	NSString* ourRepo_ns = repository.fileURL.path;
+	NSString* ourRepo_ns = repository.gitURL.path;
 	// libgit2 API results for directories end with a '/'
 	if (![ourRepo_ns hasSuffix:@"/"])
 		ourRepo_ns = [NSString stringWithFormat:@"%@/", ourRepo_ns];
@@ -141,7 +141,7 @@ void PBGitRepositoryWatcherCallback(ConstFSEventStreamRef streamRef,
     
 	for (PBGitRepositoryWatcherEventPath *eventPath in eventPaths) {
 		// .git dir
-		if ([[eventPath.path stringByStandardizingPath] isEqual:[repository.fileURL.path stringByStandardizingPath]]) {
+		if ([[eventPath.path stringByStandardizingPath] isEqual:[repository.gitURL.path stringByStandardizingPath]]) {
 			// ignore changes to lock files
 			if ([eventPath.path hasSuffix:@".lock"])
 			{
@@ -157,7 +157,7 @@ void PBGitRepositoryWatcherCallback(ConstFSEventStreamRef streamRef,
 		}
 
 		// subdirs of .git dir
-		else if ([eventPath.path rangeOfString:repository.fileURL.path].location != NSNotFound) {
+		else if ([eventPath.path rangeOfString:repository.gitURL.path].location != NSNotFound) {
 			// ignore changes to lock files
 			if ([eventPath.path hasSuffix:@".lock"])
 			{

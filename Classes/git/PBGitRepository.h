@@ -79,6 +79,8 @@ static NSString * PBStringFromBranchFilterType(PBGitXBranchFilterType type) {
 - (BOOL) deleteRemote:(PBGitRef *)ref;
 - (BOOL) deleteRef:(PBGitRef *)ref;
 
+- (NSURL *) gitURL ;
+
 - (NSFileHandle*) handleForCommand:(NSString*) cmd DEPRECATED;
 - (NSFileHandle*) handleForArguments:(NSArray*) args DEPRECATED;
 - (NSFileHandle *) handleInWorkDirForArguments:(NSArray *)args DEPRECATED;
