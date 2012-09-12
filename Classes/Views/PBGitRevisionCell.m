@@ -310,7 +310,7 @@
 	if (!contextMenuDelegate)
 		return [self menu];
 
-	int i = [self indexAtX:[view convertPointFromBase:[event locationInWindow]].x - rect.origin.x];
+	int i = [self indexAtX:[view convertPoint:[event locationInWindow] fromView:nil].x - rect.origin.x];
 
 	id ref = nil;
 	if (i >= 0)

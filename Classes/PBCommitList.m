@@ -91,7 +91,7 @@
 
 - (void)mouseDown:(NSEvent *)theEvent
 {
-	mouseDownPoint = [[self window] mouseLocationOutsideOfEventStream];
+    mouseDownPoint = [self convertPoint:[theEvent locationInWindow] fromView:nil];
 	[super mouseDown:theEvent];
 }
 
@@ -100,7 +100,7 @@
 								   event:(NSEvent *)dragEvent
 								  offset:(NSPointPointer)dragImageOffset
 {
-	NSPoint location = [self convertPointFromBase:mouseDownPoint];
+	NSPoint location = mouseDownPoint;
 	int row = [self rowAtPoint:location];
 	int column = [self columnAtPoint:location];
 	PBGitRevisionCell *cell = (PBGitRevisionCell *)[self preparedCellAtColumn:column row:row];

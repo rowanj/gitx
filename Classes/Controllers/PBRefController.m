@@ -314,7 +314,8 @@
 
 - (BOOL)tableView:(NSTableView *)tv writeRowsWithIndexes:(NSIndexSet *)rowIndexes toPasteboard:(NSPasteboard*)pboard
 {
-	NSPoint location = [tv convertPointFromBase:[(PBCommitList *)tv mouseDownPoint]];
+    
+	NSPoint location = [(PBCommitList *)tv mouseDownPoint];
 	int row = [tv rowAtPoint:location];
 	int column = [tv columnAtPoint:location];
 	int subjectColumn = [tv columnWithIdentifier:@"SubjectColumn"];
