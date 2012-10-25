@@ -83,7 +83,7 @@ var showFile = function(txt, fileName) {
     "h": "cpp",
     "hh": "cpp",
     "hpp": "cpp",
-    "cpp": "h++",
+    "h++": "cpp",
     "c": "cpp"
   }
   var brush = "objc";
