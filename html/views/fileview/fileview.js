@@ -86,13 +86,13 @@ var showFile = function(txt, fileName) {
     "h++": "cpp",
     "c": "cpp"
   }
-  var brush = "objc";
+
   var suffix = "";
   if (fileName && fileName != '') {
     suffix = fileName.substr(fileName.lastIndexOf('.') + 1);
   }
   
-  brush = suffix_map[suffix];
+  var brush = suffix_map[suffix] ? suffix_map[suffix] : "plain";
   
   $("source").innerHTML="<pre class='first-line: 1;brush: " + brush + "'>" + txt + "</pre>";
 

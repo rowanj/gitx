@@ -16,7 +16,7 @@
  */
 .syntaxhighlighter {
   background-color: white !important;
-  font: 11px "Menlo" !important;
+  font: 1em "Menlo" !important;
 }
 .syntaxhighlighter .line.alt1 {
   background-color: white !important;
@@ -34,12 +34,18 @@
   color: black !important;
 }
 .syntaxhighlighter .gutter {
-  color: #afafaf !important;
+  border: 1px solid #dddddd !important;
+  padding: 5px 0 !important;
+  background-color: #ececec !important;
+}
+.syntaxhighlighter table td.gutter .line {
+  text-align: right !important;
+  padding: 0 2px 0 2px !important;
+  min-width: 20px;
 }
 .syntaxhighlighter .gutter .line {
-  border-right: 3px solid #6ce26c !important;
-	display: block !important;
-	width: 30px !important;
+  background-color: #ececec !important;
+  color: #a9a9a9 !important;
 }
 .syntaxhighlighter .gutter .line.highlighted {
   background-color: #6ce26c !important;
