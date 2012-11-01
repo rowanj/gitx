@@ -60,9 +60,11 @@ static NSString * PBStringFromBranchFilterType(PBGitXBranchFilterType type) {
 
 @property (nonatomic, strong) PBGitHistoryList *revisionList;
 @property (nonatomic, strong) NSMutableArray* branches;
-@property (nonatomic, strong) PBGitRevSpecifier *currentBranch;
+@property (nonatomic, strong) PBGitRevSpecifier* currentBranch;
 @property (nonatomic, strong) NSMutableDictionary* refs;
 @property (readonly, strong) GTRepository* gtRepo;
+
+@property (nonatomic, strong) NSMutableArray* submodules;
 
 - (void) cloneRepositoryToPath:(NSString *)path bare:(BOOL)isBare;
 - (void) beginAddRemote:(NSString *)remoteName forURL:(NSString *)remoteURL;

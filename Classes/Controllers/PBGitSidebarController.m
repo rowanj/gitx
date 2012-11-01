@@ -16,6 +16,7 @@
 #import "PBAddRemoteSheet.h"
 #import "PBGitDefaults.h"
 #import "PBHistorySearchController.h"
+#import "PBRepositoryDocumentController.h"
 
 @interface PBGitSidebarController ()
 
@@ -53,6 +54,9 @@
 
 	[repository addObserver:self forKeyPath:@"currentBranch" options:0 context:@"currentBranchChange"];
 	[repository addObserver:self forKeyPath:@"branches" options:(NSKeyValueObservingOptionOld | NSKeyValueObservingOptionNew) context:@"branchesModified"];
+
+    [sourceView setTarget:self];
+    [sourceView setDoubleAction:@selector(doubleClicked:)];
 
 	[self menuNeedsUpdate:[actionButton menu]];
 
@@ -215,6 +219,27 @@
 	[self updateRemoteControls];
 }
 
+- (void)doubleClicked:(id)object {
+    NSInteger rowNumber = [sourceView selectedRow];
+    if ([[sourceView itemAtRow:rowNumber] isKindOfClass:[PBGitSVSubmoduleItem class]]) {
+        PBGitSVSubmoduleItem *subModule = [sourceView itemAtRow:rowNumber];
+        
+        NSURL *url = [NSURL fileURLWithPath:subModule.submodule.path];
+        [[PBRepositoryDocumentController sharedDocumentController] openDocumentWithContentsOfURL:url
+																						 display:YES
+																						   error:nil];
+
+        ;
+    }
+}
+
+- (BOOL)outlineView:(NSOutlineView *)outlineView shouldEditTableColumn:(NSTableColumn *)tableColumn item:(id)item
+{
+    if ([item isKindOfClass:[PBGitSVSubmoduleItem class]]) {
+        NSLog(@"hi");
+    }
+    return NO;
+}
 #pragma mark NSOutlineView delegate methods
 - (BOOL)outlineView:(NSOutlineView *)outlineView isGroupItem:(id)item
 {
@@ -253,21 +278,27 @@
 	branches = [PBSourceViewItem groupItemWithTitle:@"Branches"];
 	remotes = [PBSourceViewItem groupItemWithTitle:@"Remotes"];
 	tags = [PBSourceViewItem groupItemWithTitle:@"Tags"];
+	submodules = [PBSourceViewItem groupItemWithTitle:@"Submodules"];
 	others = [PBSourceViewItem groupItemWithTitle:@"Other"];
 
 	for (PBGitRevSpecifier *rev in repository.branches)
 		[self addRevSpec:rev];
-
+    
+    for (PBGitSubmodule *sub in repository.submodules)
+        [submodules addChild: [PBGitSVSubmoduleItem itemWithSubmodule:sub]];
+    
 	[items addObject:project];
 	[items addObject:branches];
 	[items addObject:remotes];
 	[items addObject:tags];
+	[items addObject:submodules];
 	[items addObject:others];
 
 	[sourceView reloadData];
 	[sourceView expandItem:project];
 	[sourceView expandItem:branches expandChildren:YES];
 	[sourceView expandItem:remotes];
+    [sourceView expandItem:submodules];
 
 	[sourceView reloadItem:nil reloadChildren:YES];
 }

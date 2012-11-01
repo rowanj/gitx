@@ -174,6 +174,8 @@
 		4AAAFDDA14A010DD008FC9B5 /* Sparkle.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 4A68AD6714A0050F006DE321 /* Sparkle.framework */; };
 		4AB71FF814B7EDD400F1DFFC /* RJModalRepoSheet.m in Sources */ = {isa = PBXBuildFile; fileRef = 4AB71FF714B7EDD400F1DFFC /* RJModalRepoSheet.m */; };
 		551BF176112F3F4B00265053 /* gitx_askpasswd in Resources */ = {isa = PBXBuildFile; fileRef = 551BF111112F371800265053 /* gitx_askpasswd */; };
+		643952741603E9BC00BB7AFF /* PBGitSubmodule.m in Sources */ = {isa = PBXBuildFile; fileRef = 643952731603E9BC00BB7AFF /* PBGitSubmodule.m */; };
+		643952771603EF9B00BB7AFF /* PBGitSVSubmoduleItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 643952761603EF9B00BB7AFF /* PBGitSVSubmoduleItem.m */; };
 		8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
 		911112370E5A097800BF76B4 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 911112360E5A097800BF76B4 /* Security.framework */; };
 		913D5E500E55645900CECEA2 /* gitx in Resources */ = {isa = PBXBuildFile; fileRef = 913D5E490E55644600CECEA2 /* gitx */; };
@@ -589,6 +591,10 @@
 		4AB71FF714B7EDD400F1DFFC /* RJModalRepoSheet.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RJModalRepoSheet.m; sourceTree = "<group>"; };
 		4AEE01C414ABF47C0009CFEA /* dct_weak.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = dct_weak.h; sourceTree = SOURCE_ROOT; };
 		551BF111112F371800265053 /* gitx_askpasswd */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = gitx_askpasswd; sourceTree = BUILT_PRODUCTS_DIR; };
+		643952721603E9BC00BB7AFF /* PBGitSubmodule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PBGitSubmodule.h; sourceTree = "<group>"; };
+		643952731603E9BC00BB7AFF /* PBGitSubmodule.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PBGitSubmodule.m; sourceTree = "<group>"; };
+		643952751603EF9B00BB7AFF /* PBGitSVSubmoduleItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PBGitSVSubmoduleItem.h; sourceTree = "<group>"; };
+		643952761603EF9B00BB7AFF /* PBGitSVSubmoduleItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PBGitSVSubmoduleItem.m; sourceTree = "<group>"; };
 		77C82804067257F0000B614F /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = /System/Library/Frameworks/CoreData.framework; sourceTree = "<absolute>"; };
 		8D1107320486CEB800E47090 /* GitX.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GitX.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		911112360E5A097800BF76B4 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = /System/Library/Frameworks/Security.framework; sourceTree = "<absolute>"; };
@@ -955,6 +961,10 @@
 				4A5D768214A9A9CC00DF6C68 /* PBGitXErrors.m */,
 				4A5D768314A9A9CC00DF6C68 /* PBGitXProtocol.h */,
 				4A5D768414A9A9CC00DF6C68 /* PBGitXProtocol.m */,
+				643952721603E9BC00BB7AFF /* PBGitSubmodule.h */,
+				643952731603E9BC00BB7AFF /* PBGitSubmodule.m */,
+				643952751603EF9B00BB7AFF /* PBGitSVSubmoduleItem.h */,
+				643952761603EF9B00BB7AFF /* PBGitSVSubmoduleItem.m */,
 			);
 			path = git;
 			sourceTree = "<group>";
@@ -1457,6 +1467,8 @@
 				4A5D777414A9AEB000DF6C68 /* PBSourceViewBadge.m in Sources */,
 				4A5D777514A9AEB000DF6C68 /* PBSourceViewRemote.m in Sources */,
 				4AB71FF814B7EDD400F1DFFC /* RJModalRepoSheet.m in Sources */,
+				643952741603E9BC00BB7AFF /* PBGitSubmodule.m in Sources */,
+				643952771603EF9B00BB7AFF /* PBGitSVSubmoduleItem.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1585,6 +1597,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CODE_SIGN_IDENTITY = "Mac Developer";
 				FRAMEWORK_SEARCH_PATHS = "\"$(PROJECT_DIR)\"";
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
@@ -1596,6 +1609,7 @@
 				INSTALL_PATH = /Applications;
 				OTHER_CFLAGS = "-Werror=incompatible-pointer-types";
 				PRODUCT_NAME = GitX;
+				PROVISIONING_PROFILE = "";
 				VERSIONING_SYSTEM = "apple-generic";
 				WRAPPER_EXTENSION = app;
 			};
@@ -1605,6 +1619,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CODE_SIGN_IDENTITY = "Mac Developer";
 				FRAMEWORK_SEARCH_PATHS = "\"$(PROJECT_DIR)\"";
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				GCC_ENABLE_OBJC_GC = unsupported;
@@ -1616,6 +1631,7 @@
 				INSTALL_PATH = /Applications;
 				OTHER_CFLAGS = "-Werror=incompatible-pointer-types";
 				PRODUCT_NAME = GitX;
+				PROVISIONING_PROFILE = "";
 				STRIP_INSTALLED_PRODUCT = YES;
 				VERSIONING_SYSTEM = "apple-generic";
 				WRAPPER_EXTENSION = app;
