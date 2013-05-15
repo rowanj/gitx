@@ -36,6 +36,7 @@
 - (void) rebaseHeadBranch:(PBRefMenuItem *)sender;
 - (void) createBranch:(PBRefMenuItem *)sender;
 - (void) copySHA:(PBRefMenuItem *)sender;
+- (void) copyShortSHA:(PBRefMenuItem *)sender;
 - (void) copyPatch:(PBRefMenuItem *)sender;
 - (void) diffWithHEAD:(PBRefMenuItem *)sender;
 - (void) createTag:(PBRefMenuItem *)sender;

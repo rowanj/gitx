@@ -192,6 +192,21 @@
 	[pasteboard setString:[commit realSha] forType:NSStringPboardType];
 }
 
+
+- (void) copyShortSHA:(PBRefMenuItem *)sender
+{
+	PBGitCommit *commit = nil;
+	if ([[sender refish] refishType] == kGitXCommitType)
+		commit = (PBGitCommit *)[sender refish];
+	else
+		commit = [historyController.repository commitForRef:[sender refish]];
+    
+	NSPasteboard *pasteboard = [NSPasteboard generalPasteboard];
+	[pasteboard declareTypes:[NSArray arrayWithObject:NSStringPboardType] owner:nil];
+	[pasteboard setString:[commit shortName] forType:NSStringPboardType];
+}
+
+
 - (void) copyPatch:(PBRefMenuItem *)sender
 {
 	PBGitCommit *commit = nil;
