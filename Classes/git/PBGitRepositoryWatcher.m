@@ -179,7 +179,7 @@ void PBGitRepositoryWatcherCallback(ConstFSEventStreamRef streamRef,
 	{
 		if ([lastStatus isEqualToDictionary:newStatus])
 		{
-			NSLog(@"Watcher: no changes to working copy");
+//			NSLog(@"Watcher: no changes to working copy");
 		}
 		else
 		{
