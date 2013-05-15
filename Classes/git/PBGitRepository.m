@@ -30,7 +30,7 @@
 
 @implementation PBGitRepository
 
-@synthesize revisionList, branches, currentBranch, refs, hasChanged, configuration, submodules;
+@synthesize revisionList, branchesSet, currentBranch, refs, hasChanged, configuration, submodules;
 @synthesize currentBranchFilter;
 
 - (BOOL)readFromData:(NSData *)data ofType:(NSString *)typeName error:(NSError **)outError
@@ -106,7 +106,7 @@
 - (void) setup
 {
 	self->configuration = self.gtRepo.configuration;
-	self.branches = [NSMutableArray array];
+	self.branchesSet = [NSMutableOrderedSet orderedSet];
     self.submodules = [NSMutableArray array];
 	[self reloadRefs];
 	currentBranchFilter = [PBGitDefaults branchFilter];
@@ -147,7 +147,7 @@
 #endif
 
 	[self showWindows];
-
+    
   // Setup the FSEvents watcher to fire notifications when things change
   watcher = [[PBGitRepositoryWatcher alloc] initWithRepository:self];
 	return self;
@@ -272,7 +272,7 @@ int addSubmoduleName(git_submodule *module, const char* name, void * context)
 	NSArray* allRefs = [self.gtRepo referenceNamesWithError:&error];
 	
 	// load all named refs
-	NSMutableArray *oldBranches = [branches mutableCopy];
+	NSMutableOrderedSet *oldBranches = [self.branchesSet mutableCopy];
 	for (NSString* referenceName in allRefs)
 	{
 		GTReference* gtRef =
@@ -502,6 +502,11 @@ int addSubmoduleName(git_submodule *module, const char* name, void * context)
 
 	return nil;
 }
+
+- (NSArray*)branches
+{
+    return [self.branchesSet array];
+}
 		
 // Returns either this object, or an existing, equal object
 - (PBGitRevSpecifier*) addBranch:(PBGitRevSpecifier*)branch
@@ -510,14 +515,14 @@ int addSubmoduleName(git_submodule *module, const char* name, void * context)
 		branch = [self headRef];
 
 	// First check if the branch doesn't exist already
-	for (PBGitRevSpecifier *rev in branches)
-		if ([branch isEqual: rev])
-			return rev;
+    if ([self.branchesSet containsObject:branch]) {
+        return branch;
+    }
 
-	NSIndexSet *newIndex = [NSIndexSet indexSetWithIndex:[branches count]];
+	NSIndexSet *newIndex = [NSIndexSet indexSetWithIndex:[self.branches count]];
 	[self willChange:NSKeyValueChangeInsertion valuesAtIndexes:newIndex forKey:@"branches"];
 
-	[branches addObject:branch];
+    [self.branchesSet addObject:branch];
 
 	[self didChange:NSKeyValueChangeInsertion valuesAtIndexes:newIndex forKey:@"branches"];
 	return branch;
@@ -525,17 +530,15 @@ int addSubmoduleName(git_submodule *module, const char* name, void * context)
 
 - (BOOL) removeBranch:(PBGitRevSpecifier *)branch
 {
-	for (PBGitRevSpecifier *rev in branches) {
-		if ([branch isEqual:rev]) {
-			NSIndexSet *oldIndex = [NSIndexSet indexSetWithIndex:[branches indexOfObject:rev]];
-			[self willChange:NSKeyValueChangeRemoval valuesAtIndexes:oldIndex forKey:@"branches"];
+    if ([self.branchesSet containsObject:branch]) {
+        NSIndexSet *oldIndex = [NSIndexSet indexSetWithIndex:[self.branches indexOfObject:branch]];
+        [self willChange:NSKeyValueChangeRemoval valuesAtIndexes:oldIndex forKey:@"branches"];
 
-			[branches removeObject:rev];
+        [self.branchesSet removeObject:branch];
 
-			[self didChange:NSKeyValueChangeRemoval valuesAtIndexes:oldIndex forKey:@"branches"];
-			return YES;
-		}
-	}
+        [self didChange:NSKeyValueChangeRemoval valuesAtIndexes:oldIndex forKey:@"branches"];
+        return YES;
+    }
 	return NO;
 }
 	
@@ -897,7 +900,7 @@ int addSubmoduleName(git_submodule *module, const char* name, void * context)
 
 	// remove the remote's branches
 	NSString *remoteRef = [kGitXRemoteRefPrefix stringByAppendingString:[ref remoteName]];
-	for (PBGitRevSpecifier *rev in [branches copy]) {
+	for (PBGitRevSpecifier *rev in [self.branchesSet copy]) {
 		PBGitRef *branch = [rev ref];
 		if ([[branch ref] hasPrefix:remoteRef]) {
 			[self removeBranch:rev];

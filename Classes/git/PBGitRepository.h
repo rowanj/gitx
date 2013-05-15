@@ -59,7 +59,8 @@ static NSString * PBStringFromBranchFilterType(PBGitXBranchFilterType type) {
 @property (readonly, nonatomic) GTConfiguration* configuration;
 
 @property (nonatomic, strong) PBGitHistoryList *revisionList;
-@property (nonatomic, strong) NSMutableArray* branches;
+@property (nonatomic, readonly, strong) NSArray* branches;
+@property (nonatomic, strong) NSMutableOrderedSet* branchesSet;
 @property (nonatomic, strong) PBGitRevSpecifier* currentBranch;
 @property (nonatomic, strong) NSMutableDictionary* refs;
 @property (readonly, strong) GTRepository* gtRepo;

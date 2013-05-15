@@ -11,7 +11,8 @@
 #import "PBGitRef.h"
 
 @implementation PBSourceViewItem
-@synthesize parent, isGroupItem, children, revSpecifier, isUncollapsible;
+
+@synthesize parent, isGroupItem, revSpecifier, isUncollapsible;
 @dynamic icon;
 
 - (id)init
@@ -19,7 +20,7 @@
 	if (!(self = [super init]))
 		return nil;
 
-	children = [NSMutableArray array];
+	childrenSet = [[NSMutableOrderedSet alloc] init];
 	return self;
 }
 
@@ -51,14 +52,24 @@
 	return [PBGitSVOtherRevItem otherItemWithRevSpec:revSpecifier];
 }
 
+- (NSArray *)children
+{
+    if (!children) {
+        children = [childrenSet sortedArrayUsingComparator:^NSComparisonResult(PBSourceViewItem *obj1, PBSourceViewItem *obj2) {
+            return [obj1.title localizedStandardCompare:obj2.title];
+        }];
+    }
+    return children;
+}
+
 - (void)addChild:(PBSourceViewItem *)child
 {
 	if (!child)
 		return;
-
-	[self.children addObject:child];
+    
+	[childrenSet addObject:child];
+    children = nil;
 	child.parent = self;
-	[self.children sortUsingDescriptors:[NSArray arrayWithObject:[[NSSortDescriptor alloc] initWithKey:@"title" ascending:YES selector:@selector(localizedStandardCompare:)]]];
 }
 
 - (void)removeChild:(PBSourceViewItem *)child
@@ -66,8 +77,9 @@
 	if (!child)
 		return;
 
-	[self.children removeObject:child];
-	if (!self.isGroupItem && ([self.children count] == 0))
+	[childrenSet removeObject:child];
+    children = nil;
+	if (!self.isGroupItem && ([childrenSet count] == 0))
 		[self.parent removeChild:self];
 }
 
@@ -81,7 +93,7 @@
 
 	NSString *firstTitle = [path objectAtIndex:0];
 	PBSourceViewItem *node = nil;
-	for (PBSourceViewItem *child in [self children])
+	for (PBSourceViewItem *child in childrenSet)
 		if ([child.title isEqualToString:firstTitle])
 			node = child;
 
@@ -98,11 +110,11 @@
 
 - (PBSourceViewItem *)findRev:(PBGitRevSpecifier *)rev
 {
-	if (rev == revSpecifier)
+	if ([rev isEqual:revSpecifier])
 		return self;
 
 	PBSourceViewItem *item = nil;
-	for (PBSourceViewItem *child in children)
+	for (PBSourceViewItem *child in childrenSet)
 		if ( (item = [child findRev:rev]) != nil )
 			return item;
 
