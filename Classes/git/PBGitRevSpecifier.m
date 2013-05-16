@@ -60,7 +60,8 @@
 
 + (PBGitRevSpecifier *)allBranchesRevSpec
 {
-	return [[PBGitRevSpecifier alloc] initWithParameters:[NSArray arrayWithObject:@"--all"] description:@"All branches"];
+    // Using --all here would include refs like refs/notes/commits, which probably isn't what we want.
+	return [[PBGitRevSpecifier alloc] initWithParameters:[NSArray arrayWithObjects:@"--branches", @"--remotes", @"--tags", nil] description:@"All branches"];
 }
 
 + (PBGitRevSpecifier *)localBranchesRevSpec
