@@ -494,7 +494,7 @@
 															<reference key="NSSupport" ref="554612341"/>
 															<reference key="NSControlView" ref="18874447"/>
 															<int key="NSButtonFlags">1211912448</int>
-															<int key="NSButtonFlags2">2</int>
+															<int key="NSButtonFlags2">402653186</int>
 															<object class="NSCustomResource" key="NSNormalImage">
 																<string key="NSClassName">NSImage</string>
 																<string key="NSResourceName">NSSwitch</string>
@@ -503,7 +503,7 @@
 																<string key="NSImageName">NSSwitch</string>
 															</object>
 															<string key="NSAlternateContents"/>
-															<string key="NSKeyEquivalent"/>
+															<string key="NSKeyEquivalent">a</string>
 															<int key="NSPeriodicDelay">200</int>
 															<int key="NSPeriodicInterval">25</int>
 														</object>
