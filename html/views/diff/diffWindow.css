@@ -1,0 +1,14 @@
+#message {
+	margin-left: 20px;
+	margin-right: 20px;
+	margin-top: 40px;
+	text-align: center;
+	font-size: 200%;
+	padding: 20px;
+	width: auto;
+
+	background-color: #B4D7FF;
+	border: 2px solid #45A1FE;
+
+	-webkit-border-radius: 10px;
+}

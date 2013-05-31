@@ -1,0 +1,48 @@
+<html>
+	<head>
+		<script src="../../lib/GitX.js" type="text/javascript" charset="utf-8"></script>
+		<script src="../../lib/syntaxhighlighter/scripts/shCore.js" type="text/javascript" charset="utf-8"></script>
+		<script src="../../lib/syntaxhighlighter/scripts/shBrushObjC.js" type="text/javascript" charset="utf-8"></script>
+		<script src="fileview.js" type="text/javascript" charset="utf-8"></script>
+		<link rel="stylesheet" href="source.css" type="text/css" media="screen" title="no title" charset="utf-8">
+		<link rel="stylesheet" href="../../css/shCoreGitX.css" type="text/css" media="screen" title="no title" charset="utf-8">
+		<link rel="stylesheet" href="../../css/shThemeGitX.css" type="text/css" media="screen" title="no title" charset="utf-8">
+	</head>
+	<body onload="test();">
+		<div id="source">
+		<pre class='first-line: 1;brush: objc'>
+//
+//  AppController.h
+//  MGScopeBar
+//
+//  Created by Matt Gemmell on 16/03/2008.
+//
+
+/* dhfas fldsa */
+
+/*
+fjdsahf dsaf dlsaf jd;sa
+fdjksal; fjhdsa
+*/
+
+#import &lt;Cocoa/Cocoa.h&gt;
+#import "MGScopeBarDelegateProtocol.h"
+
+
+/* dhfas fldsa */
+
+@interface AppController : NSObject <MGScopeBarDelegate> {
+	IBOutlet NSTextField *labelField;
+	IBOutlet MGScopeBar *scopeBar;
+	IBOutlet NSView *accessoryView;
+	NSMutableArray *groups;
+}
+
+@property(retain) NSMutableArray *groups;
+
+@end
+</pre>
+
+		</div>
+	</body>
+</html> 

@@ -1,0 +1,200 @@
+<html><head>
+	<title>Details for commit</title>
+	<link rel="stylesheet" href="../../css/GitX.css" type="text/css" media="screen" title="no title" charset="utf-8">
+	<script src="../../lib/GitX.js" type="text/javascript" charset="utf-8"></script>
+	<script src="../../lib/md5.js" type="text/javascript" charset="utf-8"></script>
+	<script src="../../lib/diffHighlighter.js" type="text/javascript" charset="utf-8"></script>
+	<script src="../../lib/keyboardNavigation.js" type="text/javascript" charset="utf-8"></script>
+
+	<link rel="stylesheet" href="log.css" type="text/css" media="screen" title="no title" charset="utf-8">
+	<script src="log.js" type="text/javascript" charset="utf-8"></script>
+
+	<script type="text/javascript" charset="utf-8">
+		var showDiff = function(diff) {
+			highlightDiff(diff, $("diff"));
+		}
+	</script>
+</head><body>
+	<div id="message" style="display:none">
+		There are no differences
+	</div>
+	<div id="log"><div id="7037821" class="commit">
+	<table>
+		<tbody><tr><td>Commit:</td><td>703782163ddb653789c304e396eadb31f541864f</td></tr>
+		<tr><td>Author:</td><td>Pieter de Bie</td></tr>
+		<tr><td>Date:</td><td>10 months ago</td></tr>
+	</tbody></table>
+	<div class="title">PBChangedFile: Add assert to make sure we're not doing something stupid</div>
+	<div class="body"></div>
+</div>
+
+<div id="0d8ba8c" class="commit">
+	<table>
+		<tbody><tr><td>Commit:</td><td>0d8ba8c2632e129fe7627f86d907c8b470c1bf20</td></tr>
+		<tr><td>Author:</td><td>Pieter de Bie</td></tr>
+		<tr><td>Date:</td><td>1 year, 1 month ago</td></tr>
+	</tbody></table>
+	<div class="title">Rename 'CachedChanges" to "StagedChanges" for greater consistency</div>
+	<div class="body"></div>
+</div>
+
+<div id="f9ff15c" class="commit">
+	<table>
+		<tbody><tr><td>Commit:</td><td>f9ff15cc6bf3c807425321581002f676985dd222</td></tr>
+		<tr><td>Author:</td><td>Pieter de Bie</td></tr>
+		<tr><td>Date:</td><td>1 year, 1 month ago</td></tr>
+	</tbody></table>
+	<div class="title">PBChangedFile: remove shouldBeDeleted boolean</div>
+	<div class="body">We don't need this anymore</div>
+</div>
+
+<div id="8d729da" class="commit">
+	<table>
+		<tbody><tr><td>Commit:</td><td>8d729dae4cc8d3b564d149d6c9bb96922ee1bafa</td></tr>
+		<tr><td>Author:</td><td>Pieter de Bie</td></tr>
+		<tr><td>Date:</td><td>1 year, 6 months ago</td></tr>
+	</tbody></table>
+	<div class="title">CommitView: Don't change selection when refreshing</div>
+	<div class="body">We used to read in a completely new array when refreshing
+the index. The problem with this is that the selection
+changes when reading in the new array. We avoid this
+by changing the current array, rather than loading in
+a completely new one.</div>
+</div>
+
+<div id="0975426" class="commit">
+	<table>
+		<tbody><tr><td>Commit:</td><td>0975426f2f5119335c00768006b1ede0252ac448</td></tr>
+		<tr><td>Author:</td><td>Pieter de Bie</td></tr>
+		<tr><td>Date:</td><td>2 years, 7 months ago</td></tr>
+	</tbody></table>
+	<div class="title">CommitView: move index functions to separate controller</div>
+	<div class="body">This merges functionality that was previously stored in the
+combination of PBGitCommitController / PBChangedFile to a
+dedicated controller, PBGitIndexController.
+</div>
+</div>
+
+<div id="1d19bd6" class="commit">
+	<table>
+		<tbody><tr><td>Commit:</td><td>1d19bd64dfa83def18d5271c9afef9300ef0d65e</td></tr>
+		<tr><td>Author:</td><td>Pieter de Bie</td></tr>
+		<tr><td>Date:</td><td>2 years, 8 months ago</td></tr>
+	</tbody></table>
+	<div class="title">PBChangedFile: Don't use cat to read file contents</div>
+	<div class="body">This changes PBChangedFile to read in files by using
+NSString's stringWithContentsOfFile: method.
+
+It still uses the UTF8 encoding scheme so that we
+can capture binary files. This should perhaps be loosened to
+also allow other encodings.
+</div>
+</div>
+
+<div id="472d36c" class="commit">
+	<table>
+		<tbody><tr><td>Commit:</td><td>472d36c7f970d9f3dbda3b9d7c8a7d51546bda56</td></tr>
+		<tr><td>Author:</td><td>Pieter de Bie</td></tr>
+		<tr><td>Date:</td><td>2 years, 8 months ago</td></tr>
+	</tbody></table>
+	<div class="title">CommitView: Add context menu to revert changes</div>
+	<div class="body"></div>
+</div>
+
+<div id="e659e63" class="commit">
+	<table>
+		<tbody><tr><td>Commit:</td><td>e659e63fc08ecd46cc1c26b6260126502ec656aa</td></tr>
+		<tr><td>Author:</td><td>Pieter de Bie</td></tr>
+		<tr><td>Date:</td><td>2 years, 8 months ago</td></tr>
+	</tbody></table>
+	<div class="title">CommitView: Add option to amend commits</div>
+	<div class="body"></div>
+</div>
+
+<div id="5010511" class="commit">
+	<table>
+		<tbody><tr><td>Commit:</td><td>5010511bdb358ad376fd4668368bc5c12d9d8214</td></tr>
+		<tr><td>Author:</td><td>Pieter de Bie</td></tr>
+		<tr><td>Date:</td><td>2 years, 8 months ago</td></tr>
+	</tbody></table>
+	<div class="title">CommitView: Always use a single PBChangedFile object</div>
+	<div class="body">This makes sure we don't add a double object to our array,
+if a file has both cached and unstaged changes.
+</div>
+</div>
+
+<div id="a0f248e" class="commit">
+	<table>
+		<tbody><tr><td>Commit:</td><td>a0f248ef9f50a3af0efebdfb29c706bd97011a97</td></tr>
+		<tr><td>Author:</td><td>Pieter de Bie</td></tr>
+		<tr><td>Date:</td><td>2 years, 8 months ago</td></tr>
+	</tbody></table>
+	<div class="title">CommitView: Also show deleted files correctly</div>
+	<div class="body"></div>
+</div>
+
+<div id="001b6bf" class="commit">
+	<table>
+		<tbody><tr><td>Commit:</td><td>001b6bf10eeaaf618971bc079e7415690c4c8d1a</td></tr>
+		<tr><td>Author:</td><td>Pieter de Bie</td></tr>
+		<tr><td>Date:</td><td>2 years, 9 months ago</td></tr>
+	</tbody></table>
+	<div class="title">CommitView: Handle new files better</div>
+	<div class="body">This fixes the 'cat' command that was acting up and also shows
+information when a file could not be displayed</div>
+</div>
+
+<div id="aafc284" class="commit">
+	<table>
+		<tbody><tr><td>Commit:</td><td>aafc284eb8fbd69acf40acfef07e25f409a87a18</td></tr>
+		<tr><td>Author:</td><td>Pieter de Bie</td></tr>
+		<tr><td>Date:</td><td>2 years, 9 months ago</td></tr>
+	</tbody></table>
+	<div class="title">ChangedFile: add a path separator to reset command</div>
+	<div class="body">Sometimes a file could not be reset because it contained weird characters.
+
+This hopefully fixes it.
+</div>
+</div>
+
+<div id="76e176e" class="commit">
+	<table>
+		<tbody><tr><td>Commit:</td><td>76e176e8b4ac59438340b129874ffbdfa7404ea3</td></tr>
+		<tr><td>Author:</td><td>Pieter de Bie</td></tr>
+		<tr><td>Date:</td><td>2 years, 9 months ago</td></tr>
+	</tbody></table>
+	<div class="title">Add staging and unstaging of files</div>
+	<div class="body"></div>
+</div>
+
+<div id="9b3909e" class="commit">
+	<table>
+		<tbody><tr><td>Commit:</td><td>9b3909e7592d3c8648accb67642a2b57a441f128</td></tr>
+		<tr><td>Author:</td><td>Pieter de Bie</td></tr>
+		<tr><td>Date:</td><td>2 years, 9 months ago</td></tr>
+	</tbody></table>
+	<div class="title">CommitView: Add a status bar to the diff view</div>
+	<div class="body"></div>
+</div>
+
+<div id="44009b6" class="commit">
+	<table>
+		<tbody><tr><td>Commit:</td><td>44009b6f3e7e6fc5b54910c2b2a9a54b13f95a14</td></tr>
+		<tr><td>Author:</td><td>Pieter de Bie</td></tr>
+		<tr><td>Date:</td><td>2 years, 9 months ago</td></tr>
+	</tbody></table>
+	<div class="title">CommitView: use only one array for all files</div>
+	<div class="body"></div>
+</div>
+
+<div id="252796e" class="commit">
+	<table>
+		<tbody><tr><td>Commit:</td><td>252796ee26ce733c4a6d3044e3142f9ee5df005e</td></tr>
+		<tr><td>Author:</td><td>Pieter de Bie</td></tr>
+		<tr><td>Date:</td><td>2 years, 9 months ago</td></tr>
+	</tbody></table>
+	<div class="title">CommitView: Show basic files</div>
+	<div class="body"></div>
+</div></div>
+
+</body></html>

@@ -1,7 +1,12 @@
 //
-// Prefix header for all source files of the 'GitTest' target in the 'GitTest' project
-//
 
 #ifdef __OBJC__
     #import <Cocoa/Cocoa.h>
+	#ifndef __cplusplus
+		#import <ObjectiveGit/ObjectiveGit.h>
+	#endif
 #endif
+
+#import "dct_weak.h"
+
+#define DEPRECATED __attribute__ ((deprecated))

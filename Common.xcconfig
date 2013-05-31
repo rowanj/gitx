@@ -1,0 +1,60 @@
+//
+//  Common.xcconfig
+//  GitX
+//
+//  Created by Andre Berg on 25.03.10.
+//  Copyright 2010 Berg Media. All rights reserved.
+//
+//  Licensed under the Apache License, Version 2.0 (the "License");
+//  you may not use this file except in compliance with the License.
+//  You may obtain a copy of the License at
+//  
+//    http://www.apache.org/licenses/LICENSE-2.0
+//  
+//  Unless required by applicable law or agreed to in writing, software
+//  distributed under the License is distributed on an "AS IS" BASIS,
+//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//  See the License for the specific language governing permissions and
+//  limitations under the License.
+
+// Archs and Target SDKs
+
+ARCHS = ppc i386 x86_64
+SDKROOT = macosx10.5
+MACOSX_DEPLOYMENT_TARGET = 10.5
+
+// Search Paths
+
+HEADER_SEARCH_PATHS = libgit2/src
+LIBRARY_SEARCH_PATHS = libgit2
+FRAMEWORK_SEARCH_PATHS = $(inherited) "$(SRCROOT)"
+
+// Info.plist
+
+INFOPLIST_PREPROCESS = YES
+INFOPLIST_OTHER_PREPROCESSOR_FLAGS = -traditional
+INFOPLIST_FILE = Info.plist
+INFOPLIST_PREFIX_HEADER = $PROJECT_TEMP_DIR/revision    // needed for the `git describe --long` output in the about dialog
+
+// Compiler
+
+GCC_ENABLE_OBJC_GC = required
+// GCC_VERSION =                                       // System Default (GCC 4.2)
+GCC_VERSION = com.apple.compilers.llvmgcc42         // LLVM GCC 4.2
+// GCC_VERSION = com.apple.compilers.llvm.clang.1_0    // Clang LLVM 1.0
+GCC_C_LANGUAGE_STANDARD = gnu99
+
+// Prefix Header
+
+GCC_PRECOMPILE_PREFIX_HEADER = YES
+GCC_PREFIX_HEADER = GitX_Prefix.pch
+
+// Linking
+
+PREBINDING = NO
+ZERO_LINK = NO // this is no longer needed
+
+// Other
+
+LLVM_LTO = NO   // Link-Time Optimization causes a Rel32 address space error when linking (since we now target x86_64 inclusively)
+

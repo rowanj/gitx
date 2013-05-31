@@ -1,0 +1,71 @@
+table {
+	border-collapse: collapse !important;
+	border-spacing: 0 !important;
+}
+
+body,th, td {
+	margin: 0 !important;
+	padding: 0 !important;
+	border: 0 !important;
+	outline: 0 !important;
+	font-size: 100% !important;
+	vertical-align: baseline !important;
+	background: transparent !important;
+}
+
+p.summary {
+}
+
+p{
+	margin: 0 !important;
+	padding: 0 !important;
+	font-size: 11px;
+	font-family: Menlo, Consolas, 'Bitstream Vera Sans Mono', 'Courier New', Courier, monospace;
+	white-space: nowrap;
+}
+
+pre{
+  font-size: 1em;
+  font-family: Menlo, Consolas, 'Bitstream Vera Sans Mono', 'Courier New', Courier, monospace;
+}
+
+tr.block.l3 p.summary,
+tr.block.l2 p.summary,
+tr.block.l1 p.summary{
+	display: none !important;
+}
+
+table.blocks td {
+	vertical-align: top !important;
+}
+
+p.author {
+	white-space: nowrap !important;	
+}
+
+table.blocks {
+	font: 11px "Menlo" !important !important;
+}
+
+table tr.block{
+	border-top: 1px solid #c9c9c9 !important;
+}
+table.blocks{
+	border-bottom: 1px solid #c9c9c9 !important;
+	width: 100% !important;
+}
+
+table.blocks tr td:nth-of-type(1) {
+  background-color: #ececec !important;
+	border-right: 1px solid #c9c9c9 !important;
+}
+
+table.blocks tr td:nth-of-type(2) {
+	width: 100% !important;
+  padding-left: 1em !important;
+}
+
+table.blocks tr.block td:nth-of-type(1){
+	padding-right: 5px !important;
+	padding-left: 5px !important;
+}

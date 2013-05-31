@@ -1,0 +1,95 @@
+<html><head>
+	<title>Diff for file</title>
+	<link rel="stylesheet" href="../../css/GitX.css" type="text/css" media="screen" title="no title" charset="utf-8">
+	<script src="../../lib/GitX.js" type="text/javascript" charset="utf-8"></script>
+	<script src="../../lib/md5.js" type="text/javascript" charset="utf-8"></script>
+	<script src="../../lib/diffHighlighter.js" type="text/javascript" charset="utf-8"></script>
+	<script src="../../lib/keyboardNavigation.js" type="text/javascript" charset="utf-8"></script>
+	
+	<link rel="stylesheet" href="commit.css" type="text/css" media="screen" title="no title" charset="utf-8">
+	<script src="commit.js" type="text/javascript" chahrset="utf-8"></script>
+	<script src="multipleSelection.js" type="text/javascript" chahrset="utf-8"></script>
+</head><body>
+	<h1 id="title">
+		<input type="range" min="1" max="8" value="3" id="contextSize">
+		<span id="contextTitle">Context:</span>
+		<span id="status">Nothing to commit</span>
+
+	</h1>
+
+	<div id="notification" style="display:none">
+		<img src="../../images/spinner.gif" alt="Spinner" id="spinner">
+		<div id="notification_message"></div>
+	</div>
+
+	<!-- we use "state" for the current status (as opposed to something in the diff
+		 and we use the notification for short notifications, which can occur together
+		 with a diff display -->
+	<div id="state">
+		Nothing to commit (working directory clean)
+	</div>
+	<div id="diff" class="diff"><div class="file" id="file_index_0"><div class="fileHeader">PBWebChangesController.m</div><div class="diffContent"><div class="lineno">...
+12
+13
+14
+
+
+15
+16
+17
+...
+72
+73
+74
+75
+
+
+76
+
+
+77
+78
+79
+...
+85
+86
+87
+88
+
+89
+90
+91
+</div><div class="lineno">...
+12
+13
+14
+15
+16
+17
+18
+19
+...
+74
+75
+76
+
+77
+78
+79
+80
+81
+82
+83
+84
+...
+90
+91
+92
+
+93
+94
+95
+96
+</div><div class="lines"><div index="0" class="hunkheader"><a href="#" class="hunkbutton" onclick="discardHunk(this, event); return false">Discard</a><a href="#" class="hunkbutton" onclick="addHunk(this, false); return false">Stage</a>@@ -12,6 +12,8 @@</div><div index="1" class="noopline"> </div><div index="2" class="noopline"> @implementation PBWebChangesController</div><div index="3" class="noopline"> </div><div index="4" class="addline">+@synthesize fileViewerController;</div><div index="5" class="addline">+</div><div index="6" class="noopline"> - (void) awakeFromNib</div><div index="7" class="noopline"> {</div><div index="8" class="noopline">     selectedFile = nil;</div><div index="9" class="hunkheader"><a href="#" class="hunkbutton" onclick="discardHunk(this, event); return false">Discard</a><a href="#" class="hunkbutton" onclick="addHunk(this, false); return false">Stage</a>@@ -72,8 +74,11 @@ -(IBAction)displayControlChanged:(id)sender{</div><div index="10" class="noopline"> </div><div index="11" class="noopline"> - (void) refresh</div><div index="12" class="noopline"> {</div><div index="13" class="delline">-    if (!finishedLoading)</div><div index="14" class="addline">+    [fileViewerController showFile:[selectedFile path] sha:nil];</div><div index="15" class="addline">+    /*if (!finishedLoading)</div><div index="16" class="noopline">         return;</div><div index="17" class="addline">+<span class="whitespace">    </span></div><div index="18" class="addline">+    [fileViewerController showFile:selectedFile sha:@""];</div><div index="19" class="noopline"> </div><div index="20" class="noopline">     id script = [view windowScriptObject];</div><div index="21" class="noopline">     </div><div index="22" class="hunkheader"><a href="#" class="hunkbutton" onclick="discardHunk(this, event); return false">Discard</a><a href="#" class="hunkbutton" onclick="addHunk(this, false); return false">Stage</a>@@ -85,7 +90,7 @@ - (void) refresh</div><div index="23" class="noopline">         [script callWebScriptMethod:@"showFileBlame"</div><div index="24" class="noopline">                       withArguments:[NSArray arrayWithObjects:selectedFile ?: (id)[NSNull null],</div><div index="25" class="noopline">                                      [NSNumber numberWithBool:selectedFileIsCached], nil]];</div><div index="26" class="delline">-    }</div><div index="27" class="addline">+    }*/</div><div index="28" class="noopline"> }</div><div index="29" class="noopline"> </div><div index="30" class="noopline"> - (void)stageHunk:(NSString *)hunk reverse:(BOOL)reverse</div></div></div></div></div>
+
+</body></html>

@@ -1,0 +1,205 @@
+<!doctype html>
+<html>
+<head>
+<meta http-equiv="Content-type" content="text/html;charset=UTF-8" />
+<title>GitX-dev Release Notes</title>
+<link rel="stylesheet" href="GitX-dev.css" />
+</head>
+<body>
+<div class="wrapper">
+<header>
+<h1>GitX-dev Release Notes</h1>
+<p>Recent changes made to <a href="https://github.com/rowanj/gitx">GitX-dev</a></p>
+</header>
+<section>
+<h2>Changes since 0.14.84</h2>
+<ul>
+<li>Merge <a href="https://github.com/rowanj/gitx/pull/121">pull request #121</a> (<a href="https://github.com/jdelStrother">jdelStrother</a>) - Hide notes refs in the log view</li>
+</ul>
+
+<h2>Changes since 0.14.83</h2>
+<ul>
+<li>Merge <a href="https://github.com/rowanj/gitx/pull/156">pull request #156</a> (<a href="https://github.com/elia">elia</a>) - Add keyboard shortcuts for commit view actions (cmd-s stage, cmd-u unstage, cmd-opt-a toggle amend)</li>
+<li>Merge <a href="https://github.com/rowanj/gitx/pull/167">pull request #167</a> (<a href="https://github.com/sas71">sas71</a>) - Tone down logging to console of no-op repository watcher events</li>
+</ul>
+
+<h2>Changes since 0.14.82</h2>
+<ul>
+<li>Merge <a href="https://github.com/rowanj/gitx/pull/148">pull request #148</a> (<a href="https://github.com/claytonrcarter">claytonrcarter</a>) - Add context menu item to copy short SHA</li>
+<li>Merge <a href="https://github.com/rowanj/gitx/pull/158">pull request #158</a>, fixes <a href="https://github.com/rowanj/gitx/issues/157">issue #157</a> (<a href="https://github.com/micampe">micampe</a>) - Improve repository loading and refresh performance</li>
+</ul>
+
+<h2>Changes since 0.14.81</h2>
+<ul>
+<li>Updates to upstream components libgit2, Objective-Git and Sparkle.</li>
+<li>Fix a crash due to bad parsing of unicode commit messages.</li>
+<li>Reconstructed build and update deployment on a new server.  Made several stages into re-usable scripts (in the GitX repo) for the community at large.</li>
+</ul>
+
+<h2>Changes since 0.14.80</h2>
+<ul>
+<li>Fix for <a href="https://github.com/rowanj/gitx/issues/140">issue #140</a> - Command line <em>gitx</em> only working at the top-level working directory.</li>
+</ul>
+
+<h2>Changes since 0.14.70</h2>
+<ul>
+<li>Distribute updates as .dmg bundles, significantly reducing download size</li>
+<li>Bypass CDN for update checks, reducing regional latency in finding new versions by up to 24 hours</li>
+<li>Fix for <a href="https://github.com/rowanj/gitx/issues/137">issue #137</a> - Pushing tags to remotes via context menu</li>
+</ul>
+
+<h2>Changes since 0.14.64</h2>
+<ul>
+<li>More code signing changes</li>
+<li>Fix for <a href="https://github.com/rowanj/gitx/issues/131">issue #131</a> - Minor patch to upstream objective-git for submodule handling</li>
+</ul>
+
+<h2>Changes since 0.14.63</h2>
+<ul>
+<li>Fix for <a href="https://github.com/rowanj/gitx/issues/131">issue #131</a> - Check for NULL repository before listing submodules</li>
+</ul>
+
+<h2>Changes since 0.14.62</h2>
+<ul>
+<li>Fix another instance of opening the same repository multiple times</li>
+<li>Improve handling of bare repositories</li>
+<li>Sort file list in tree view like Finder does</li>
+</ul>
+
+<h2>Changes since 0.14.61</h2>
+<ul>
+<li>Fix for <a href="https://github.com/rowanj/gitx/issues/132">issue #132</a> - <em>Move to Trash</em> action refreshes the list of files automatically</li>
+<li>Restore the preference checkbox to enable repository file watcher</li>
+<li>Fix for <a href="https://github.com/rowanj/gitx/issues/127">issue #127</a> - Syntax highlighting restored for Objective-C</li>
+</ul>
+
+<h2>Changes since 0.14.57</h2>
+<ul>
+<li>Fix for <a href="https://github.com/rowanj/gitx/issues/119">issue #119</a> - sort tags and other refs numerically (like Finder would)</li>
+<li>Fix for <a href="https://github.com/rowanj/gitx/issues/111">issue #111</a> - add <em>Move to Trash</em> menu item for unversioned files under Mountain Lion</li>
+<li>Updates to upstream components libgit2, Objective-Git and Sparkle.</li>
+</ul>
+
+<h2>Changes since 0.14.56</h2>
+<ul>
+<li>Simplify launch behaviour, window restoration, and pop-ups</li>
+<li>Fix issue with non-git directories being added to recents</li>
+</ul>
+
+<h2>Changes since 0.14.51</h2>
+<ul>
+<li>Merge <a href="https://github.com/rowanj/gitx/pull/88">pull request #88</a>, fixes <a href="https://github.com/rowanj/gitx/issues/27">issue #27</a> (<a href="https://github.com/magicseth">magicseth</a>) - Add submodules to the sidebar</li>
+<li>Merge <a href="https://github.com/rowanj/gitx/pull/95">pull request #95</a> (<a href="https://github.com/nanoant">nanoant</a>) - Fix broken .cpp highlighting</li>
+<li>Merge <a href="https://github.com/rowanj/gitx/pull/96">pull request #96</a> (<a href="https://github.com/nanoant">nanoant</a>) - Consistent source views, including better layout of unknown text</li>
+</ul>
+
+<h2>Changes since 0.14.50</h2>
+<ul>
+<li>Merge <a href="https://github.com/rowanj/gitx/pull/82">pull request #82</a> (<a href="https://github.com/magicseth">magicseth</a>) - Fix label dragging on Retina macs</li>
+<li>Merge <a href="https://github.com/rowanj/gitx/pull/86">pull request #86</a>, fixes <a href="https://github.com/rowanj/gitx/issues/26">issue #26</a> (<a href="https://github.com/magicseth">magicseth</a>) - Fix GitX crash where <em>.git</em> is not a directory</li>
+</ul>
+
+<h2>Changes since 0.14.46</h2>
+<ul>
+<li>Improvement for <a href="https://github.com/rowanj/gitx/issues/80">issue #80</a> - GitX hangs at startup if <em>xcrun</em> is not configured</li>
+</ul>
+
+<h2>Changes since 0.14.40</h2>
+<ul>
+<li>Fix for <a href="https://github.com/rowanj/gitx/issues/69">issue #69</a> - disable automatic spelling correction in commit message, but enable spelling and grammar checking (underlines) and automatic link substitution</li>
+<li>Fix for <a href="https://github.com/rowanj/gitx/issues/66">issue #66</a> - try to locate <em>git</em> binary with <em>xcrun</em></li>
+<li>Fix for <a href="https://github.com/rowanj/gitx/issues/72">issue #72</a> - add ability to open links in commit messages in default browser</li>
+</ul>
+
+<h2>Changes since 0.14.39</h2>
+<ul>
+<li>Fix &quot;Display Image&quot; links in history view</li>
+</ul>
+
+<h2>Changes since 0.14.38</h2>
+<ul>
+<li>Fix for <a href="https://github.com/rowanj/gitx/issues/63">issue #63</a> - commit message font and indenting was inconsistent with the rest of the commit details</li>
+</ul>
+
+<h2>Changes since 0.14.37</h2>
+<ul>
+<li>Added a prototype fix for <a href="https://github.com/rowanj/gitx/issues/9">issue #9</a> - should significantly reduce bogus re-loading of the repo history</li>
+<li>Updated to upstream <a href="https://github.com/libgit2/objective-git">ObjectiveGit</a></li>
+<li>Updated to upstream <a href="http://libgit2.github.com/">libgit2</a></li>
+<li>Updated to upstream <a href="http://sparkle.andymatuschak.org/">Sparkle</a></li>
+</ul>
+
+<h2>Changes since 0.14.34</h2>
+<ul>
+<li>Merge <a href="https://github.com/rowanj/gitx/pull/62">pull request #62</a>, fixes <a href="https://github.com/rowanj/gitx/issues/61">issue #61</a> (<a href="https://github.com/RomainMuller">RomainMuller</a>) - change commit key equivalent to <em>Cmd+Return</em></li>
+</ul>
+
+<h2>Changes since 0.14.33</h2>
+<ul>
+<li>Work on <a href="https://github.com/rowanj/gitx/issues/9">issue #9</a> - ignore changes to <em>*.lock</em> files when listening for repository changes</li>
+</ul>
+
+<h2>Changes since 0.14.30</h2>
+<ul>
+<li>Fixed <a href="https://github.com/rowanj/gitx/issues/53">issue #53</a> - stop &ldquo;Failed to lookup reference...&rdquo; errors</li>
+</ul>
+
+<h2>Changes since 0.14.29</h2>
+<ul>
+<li>Merge <a href="https://github.com/rowanj/gitx/pull/52">pull request #52</a> (<a href="https://github.com/mczepiel">mczepiel</a>) - use fixed-width font for SHA columns in the history view</li>
+</ul>
+
+<h2>Changes since 0.14.27</h2>
+<ul>
+<li>Merge <a href="https://github.com/rowanj/gitx/pull/49">pull request #49</a> (<a href="https://github.com/mczepiel">mczepiel</a>) - better display of subject field when it's very narrow</li>
+</ul>
+
+<h2>Changes since 0.14.25</h2>
+<ul>
+<li>Fix for <a href="https://github.com/rowanj/gitx/issues/41">issue #41</a> - tags not appearing in the history view</li>
+<li>Merge <a href="https://github.com/rowanj/gitx/pull/42">pull request #42</a> (<a href="https://github.com/mczepiel">mczepiel</a>) - link tile bar icon to the working directory, not the (hidden) .git directory</li>
+<li>Merge <a href="https://github.com/rowanj/gitx/pull/43">pull request #43</a> (<a href="https://github.com/mczepiel">mczepiel</a>) - add a second line to the commit message view as a format guide</li>
+</ul>
+
+<h2>Changes since 0.14.23</h2>
+<ul>
+<li>Update to upstream objective-git and libgit2, fixes errors due to user <em>.gitconfig</em> format parsing</li>
+</ul>
+<h2>Changes since 0.14.21</h2>
+<ul>
+<li>Fix reported instances of error sheets not displaying for failed git operations</li>
+</ul>
+<h2>Changes since 0.14.20</h2>
+<ul>
+<li>Fixed a crash when deleting a named reference (branch, tag) in an open repository from outside GitX (i.e. by command-line tools)</li>
+</ul>
+
+<h2>Changes since 0.14.19</h2>
+<ul>
+<li>Fixed a crash in <em>gitx</em> command-line tool when run without a working directory</li>
+</ul>
+
+<h2>Changes since 0.14.16</h2>
+<ul>
+<li>Launching the <em>gitx</em> command-line tool now works as expected in subdirectories of a git repository</li>
+<li>More regular usage of <a href="https://github.com/libgit2/libgit2">libgit2</a> and <a href="https://github.com/libgit2/objective-git">objective-git</a> in continued effort to <a href="https://github.com/rowanj/gitx/issues/2">remove git command-line usage</a>.</li>
+</ul>
+
+</section>
+<section>
+<h2>GitX - development 0.14.16</h2>
+<h3>Automated Deployment</h3>
+<p>This build is part of the automated deployment of GitX builds.  Under this system, code and resource changes pushed to the <a href="https://github.com/rowanj/gitx/">GitHub repository</a> are automatically built and pushed out for in-app updates.</p>
+
+<h3>Recent Changes</h3>
+<ul>
+<li>Resolved many broken dialogs and screens, like <em>Add Remote...</em> or <em>Push [branch] to...</em></li>
+<li>Finished automated deployment system, dramatically reducing the overhead between fixing a bug and getting a new build out to users</li>
+<li>Fixed some issues with the command-line <em>gitx</em> utility</li>
+<li>Added OS X Lion full-screen support to the main window</li>
+</ul>
+</section>
+</div>
+</body>
+</html>
+

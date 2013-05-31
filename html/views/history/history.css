@@ -3,38 +3,49 @@ body {
 }
 
 #commit_header {
-	width: 100%;
+	width: auto;
 	font-size: 12px;
+	padding-left: 5px;
+	padding-right: 5px;
 }
 
-#commit_header td {
-  padding-left: 5px;
+#commit_header tr {
+        vertical-align: top;
+}
+
+#authorTable {
+	margin: -4px;
 }
 
 #rightcontent {
-	float: right;
-	margin: 5px;
+	position: absolute;
+	right: 5px;
+	top: 5px;
 }
 
 #buttons {
-	float: left;
 }
 
-a.servicebutton{
-	display: block;
-	width: 80px;
-	padding: 2px;
-	margin-bottom: 4px;
+a.servicebutton {
+    display: block;
+    width: 80px;
+    padding: 2px;
+    margin-bottom: 4px;
 
-	border: 1px solid #3465a4;
-	background-color: #cce5ff;
-	color: #204a87;
+    border: 1px solid #3465a4;
+    background-color: #cce5ff;
+    color: #204a87;
 
-	font-size: 65%;
-	text-decoration: none;
-	text-align: center;
+    font-size: 65%;
+    text-decoration: none;
+    text-align: center;
 
-	-webkit-border-radius: 2px;
+    -webkit-border-radius: 2px;
+}
+
+a.servicebutton:hover {
+	padding: 1px;
+	border: 2px solid #3465a4;
 }
 
 #gravatar {
@@ -45,6 +56,13 @@ a.servicebutton{
 
 	border: solid gray 1px;
 	-webkit-border-radius: 2px;
+}
+
+.gravatar img {
+	width: 2.9em;
+	height: 2.9em;
+	max-height: 60px;
+	max-width: 60px;
 }
 
 .property_name {
@@ -63,22 +81,35 @@ a.servicebutton{
 
 #message {
 	font-family: Monaco;
-	font-size: 10px;
+	font-size: 12px;
+	white-space: pre-wrap;
+	padding: 10px;
 }
 
 #files {
 	margin-top: 1em;
+	margin-left: 0.5em;
 }
 
 #files a {
 	color: #666666;
+	text-decoration: none;
+}
+
+#files a:hover {
+	color: #4444ff;
+	border-bottom: 1px solid #4444ff;
+}
+
+#files img {
+	float: left;
+	margin-right: 0.5em;
+	margin-top: 1px;
 }
 
 #files p {
-	margin: 4px;
-}
-#files a:hover {
-	color: #4444ff;
+	margin-top: 0.25em;
+	margin-bottom: 0.25em;
 }
 
 .clear_both {
@@ -117,7 +148,7 @@ a.showdiff {
 	font-size: 9px;
 	font-family: Helvetica;
 	border: 1px solid black;
-	margin-right: 5px;
+	margin-right: 2px;
 	padding: 1px 3px 1px 3px;
 	-webkit-border-radius: 2px;
 }
@@ -138,6 +169,7 @@ a.showdiff {
 	background-color: #fca64f;
 }
 
+/*
 div.button
 {
 	color: #666666;
@@ -178,5 +210,6 @@ div.deleted
 
 div.renamed
 {
-	/*No colour needed right now.*/
+	// No colour needed right now.
 }
+*/

@@ -1,0 +1,12 @@
+.commit table tr td:nth-of-type(1){
+	text-align: right;
+	color: gray;
+}
+
+.commit{
+	margin: 10px;
+	padding: 10px;
+	border-radius: 10px;
+	border: 1px solid #CCC;
+	-webkit-box-shadow: 1px 1px 2px #DDD;
+}

@@ -1,3 +1,12 @@
-[submodule "libgit2"]
-	path = libgit2
-	url = git://github.com/pieter/libgit2.git
+[submodule "objective-git"]
+	path = objective-git
+	url = git://github.com/rowanj/objective-git.git
+[submodule "Sparkle"]
+	path = Sparkle
+	url = https://github.com/andymatuschak/Sparkle.git
+[submodule "SyntaxHighlighter"]
+	path = SyntaxHighlighter
+	url = git://github.com/alexgorbatchev/SyntaxHighlighter.git
+[submodule "MGScopeBar"]
+	path = MGScopeBar
+	url = git://github.com/rowanj/MGScopeBar.git

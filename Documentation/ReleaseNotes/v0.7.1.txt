@@ -1,0 +1,12 @@
+v0.7.1
+===
+
+This is a maintenance release. The following bugs have been fixed:
+
+* The Tree View now tries to be smart about displaying binaries (Johannes)
+* GitX now correctly tries to require git v1.6.0 or higher (Pieter)
+* Amending commits if the author name has UTF-8 multi-byte characters now correctly works (Pieter)
+* GitX no longer stalls for large periods when refreshing in the commit view (Johannes, Pieter)
+* The history view tries to be less crashy when loading commits
+
+In addition, the Sparkle framework has been updated so that future updates will be signed
