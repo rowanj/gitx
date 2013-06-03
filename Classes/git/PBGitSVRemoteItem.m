@@ -25,7 +25,7 @@
 {
 	static NSImage *networkImage = nil;
 	if (!networkImage) {
-		networkImage = [NSImage imageNamed:NSImageNameNetwork];
+		networkImage = [NSImage imageNamed:@"Remote"];
 		[networkImage setSize:NSMakeSize(16,16)];
 	}
 	

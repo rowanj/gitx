@@ -26,7 +26,7 @@
 {
 	static NSImage *otherRevImage = nil;
 	if (!otherRevImage)
-		otherRevImage = [NSImage imageNamed:@"Branch.png"];
+		otherRevImage = [NSImage imageNamed:@"Branch"];
 	
 	return otherRevImage;
 }

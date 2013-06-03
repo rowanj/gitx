@@ -51,6 +51,13 @@
 	background-color: rgba(255,0,0,0.5);
 }
 
+.diffCollapsed:before {
+    content: "\25b8\0020";
+}
+.diffExpanded:before {
+    content: "\25be\0020";
+}
+
 #CurrentHunk {
 	border-left: 5px solid black;
 }

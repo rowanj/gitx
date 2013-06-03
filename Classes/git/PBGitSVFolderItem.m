@@ -24,7 +24,8 @@
 {
 	static NSImage *folderImage = nil;
 	if (!folderImage) {
-		folderImage = [[NSWorkspace sharedWorkspace] iconForFileType:NSFileTypeForHFSTypeCode(kGenericFolderIcon)];
+		//folderImage = [[NSWorkspace sharedWorkspace] iconForFileType:NSFileTypeForHFSTypeCode(kGenericFolderIcon)];
+        folderImage = [NSImage imageNamed:@"Folder"];
 		[folderImage setSize:NSMakeSize(16,16)];
 	}
 

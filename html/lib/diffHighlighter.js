@@ -6,6 +6,22 @@ if (typeof Controller == 'undefined') {
 	Controller.log_ = console.log;
 }
 
+var toggleDiff = function(diff_id) {
+	if (!diff_id || diff_id == "")
+		return;
+
+    var diff_element = document.getElementById(diff_id);
+    if (diff_element) {
+        var isCollapsed = diff_element.style.display == 'none';
+        diff_element.style.display = (isCollapsed ? 'block' : 'none');
+        var link_element = document.getElementById('toggle_' + diff_id);
+        if (link_element) {
+            link_element.className = (isCollapsed ? 'diffExpanded' : 'diffCollapsed' );
+            link_element.title = 'click to ' + (isCollapsed ? 'hide' : 'show') + ' diff';
+        }
+    }
+}
+
 var highlightDiff = function(diff, element, callbacks) {
 	if (!diff || diff == "")
 		return;
@@ -69,11 +85,14 @@ var highlightDiff = function(diff, element, callbacks) {
 
 		if (diffContent != "" || binary) {
 			finalContent += '<div class="file" id="file_index_' + (file_index - 1) + '">' +
-				'<div class="fileHeader">' + title + '</div>';
+                '<div class="fileHeader">' +
+                '<a href="javascript:toggleDiff(\'diff_index_' + (file_index - 1) + '\');"' +
+                ' id="toggle_diff_index_' + (file_index - 1) + '"' +
+                ' class="diffExpanded" title="click to hide diff">' + title + '</a></div>';
 		}
 
 		if (!binary && (diffContent != ""))  {
-			finalContent +=		'<div class="diffContent">' +
+			finalContent +=		'<div class="diffContent" id="diff_index_' + (file_index - 1) + '">' +
 								'<div class="lineno">' + line1 + "</div>" +
 								'<div class="lineno">' + line2 + "</div>" +
 								'<div class="lines">' + diffContent + "</div>" +

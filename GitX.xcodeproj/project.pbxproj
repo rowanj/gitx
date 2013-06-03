@@ -183,6 +183,22 @@
 		8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
 		911112370E5A097800BF76B4 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 911112360E5A097800BF76B4 /* Security.framework */; };
 		913D5E500E55645900CECEA2 /* gitx in Resources */ = {isa = PBXBuildFile; fileRef = 913D5E490E55644600CECEA2 /* gitx */; };
+		BC067C64175A0EC400D86938 /* AddBranchTemplate@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = BC067C63175A0EC400D86938 /* AddBranchTemplate@2x.png */; };
+		BC067C6F175A0ECD00D86938 /* AddLabelTemplate@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = BC067C6E175A0ECD00D86938 /* AddLabelTemplate@2x.png */; };
+		BC067C71175A100600D86938 /* AddRemote@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = BC067C70175A100600D86938 /* AddRemote@2x.png */; };
+		BC067C73175A12A400D86938 /* CherryPickTemplate@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = BC067C72175A12A400D86938 /* CherryPickTemplate@2x.png */; };
+		BC067C75175A149000D86938 /* MergeTemplate@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = BC067C74175A149000D86938 /* MergeTemplate@2x.png */; };
+		BC067C77175A16A500D86938 /* RebaseTemplate@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = BC067C76175A16A500D86938 /* RebaseTemplate@2x.png */; };
+		BC0AAF6117590F5100F4EE9A /* StageView@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = BC0AAF6017590F5100F4EE9A /* StageView@2x.png */; };
+		BC0AAF6C17590F5B00F4EE9A /* Branch@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = BC0AAF6B17590F5B00F4EE9A /* Branch@2x.png */; };
+		BC0AAF6E17590F6400F4EE9A /* RemoteBranch@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = BC0AAF6D17590F6400F4EE9A /* RemoteBranch@2x.png */; };
+		BC0AAF701759140C00F4EE9A /* deleted_file@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = BC0AAF6F1759140C00F4EE9A /* deleted_file@2x.png */; };
+		BC0AAF721759141400F4EE9A /* empty_file@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = BC0AAF711759141400F4EE9A /* empty_file@2x.png */; };
+		BC0AAF741759142500F4EE9A /* new_file@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = BC0AAF731759142500F4EE9A /* new_file@2x.png */; };
+		BC0AAF77175915F400F4EE9A /* Remote.png in Resources */ = {isa = PBXBuildFile; fileRef = BC0AAF75175915F400F4EE9A /* Remote.png */; };
+		BC0AAF78175915F400F4EE9A /* Remote@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = BC0AAF76175915F400F4EE9A /* Remote@2x.png */; };
+		BC0AAF7B175916D700F4EE9A /* Folder.png in Resources */ = {isa = PBXBuildFile; fileRef = BC0AAF79175916D700F4EE9A /* Folder.png */; };
+		BC0AAF7C175916D700F4EE9A /* Folder@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = BC0AAF7A175916D700F4EE9A /* Folder@2x.png */; };
 		D87127011229A21C00012334 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D87127001229A21C00012334 /* QuartzCore.framework */; };
 		D89E9B141218BA260097A90B /* ScriptingBridge.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D89E9AB21218A9DA0097A90B /* ScriptingBridge.framework */; };
 		D8E3B2B810DC9FB2001096A3 /* ScriptingBridge.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D8E3B2B710DC9FB2001096A3 /* ScriptingBridge.framework */; };
@@ -606,6 +622,22 @@
 		8D1107320486CEB800E47090 /* GitX.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GitX.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		911112360E5A097800BF76B4 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = /System/Library/Frameworks/Security.framework; sourceTree = "<absolute>"; };
 		913D5E490E55644600CECEA2 /* gitx */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = gitx; sourceTree = BUILT_PRODUCTS_DIR; };
+		BC067C63175A0EC400D86938 /* AddBranchTemplate@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "AddBranchTemplate@2x.png"; sourceTree = "<group>"; };
+		BC067C6E175A0ECD00D86938 /* AddLabelTemplate@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "AddLabelTemplate@2x.png"; sourceTree = "<group>"; };
+		BC067C70175A100600D86938 /* AddRemote@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "AddRemote@2x.png"; sourceTree = "<group>"; };
+		BC067C72175A12A400D86938 /* CherryPickTemplate@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "CherryPickTemplate@2x.png"; sourceTree = "<group>"; };
+		BC067C74175A149000D86938 /* MergeTemplate@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "MergeTemplate@2x.png"; sourceTree = "<group>"; };
+		BC067C76175A16A500D86938 /* RebaseTemplate@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "RebaseTemplate@2x.png"; sourceTree = "<group>"; };
+		BC0AAF6017590F5100F4EE9A /* StageView@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "StageView@2x.png"; sourceTree = "<group>"; };
+		BC0AAF6B17590F5B00F4EE9A /* Branch@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Branch@2x.png"; sourceTree = "<group>"; };
+		BC0AAF6D17590F6400F4EE9A /* RemoteBranch@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "RemoteBranch@2x.png"; sourceTree = "<group>"; };
+		BC0AAF6F1759140C00F4EE9A /* deleted_file@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "deleted_file@2x.png"; sourceTree = "<group>"; };
+		BC0AAF711759141400F4EE9A /* empty_file@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "empty_file@2x.png"; sourceTree = "<group>"; };
+		BC0AAF731759142500F4EE9A /* new_file@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "new_file@2x.png"; sourceTree = "<group>"; };
+		BC0AAF75175915F400F4EE9A /* Remote.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Remote.png; sourceTree = "<group>"; };
+		BC0AAF76175915F400F4EE9A /* Remote@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Remote@2x.png"; sourceTree = "<group>"; };
+		BC0AAF79175916D700F4EE9A /* Folder.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Folder.png; sourceTree = "<group>"; };
+		BC0AAF7A175916D700F4EE9A /* Folder@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Folder@2x.png"; sourceTree = "<group>"; };
 		D87127001229A21C00012334 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		D89E9AB21218A9DA0097A90B /* ScriptingBridge.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ScriptingBridge.framework; path = System/Library/Frameworks/ScriptingBridge.framework; sourceTree = SDKROOT; };
 		D8E3B2B710DC9FB2001096A3 /* ScriptingBridge.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ScriptingBridge.framework; path = /System/Library/Frameworks/ScriptingBridge.framework; sourceTree = "<absolute>"; };
@@ -745,34 +777,45 @@
 			isa = PBXGroup;
 			children = (
 				4A5D758214A9A90500DF6C68 /* add_branch.psd */,
+				BC067C63175A0EC400D86938 /* AddBranchTemplate@2x.png */,
 				4A5D758314A9A90500DF6C68 /* AddBranchTemplate.png */,
 				4A5D758414A9A90500DF6C68 /* AddBranchTemplate.psd */,
+				BC067C6E175A0ECD00D86938 /* AddLabelTemplate@2x.png */,
 				4A5D758514A9A90500DF6C68 /* AddLabelTemplate.png */,
 				4A5D758614A9A90500DF6C68 /* AddLabelTemplate.psd */,
 				4A5D758714A9A90500DF6C68 /* AddRemote.acorn */,
+				BC067C70175A100600D86938 /* AddRemote@2x.png */,
 				4A5D758814A9A90500DF6C68 /* AddRemote.png */,
 				4A5D758914A9A90500DF6C68 /* AddRemoteBranchFireworksTemplate.png */,
 				4A5D758A14A9A90500DF6C68 /* AddRemoteBranchTemplate.png */,
+				BC0AAF6B17590F5B00F4EE9A /* Branch@2x.png */,
 				4A5D758B14A9A90500DF6C68 /* Branch.png */,
 				4A5D758C14A9A90500DF6C68 /* branch.tiff */,
 				4A5D758D14A9A90500DF6C68 /* CherryPickTemplate.png */,
+				BC067C72175A12A400D86938 /* CherryPickTemplate@2x.png */,
 				4A5D758E14A9A90500DF6C68 /* CloneRepositoryFireworksTemplate.png */,
 				4A5D758F14A9A90500DF6C68 /* CloneRepositoryTemplate.png */,
 				4A5D759014A9A90500DF6C68 /* CommitViewTemplate.png */,
 				4A5D759114A9A90500DF6C68 /* CommitViewTemplate.psd */,
 				4A5D759214A9A90500DF6C68 /* deleted_file.png */,
+				BC0AAF6F1759140C00F4EE9A /* deleted_file@2x.png */,
 				4A5D759314A9A90500DF6C68 /* DetailViewTemplate.png */,
 				4A5D759414A9A90500DF6C68 /* empty_file.png */,
+				BC0AAF711759141400F4EE9A /* empty_file@2x.png */,
 				4A5D759514A9A90500DF6C68 /* FetchTemplate.png */,
 				4A5D759614A9A90500DF6C68 /* file_template.psd */,
 				4A5D759714A9A90500DF6C68 /* folder.tiff */,
+				BC0AAF79175916D700F4EE9A /* Folder.png */,
+				BC0AAF7A175916D700F4EE9A /* Folder@2x.png */,
 				4A5D759814A9A90500DF6C68 /* gitx_icon.psd */,
 				4A5D759914A9A90500DF6C68 /* HistoryViewTemplate.png */,
 				4A5D759A14A9A90500DF6C68 /* HistoryViewTemplate.psd */,
 				4A5D759B14A9A90500DF6C68 /* mainSplitterBar.tiff */,
 				4A5D759C14A9A90500DF6C68 /* mainSplitterDimple.tiff */,
 				4A5D759D14A9A90500DF6C68 /* MergeTemplate.png */,
+				BC067C74175A149000D86938 /* MergeTemplate@2x.png */,
 				4A5D759E14A9A90500DF6C68 /* new_file.png */,
+				BC0AAF731759142500F4EE9A /* new_file@2x.png */,
 				4A5D759F14A9A90500DF6C68 /* Preferences */,
 				4A5D75A114A9A90500DF6C68 /* PullFireworksTemplate.png */,
 				4A5D75A214A9A90500DF6C68 /* PullPopUpFireworksTemplate.png */,
@@ -785,11 +828,16 @@
 				4A5D75A914A9A90500DF6C68 /* RebaseFireworksTemplate.png */,
 				4A5D75AA14A9A90500DF6C68 /* RebasePopUpFireworksTemplate.png */,
 				4A5D75AB14A9A90500DF6C68 /* RebasePopUpTemplate.png */,
+				BC067C76175A16A500D86938 /* RebaseTemplate@2x.png */,
 				4A5D75AC14A9A90500DF6C68 /* RebaseTemplate.png */,
 				4A5D75AD14A9A90500DF6C68 /* remote.tiff */,
+				BC0AAF75175915F400F4EE9A /* Remote.png */,
+				BC0AAF76175915F400F4EE9A /* Remote@2x.png */,
+				BC0AAF6D17590F6400F4EE9A /* RemoteBranch@2x.png */,
 				4A5D75AE14A9A90500DF6C68 /* RemoteBranch.png */,
 				4A5D75AF14A9A90500DF6C68 /* rewindImage.pdf */,
 				4A5D75B014A9A90500DF6C68 /* site_download_background.png */,
+				BC0AAF6017590F5100F4EE9A /* StageView@2x.png */,
 				4A5D75B114A9A90500DF6C68 /* StageView.png */,
 				4A5D75B214A9A90500DF6C68 /* Tag.png */,
 				4A5D75B314A9A90500DF6C68 /* tag.tiff */,
@@ -1339,6 +1387,22 @@
 				4A5D761F14A9A99E00DF6C68 /* Preferences.xib in Resources */,
 				4A5D762014A9A99E00DF6C68 /* RepositoryWindow.xib in Resources */,
 				4A90A73514A9D24300D0DA02 /* GitX.sdef in Resources */,
+				BC0AAF6117590F5100F4EE9A /* StageView@2x.png in Resources */,
+				BC0AAF6C17590F5B00F4EE9A /* Branch@2x.png in Resources */,
+				BC0AAF6E17590F6400F4EE9A /* RemoteBranch@2x.png in Resources */,
+				BC0AAF701759140C00F4EE9A /* deleted_file@2x.png in Resources */,
+				BC0AAF721759141400F4EE9A /* empty_file@2x.png in Resources */,
+				BC0AAF741759142500F4EE9A /* new_file@2x.png in Resources */,
+				BC0AAF77175915F400F4EE9A /* Remote.png in Resources */,
+				BC0AAF78175915F400F4EE9A /* Remote@2x.png in Resources */,
+				BC0AAF7B175916D700F4EE9A /* Folder.png in Resources */,
+				BC0AAF7C175916D700F4EE9A /* Folder@2x.png in Resources */,
+				BC067C64175A0EC400D86938 /* AddBranchTemplate@2x.png in Resources */,
+				BC067C6F175A0ECD00D86938 /* AddLabelTemplate@2x.png in Resources */,
+				BC067C71175A100600D86938 /* AddRemote@2x.png in Resources */,
+				BC067C73175A12A400D86938 /* CherryPickTemplate@2x.png in Resources */,
+				BC067C75175A149000D86938 /* MergeTemplate@2x.png in Resources */,
+				BC067C77175A16A500D86938 /* RebaseTemplate@2x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

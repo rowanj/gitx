@@ -2,28 +2,28 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="8.00">
 	<data>
 		<int key="IBDocument.SystemTarget">1060</int>
-		<string key="IBDocument.SystemVersion">11C74</string>
-		<string key="IBDocument.InterfaceBuilderVersion">2148</string>
-		<string key="IBDocument.AppKitVersion">1138.23</string>
-		<string key="IBDocument.HIToolboxVersion">567.00</string>
+		<string key="IBDocument.SystemVersion">12D78</string>
+		<string key="IBDocument.InterfaceBuilderVersion">3084</string>
+		<string key="IBDocument.AppKitVersion">1187.37</string>
+		<string key="IBDocument.HIToolboxVersion">626.00</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginVersions">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin</string>
-			<string key="NS.object.0">2148</string>
+			<string key="NS.object.0">3084</string>
 		</object>
 		<array key="IBDocument.IntegratedClassDependencies">
-			<string>NSSegmentedControl</string>
-			<string>NSPopUpButton</string>
-			<string>NSScroller</string>
-			<string>NSMenuItem</string>
-			<string>NSMenu</string>
-			<string>NSTextFieldCell</string>
-			<string>NSScrollView</string>
-			<string>NSOutlineView</string>
-			<string>NSCustomView</string>
 			<string>NSCustomObject</string>
+			<string>NSCustomView</string>
+			<string>NSMenu</string>
+			<string>NSMenuItem</string>
+			<string>NSOutlineView</string>
+			<string>NSPopUpButton</string>
 			<string>NSPopUpButtonCell</string>
-			<string>NSTableColumn</string>
+			<string>NSScrollView</string>
+			<string>NSScroller</string>
 			<string>NSSegmentedCell</string>
+			<string>NSSegmentedControl</string>
+			<string>NSTableColumn</string>
+			<string>NSTextFieldCell</string>
 		</array>
 		<array key="IBDocument.PluginDependencies">
 			<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -59,7 +59,10 @@
 										<int key="NSvFlags">4352</int>
 										<string key="NSFrameSize">{153, 354}</string>
 										<reference key="NSSuperview" ref="973377808"/>
+										<reference key="NSNextKeyView" ref="636071848"/>
 										<bool key="NSEnabled">YES</bool>
+										<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+										<bool key="NSControlAllowsExpansionToolTips">YES</bool>
 										<object class="_NSCornerView" key="NSCornerView">
 											<nil key="NSNextResponder"/>
 											<int key="NSvFlags">256</int>
@@ -71,7 +74,7 @@
 												<double key="NSMinWidth">16</double>
 												<double key="NSMaxWidth">1000</double>
 												<object class="NSTableHeaderCell" key="NSHeaderCell">
-													<int key="NSCellFlags">75628096</int>
+													<int key="NSCellFlags">75497536</int>
 													<int key="NSCellFlags2">2048</int>
 													<string key="NSContents"/>
 													<object class="NSFont" key="NSSupport">
@@ -94,7 +97,7 @@
 													</object>
 												</object>
 												<object class="NSTextFieldCell" key="NSDataCell" id="247185217">
-													<int key="NSCellFlags">69336641</int>
+													<int key="NSCellFlags">69206081</int>
 													<int key="NSCellFlags2">2048</int>
 													<string key="NSContents">Text Cell</string>
 													<object class="NSFont" key="NSSupport">
@@ -176,6 +179,8 @@
 								<int key="NSvFlags">-2147483392</int>
 								<string key="NSFrame">{{137, 1}, {15, 338}}</string>
 								<reference key="NSSuperview" ref="631607481"/>
+								<reference key="NSNextKeyView"/>
+								<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 								<reference key="NSTarget" ref="631607481"/>
 								<string key="NSAction">_doScroller:</string>
 								<double key="NSPercent">0.99698790000000004</double>
@@ -185,6 +190,8 @@
 								<int key="NSvFlags">-2147483392</int>
 								<string key="NSFrame">{{-100, -100}, {196, 15}}</string>
 								<reference key="NSSuperview" ref="631607481"/>
+								<reference key="NSNextKeyView" ref="973377808"/>
+								<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 								<int key="NSsFlags">1</int>
 								<reference key="NSTarget" ref="631607481"/>
 								<string key="NSAction">_doScroller:</string>
@@ -193,30 +200,35 @@
 						</array>
 						<string key="NSFrameSize">{153, 354}</string>
 						<reference key="NSSuperview" ref="694945622"/>
-						<reference key="NSNextKeyView" ref="973377808"/>
+						<reference key="NSNextKeyView" ref="46429660"/>
 						<int key="NSsFlags">133648</int>
 						<reference key="NSVScroller" ref="636071848"/>
 						<reference key="NSHScroller" ref="46429660"/>
 						<reference key="NSContentView" ref="973377808"/>
 						<bytes key="NSScrollAmts">QSAAAEEgAABBoAAAQaAAAA</bytes>
+						<double key="NSMinMagnification">0.25</double>
+						<double key="NSMaxMagnification">4</double>
+						<double key="NSMagnification">1</double>
 					</object>
 				</array>
 				<string key="NSFrameSize">{153, 354}</string>
 				<reference key="NSSuperview"/>
+				<reference key="NSNextKeyView" ref="631607481"/>
 				<string key="NSClassName">NSView</string>
 			</object>
 			<object class="NSCustomView" id="790712736">
-				<nil key="NSNextResponder"/>
+				<reference key="NSNextResponder"/>
 				<int key="NSvFlags">268</int>
 				<array class="NSMutableArray" key="NSSubviews">
 					<object class="NSSegmentedControl" id="200965348">
 						<reference key="NSNextResponder" ref="790712736"/>
 						<int key="NSvFlags">268</int>
-						<string key="NSFrame">{{96, 1}, {147, 25}}</string>
+						<string key="NSFrame">{{89, 1}, {161, 25}}</string>
 						<reference key="NSSuperview" ref="790712736"/>
+						<reference key="NSNextKeyView"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSSegmentedCell" key="NSCell" id="431684212">
-							<int key="NSCellFlags">-2080244224</int>
+							<int key="NSCellFlags">-2080374784</int>
 							<int key="NSCellFlags2">0</int>
 							<object class="NSFont" key="NSSupport" id="326460798">
 								<string key="NSName">LucidaGrande</string>
@@ -267,19 +279,21 @@
 							<int key="NSTrackingMode">2</int>
 							<int key="NSSegmentStyle">2</int>
 						</object>
+						<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 					</object>
 					<object class="NSPopUpButton" id="962175484">
 						<reference key="NSNextResponder" ref="790712736"/>
 						<int key="NSvFlags">268</int>
 						<string key="NSFrame">{{9, 1}, {35, 25}}</string>
 						<reference key="NSSuperview" ref="790712736"/>
+						<reference key="NSNextKeyView" ref="200965348"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSPopUpButtonCell" key="NSCell" id="1043051029">
-							<int key="NSCellFlags">-2076049856</int>
+							<int key="NSCellFlags">-2076180416</int>
 							<int key="NSCellFlags2">134219776</int>
 							<reference key="NSSupport" ref="326460798"/>
 							<reference key="NSControlView" ref="962175484"/>
-							<int key="NSButtonFlags">-2034220801</int>
+							<int key="NSButtonFlags">-2034221056</int>
 							<int key="NSButtonFlags2">163</int>
 							<string key="NSAlternateContents"/>
 							<string key="NSKeyEquivalent"/>
@@ -345,9 +359,12 @@
 							<bool key="NSAltersState">YES</bool>
 							<int key="NSArrowPosition">2</int>
 						</object>
+						<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 					</object>
 				</array>
 				<string key="NSFrameSize">{367, 28}</string>
+				<reference key="NSSuperview"/>
+				<reference key="NSNextKeyView" ref="962175484"/>
 				<string key="NSClassName">NSView</string>
 			</object>
 		</array>
@@ -607,11 +624,11 @@
 		<bool key="IBDocument.PluginDeclaredDependenciesTrackSystemTargetVersion">YES</bool>
 		<int key="IBDocument.defaultPropertyAccessControl">3</int>
 		<dictionary class="NSMutableDictionary" key="IBDocument.LastKnownImageSizes">
-			<string key="AddRemote">{23, 12}</string>
+			<string key="AddRemote">{32, 32}</string>
 			<string key="FetchTemplate">{128, 128}</string>
 			<string key="NSActionTemplate">{15, 15}</string>
-			<string key="NSMenuCheckmark">{9, 8}</string>
-			<string key="NSMenuMixedState">{7, 2}</string>
+			<string key="NSMenuCheckmark">{11, 11}</string>
+			<string key="NSMenuMixedState">{10, 3}</string>
 			<string key="PullTemplate">{128, 128}</string>
 			<string key="PushTemplate">{128, 128}</string>
 		</dictionary>

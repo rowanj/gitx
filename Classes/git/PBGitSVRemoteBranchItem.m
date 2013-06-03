@@ -25,7 +25,7 @@
 {
 	static NSImage *remoteBranchImage = nil;
 	if (!remoteBranchImage)
-		remoteBranchImage = [NSImage imageNamed:@"RemoteBranch.png"];
+		remoteBranchImage = [NSImage imageNamed:@"RemoteBranch"];
 	
 	return remoteBranchImage;
 }

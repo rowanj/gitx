@@ -46,8 +46,7 @@
 			filename = @"empty_file";
 			break;
 	}
-	NSString *p = [[NSBundle mainBundle] pathForResource:filename ofType:@"png"];
-	return [[NSImage alloc] initByReferencingFile: p];
+	return [NSImage imageNamed:filename];
 }
 
 + (BOOL)isSelectorExcludedFromWebScript:(SEL)aSelector
