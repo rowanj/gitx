@@ -6,6 +6,27 @@ if (typeof Controller == 'undefined') {
 	Controller.log_ = console.log;
 }
 
+var toggleDiff = function(id)
+{
+  var content = document.getElementById('content_' + id);
+  if (content) {
+    var collapsed = (content.style.display == 'none');
+    content.style.display = (collapsed) ? 'block' : 'none';
+
+    var title = document.getElementById('title_' + id);
+    if (title) {
+      if (collapsed) {
+        title.classList.remove('collapsed');
+        title.classList.add('expanded');
+      }
+      else {
+        title.classList.add('collapsed');
+        title.classList.remove('expanded');
+      }
+    }
+  }
+}
+
 var highlightDiff = function(diff, element, callbacks) {
 	if (!diff || diff == "")
 		return;
@@ -69,11 +90,11 @@ var highlightDiff = function(diff, element, callbacks) {
 
 		if (diffContent != "" || binary) {
 			finalContent += '<div class="file" id="file_index_' + (file_index - 1) + '">' +
-				'<div class="fileHeader">' + title + '</div>';
+				'<div id="title_' + title + '" class="expanded fileHeader"><a href="javascript:toggleDiff(\'' + title + '\');">' + title + '</a></div>';
 		}
 
 		if (!binary && (diffContent != ""))  {
-			finalContent +=		'<div class="diffContent">' +
+			finalContent +=		'<div id="content_' + title + '" class="diffContent">' +
 								'<div class="lineno">' + line1 + "</div>" +
 								'<div class="lineno">' + line2 + "</div>" +
 								'<div class="lines">' + diffContent + "</div>" +
@@ -84,7 +105,7 @@ var highlightDiff = function(diff, element, callbacks) {
 				if (callbacks["binaryFile"])
 					finalContent += callbacks["binaryFile"](binaryname);
 				else
-					finalContent += "<div>Binary file differs</div>";
+					finalContent += '<div id="content_' + title + '">Binary file differs</div>';
 			}
 		}
 

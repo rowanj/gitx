@@ -7,3 +7,12 @@ body {
 	width: 100%;
 	font-family: 'Lucida Grande', Arial;
 }
+
+.expanded:before {
+  content: "\25be\0020";
+}
+
+.collapsed:before {
+  content: "\25b8\0020";
+}
+
