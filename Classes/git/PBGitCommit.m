@@ -16,7 +16,7 @@ NSString * const kGitXCommitType = @"commit";
 
 @implementation PBGitCommit
 
-@synthesize repository, subject, timestamp, author, sign, lineInfo;
+@synthesize repository, subject, timestamp, author, sign, lineInfo, SVNRevision;
 @synthesize sha;
 @synthesize parents;
 @synthesize committer;

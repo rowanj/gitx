@@ -56,6 +56,32 @@
 	return [PBGitRepository isBareRepository:[self fileURL]];
 }
 
++ (BOOL) hasSVNRemote: (NSURL *)url
+{
+    // ObjectiveGit doesn't give us the machinery to determine whether there's an SVN remote
+    // defined; so let's just find out ourselves...
+    
+    NSError* pError;
+    GTRepository* gitRepo = [[GTRepository alloc] initWithURL:url error:&pError];
+    
+    if (gitRepo)
+    {
+        NSURL    *configURL = [NSURL URLWithString:@".git/config" relativeToURL:url];
+        NSString *gitConfig = [NSString stringWithContentsOfURL:configURL encoding:NSUTF8StringEncoding error:&pError];
+        
+        if ([gitConfig rangeOfString:@"svn-remote"].location != NSNotFound) {
+            return YES;
+        }
+    }
+
+    return NO;
+}
+
+- (BOOL) hasSVNRemote
+{
+    return [PBGitRepository hasSVNRemote:[self fileURL]];
+}
+
 // NSFileWrapper is broken and doesn't work when called on a directory containing a large number of directories and files.
 //because of this it is safer to implement readFromURL than readFromFileWrapper.
 //Because NSFileManager does not attempt to recursively open all directories and file when fileExistsAtPath is called

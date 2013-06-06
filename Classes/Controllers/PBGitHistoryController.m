@@ -76,6 +76,12 @@
 	else
 		[repository lazyReload];
 
+    if (![repository hasSVNRemote])
+    {
+        // Remove the SVN revision table column for repositories with no SVN remote configured
+        [commitList removeTableColumn:[commitList tableColumnWithIdentifier:@"GitSVNRevision"]];
+    }
+
 	// Set a sort descriptor for the subject column in the history list, as
 	// It can't be sorted by default (because it's bound to a PBGitCommit)
 	[[commitList tableColumnWithIdentifier:@"SubjectColumn"] setSortDescriptorPrototype:[[NSSortDescriptor alloc] initWithKey:@"subject" ascending:YES]];

@@ -26,6 +26,7 @@ extern NSString * const kGitXCommitType;
 	NSString *_patch;
 	NSArray *parents;
 	NSString *realSHA;
+    NSString *SVNRevision;
 
 	int timestamp;
 	char sign;
@@ -52,6 +53,7 @@ extern NSString * const kGitXCommitType;
 @property (copy) NSString* subject;
 @property (copy) NSString* author;
 @property (copy) NSString *committer;
+@property (copy) NSString *SVNRevision;
 @property  NSArray *parents;
 
 @property (assign) int timestamp;

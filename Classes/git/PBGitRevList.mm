@@ -105,7 +105,8 @@ using namespace std;
 		std::map<string, NSStringEncoding> encodingMap;
 		NSThread *currentThread = [NSThread currentThread];
 		
-		NSString *formatString = @"--pretty=format:%H\03%e\03%aN\03%cN\03%s\03%P\03%at";
+		NSString *formatString = @"--pretty=format:%H\03%e\03%aN\03%cN\03%s\03%b\03%P\03%at";
+
 		BOOL showSign = [rev hasLeftRight];
 		
 		if (showSign)
@@ -132,6 +133,10 @@ using namespace std;
 		__gnu_cxx::stdio_filebuf<char> buf(fd, std::ios::in);
 		std::istream stream(&buf);
 		
+        // Regular expression for pulling out the SVN revision from the git log
+        NSError *error = nil;
+        NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:@"^git-svn-id: .*@(\\d+) .*$" options:0 error:&error];
+        
 		int num = 0;
 		while (true) {
 			if ([currentThread isCancelled])
@@ -167,6 +172,9 @@ using namespace std;
 			
 			string subject;
 			getline(stream, subject, '\3');
+            
+            string message;
+            getline(stream, message, '\3');
 			
 			string parentString;
 			getline(stream, parentString, '\3');
@@ -197,6 +205,21 @@ using namespace std;
 			[newCommit setSubject:[NSString stringWithCString:subject.c_str() encoding:encoding]];
 			[newCommit setAuthor:[NSString stringWithCString:author.c_str() encoding:encoding]];
 			[newCommit setCommitter:[NSString stringWithCString:committer.c_str() encoding:encoding]];
+            
+            if ([repository hasSVNRemote])
+            {
+                // get the git-svn-id from the message
+                NSString *string = [NSString stringWithCString:message.c_str() encoding:encoding];
+                NSArray *matches = [regex matchesInString:string options:0 range:NSMakeRange(0, [string length])];
+                
+                for (NSTextCheckingResult *match in matches)
+                {
+                    NSRange matchRange = [match rangeAtIndex:1];
+                    NSString *matchString = [string substringWithRange:matchRange];
+                    [newCommit setSVNRevision:matchString];
+                }
+            }
+            
 			[newCommit setTimestamp:time];
 			
 			if (showSign)
