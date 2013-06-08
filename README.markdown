@@ -47,7 +47,7 @@ command-line `git` usage.
     * Drag and drop files out of the tree view to copy them to your system
   * Support for all parameters git rev-list has
   * Good performance on large (200+ MB) repositories
-  
+
 # Development
 
 Developing for GitX-dev has a few requirements above and beyond those
@@ -59,6 +59,14 @@ Most third-party code is referenced with Git submodules, so [read up](http://boo
   * Most development is done on OS X Lion, Snow Leopard may or may not work
   * `CMake` with a working command-line compiling environment for building `libgit2`
   * `node.js` for building `SyntaxHighlighter` (not necessary unless you're updating SyntaxHighlighter itself)
+
+To get GitX-dev to compile locally you need to:
+
+  1. Clone the repository locally: `git clone https://github.com/rowanj/gitx.git`
+  2. After cloning it `cd gitx` and then recursively initialize all submodules: `git submodule update --init --recursive`
+  3. Then compile objective-git: `objective-git/scripts/update_libgit2.sh`
+
+After that you should be able to open the Xcode project and build successfully.
 
 # License
 
