@@ -159,9 +159,27 @@ var setSelectHandlers = function()
 	}
 }
 
+var toggleMode = function()
+{
+  selectLines = !selectLines;
+  if (selectLines) {
+    jQuery('#selectmode').attr('title', 'Switch to stage lines mode');
+    jQuery('#selectmode img').attr('src', '../../../StageLines@2x.png');
+    document.onmousedown = null;
+    document.onselectstart = null;
+    document.onmouseup = null;
+  }
+  else {
+    jQuery('#selectmode').attr('title', 'Switch to copy lines mode');
+    jQuery('#selectmode img').attr('src', '../../../CopyLines@2x.png');
+  }
+  Controller.refresh();
+}
+
 var diffHeader;
 var originalDiff;
 var originalCached;
+var selectLines;
 
 var displayDiff = function(diff, cached)
 {
@@ -182,7 +200,10 @@ var displayDiff = function(diff, cached)
 			header.innerHTML = "<a href='#' class='hunkbutton' onclick='discardHunk(this, event); return false'>Discard</a>" + header.innerHTML;
 		}
 	}
-	setSelectHandlers();
+
+  if (!selectLines) {
+    setSelectHandlers();
+  }
 }
 
 var getNextText = function(element)

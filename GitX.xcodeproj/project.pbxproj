@@ -183,6 +183,10 @@
 		8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
 		911112370E5A097800BF76B4 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 911112360E5A097800BF76B4 /* Security.framework */; };
 		913D5E500E55645900CECEA2 /* gitx in Resources */ = {isa = PBXBuildFile; fileRef = 913D5E490E55644600CECEA2 /* gitx */; };
+		BC0444F61764AB1E00353E6D /* CopyLines.png in Resources */ = {isa = PBXBuildFile; fileRef = BC0444F41764AB1E00353E6D /* CopyLines.png */; };
+		BC0444F71764AB1E00353E6D /* CopyLines@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = BC0444F51764AB1E00353E6D /* CopyLines@2x.png */; };
+		BC0445031764AB2C00353E6D /* StageLines.png in Resources */ = {isa = PBXBuildFile; fileRef = BC0445011764AB2C00353E6D /* StageLines.png */; };
+		BC0445041764AB2C00353E6D /* StageLines@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = BC0445021764AB2C00353E6D /* StageLines@2x.png */; };
 		BC067C64175A0EC400D86938 /* AddBranchTemplate@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = BC067C63175A0EC400D86938 /* AddBranchTemplate@2x.png */; };
 		BC067C6F175A0ECD00D86938 /* AddLabelTemplate@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = BC067C6E175A0ECD00D86938 /* AddLabelTemplate@2x.png */; };
 		BC067C71175A100600D86938 /* AddRemote@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = BC067C70175A100600D86938 /* AddRemote@2x.png */; };
@@ -621,6 +625,10 @@
 		8D1107320486CEB800E47090 /* GitX.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GitX.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		911112360E5A097800BF76B4 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = /System/Library/Frameworks/Security.framework; sourceTree = "<absolute>"; };
 		913D5E490E55644600CECEA2 /* gitx */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = gitx; sourceTree = BUILT_PRODUCTS_DIR; };
+		BC0444F41764AB1E00353E6D /* CopyLines.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = CopyLines.png; sourceTree = "<group>"; };
+		BC0444F51764AB1E00353E6D /* CopyLines@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "CopyLines@2x.png"; sourceTree = "<group>"; };
+		BC0445011764AB2C00353E6D /* StageLines.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = StageLines.png; sourceTree = "<group>"; };
+		BC0445021764AB2C00353E6D /* StageLines@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "StageLines@2x.png"; sourceTree = "<group>"; };
 		BC067C63175A0EC400D86938 /* AddBranchTemplate@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "AddBranchTemplate@2x.png"; sourceTree = "<group>"; };
 		BC067C6E175A0ECD00D86938 /* AddLabelTemplate@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "AddLabelTemplate@2x.png"; sourceTree = "<group>"; };
 		BC067C70175A100600D86938 /* AddRemote@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "AddRemote@2x.png"; sourceTree = "<group>"; };
@@ -814,6 +822,10 @@
 				BC067C74175A149000D86938 /* MergeTemplate@2x.png */,
 				4A5D759E14A9A90500DF6C68 /* new_file.png */,
 				BC0AAF731759142500F4EE9A /* new_file@2x.png */,
+				BC0444F41764AB1E00353E6D /* CopyLines.png */,
+				BC0444F51764AB1E00353E6D /* CopyLines@2x.png */,
+				BC0445011764AB2C00353E6D /* StageLines.png */,
+				BC0445021764AB2C00353E6D /* StageLines@2x.png */,
 				4A5D759F14A9A90500DF6C68 /* Preferences */,
 				4A5D75A114A9A90500DF6C68 /* PullFireworksTemplate.png */,
 				4A5D75A214A9A90500DF6C68 /* PullPopUpFireworksTemplate.png */,
@@ -1401,6 +1413,10 @@
 				BC067C73175A12A400D86938 /* CherryPickTemplate@2x.png in Resources */,
 				BC067C75175A149000D86938 /* MergeTemplate@2x.png in Resources */,
 				BC067C77175A16A500D86938 /* RebaseTemplate@2x.png in Resources */,
+				BC0444F61764AB1E00353E6D /* CopyLines.png in Resources */,
+				BC0444F71764AB1E00353E6D /* CopyLines@2x.png in Resources */,
+				BC0445031764AB2C00353E6D /* StageLines.png in Resources */,
+				BC0445041764AB2C00353E6D /* StageLines@2x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
