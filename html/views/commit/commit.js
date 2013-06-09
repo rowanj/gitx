@@ -34,11 +34,13 @@ var setTitle = function(status) {
 	$("status").innerHTML = status;
 	$("contextSize").style.display = "none";
 	$("contextTitle").style.display = "none";
+	$("selectTitle").style.display = "none";
 }
 
 var displayContext = function() {
 	$("contextSize").style.display = "";
 	$("contextTitle").style.display = "";
+	$("selectTitle").style.display = "";
 	contextLines = $("contextSize").value;
 }
 
@@ -163,15 +165,15 @@ var toggleMode = function()
 {
   selectLines = !selectLines;
   if (selectLines) {
-    jQuery('#selectmode').attr('title', 'Switch to stage lines mode');
-    jQuery('#selectmode img').attr('src', '../../../StageLines@2x.png');
+    jQuery('#selectMode').attr('title', 'Switch to stage lines mode');
+    jQuery('#selectMode img').attr('src', '../../../CopyLines@2x.png');
     document.onmousedown = null;
     document.onselectstart = null;
     document.onmouseup = null;
   }
   else {
-    jQuery('#selectmode').attr('title', 'Switch to copy lines mode');
-    jQuery('#selectmode img').attr('src', '../../../CopyLines@2x.png');
+    jQuery('#selectMode').attr('title', 'Switch to copy lines mode');
+    jQuery('#selectMode img').attr('src', '../../../StageLines@2x.png');
   }
   Controller.refresh();
 }

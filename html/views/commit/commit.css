@@ -118,20 +118,13 @@ table.diff {
 	padding-left: 20px;
 }
 
+#selectTitle {
+	margin-right: 20px;
+  float: right;
+}
+
 #selectmode img {
   width: 16px;
   height: 16px;
 }
 
-#selectmode {
-  width: 24px;
-  padding: 6px 3px 0px 3px;
-  margin-left: 10px;
-  -webkit-border-radius: 6px;
-  border: 2px solid #CCC;
-}
-
-#selectmode:hover {
-  background-color: #B5D5FE;
-	border: 2px solid #45A1FE;
-}
