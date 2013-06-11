@@ -56,7 +56,6 @@ static NSString * PBStringFromBranchFilterType(PBGitXBranchFilterType type) {
 
 @property (readonly, strong) PBGitWindowController *windowController;
 @property (readonly, getter = getIndexURL) NSURL* indexURL;
-@property (readonly, nonatomic) GTConfiguration* configuration;
 
 @property (nonatomic, strong) PBGitHistoryList *revisionList;
 @property (nonatomic, readonly, strong) NSArray* branches;
@@ -136,7 +135,6 @@ static NSString * PBStringFromBranchFilterType(PBGitXBranchFilterType type) {
 - (NSString*) parseReference:(NSString*) ref;
 
 - (id) initWithURL: (NSURL*) path;
-- (void) setup;
 - (void) forceUpdateRevisions;
 - (NSURL*) getIndexURL;
 

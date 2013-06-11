@@ -132,15 +132,15 @@
 		return [NSString stringWithFormat:@"This is a tree with path %@", [self fullPath]];
 	
 	if ([self hasBinaryAttributes])
-		return [NSString stringWithFormat:@"%@ appears to be a binary file of %d bytes", [self fullPath], [self fileSize]];
+		return [NSString stringWithFormat:@"%@ appears to be a binary file of %lld bytes", [self fullPath], [self fileSize]];
 	
 	if ([self fileSize] > 52428800) // ~50MB
-		return [NSString stringWithFormat:@"%@ is too big to be displayed (%d bytes)", [self fullPath], [self fileSize]];
+		return [NSString stringWithFormat:@"%@ is too big to be displayed (%lld bytes)", [self fullPath], [self fileSize]];
 	
 	NSString *contents=[repository outputInWorkdirForArguments:[NSArray arrayWithObjects:@"blame", @"-p",  sha, @"--", [self fullPath], nil]];
 	
 	if ([self hasBinaryHeader:contents])
-		return [NSString stringWithFormat:@"%@ appears to be a binary file of %d bytes", [self fullPath], [self fileSize]];
+		return [NSString stringWithFormat:@"%@ appears to be a binary file of %lld bytes", [self fullPath], [self fileSize]];
 	
 	
 	return contents;
@@ -152,15 +152,15 @@
 		return [NSString stringWithFormat:@"This is a tree with path %@", [self fullPath]];
 	
 	if ([self hasBinaryAttributes])
-		return [NSString stringWithFormat:@"%@ appears to be a binary file of %d bytes", [self fullPath], [self fileSize]];
+		return [NSString stringWithFormat:@"%@ appears to be a binary file of %lld bytes", [self fullPath], [self fileSize]];
 	
 	if ([self fileSize] > 52428800) // ~50MB
-		return [NSString stringWithFormat:@"%@ is too big to be displayed (%d bytes)", [self fullPath], [self fileSize]];
+		return [NSString stringWithFormat:@"%@ is too big to be displayed (%lld bytes)", [self fullPath], [self fileSize]];
 
 	NSString *contents=[repository outputInWorkdirForArguments:[NSArray arrayWithObjects:@"log", [NSString stringWithFormat:@"--pretty=format:%@",format], @"--", [self fullPath], nil]];
 	
 	if ([self hasBinaryHeader:contents])
-		return [NSString stringWithFormat:@"%@ appears to be a binary file of %d bytes", [self fullPath], [self fileSize]];
+		return [NSString stringWithFormat:@"%@ appears to be a binary file of %lld bytes", [self fullPath], [self fileSize]];
 	
 	
 	return contents;
@@ -188,15 +188,15 @@
 		return [NSString stringWithFormat:@"This is a tree with path %@", [self fullPath]];
 
 	if ([self hasBinaryAttributes])
-		return [NSString stringWithFormat:@"%@ appears to be a binary file of %d bytes", [self fullPath], [self fileSize]];
+		return [NSString stringWithFormat:@"%@ appears to be a binary file of %lld bytes", [self fullPath], [self fileSize]];
 
 	if ([self fileSize] > 52428800) // ~50MB
-		return [NSString stringWithFormat:@"%@ is too big to be displayed (%d bytes)", [self fullPath], [self fileSize]];
+		return [NSString stringWithFormat:@"%@ is too big to be displayed (%lld bytes)", [self fullPath], [self fileSize]];
 
 	NSString* contents = [self contents];
 
 	if ([self hasBinaryHeader:contents])
-		return [NSString stringWithFormat:@"%@ appears to be a binary file of %d bytes", [self fullPath], [self fileSize]];
+		return [NSString stringWithFormat:@"%@ appears to be a binary file of %lld bytes", [self fullPath], [self fileSize]];
 
 	return contents;
 }
@@ -210,7 +210,11 @@
 		NSData* data = [handle readDataToEndOfFile];
 		[data writeToFile:newName atomically:YES];
 	} else { // Directory
-		[[NSFileManager defaultManager] createDirectoryAtPath:newName attributes:nil];
+        NSError *error = nil;
+		if (![[NSFileManager defaultManager] createDirectoryAtPath:newName withIntermediateDirectories:YES attributes:nil error:&error]) {
+            NSLog(@"Error creating directory %@: %@", newName, error);
+            return;
+        }
 		for (PBGitTree* child in [self children])
 			[child saveToFolder: newName];
 	}
@@ -301,7 +305,11 @@
 
 - (void) dealloc
 {
-	if (localFileName)
-		[[NSFileManager defaultManager] removeFileAtPath:localFileName handler:nil];
+	if (localFileName) {
+        NSError *error = nil;
+		if (![[NSFileManager defaultManager] removeItemAtPath:localFileName error:&error]) {
+            NSLog(@"Failed to remove item %@: %@", localFileName, error);
+        }
+    }
 }
 @end

@@ -441,7 +441,7 @@ NSString *PBGitIndexOperationFailed = @"PBGitIndexOperationFailed";
 
 - (NSString *)diffForFile:(PBChangedFile *)file staged:(BOOL)staged contextLines:(NSUInteger)context
 {
-	NSString *parameter = [NSString stringWithFormat:@"-U%u", context];
+	NSString *parameter = [NSString stringWithFormat:@"-U%lu", (unsigned long)context];
 	if (staged) {
 		NSString *indexPath = [@":0:" stringByAppendingString:file.path];
 

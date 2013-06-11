@@ -39,23 +39,6 @@
 	[super show];
 }
 
-
-- (void) browseSheetDidEnd:(NSWindow *)sheet returnCode:(NSInteger)code contextInfo:(void *)info
-{
-	[self hide];
-
-    if (code == NSOKButton)
-	{
-		NSOpenPanel* panel = (NSOpenPanel*)sheet;
-		NSString* directory = panel.directoryURL.path;
-		[self.remoteURL setStringValue:directory];
-	}
-
-	[self show];
-}
-
-
-
 #pragma mark IBActions
 
 - (IBAction) browseFolders:(id)sender
@@ -72,11 +55,15 @@
     [browseSheet setCanCreateDirectories:NO];
 	[browseSheet setAccessoryView:browseAccessoryView];
 
-    [browseSheet beginSheetForDirectory:nil file:nil types:nil
-						 modalForWindow:self.repoWindow.window
-						  modalDelegate:self
-						 didEndSelector:@selector(browseSheetDidEnd:returnCode:contextInfo:)
-							contextInfo:NULL];
+    [browseSheet beginSheetModalForWindow:self.repoWindow.window
+                        completionHandler:^(NSInteger result) {
+                            [self hide];
+                            if (result == NSOKButton) {
+                                NSString* directory = browseSheet.directoryURL.path;
+                                [self.remoteURL setStringValue:directory];
+                            }
+                            [self show];
+                        }];
 }
 
 
@@ -109,9 +96,7 @@
 
 - (IBAction) showHideHiddenFiles:(id)sender
 {
-	// This uses undocumented OpenPanel features to show hidden files (required for 10.5 support)
-	NSNumber *showHidden = [NSNumber numberWithBool:[sender state] == NSOnState];
-	[[self.browseSheet valueForKey:@"_navView"] setValue:showHidden forKey:@"showsHiddenFiles"];
+    [self.browseSheet setShowsHiddenFiles:[sender state] == NSOnState];
 }
 
 - (IBAction) cancelOperation:(id)sender

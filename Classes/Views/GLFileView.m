@@ -17,6 +17,9 @@
 #define ITEM_IDENTIFIER			@"Identifier"		// string
 #define ITEM_NAME				@"Name"				// string
 
+#define GROUP_ID_FILEVIEW       @"fileview"
+#define GROUP_ID_BLAME          @"blame"
+#define GROUP_ID_LOG            @"log"
 
 @interface GLFileView ()
 
@@ -34,7 +37,7 @@
 		logFormat=[NSString stringWithContentsOfURL:[NSURL fileURLWithPath:formatFile] encoding:NSUTF8StringEncoding error:nil];
 	
 	
-	startFile = @"fileview";
+	startFile = GROUP_ID_FILEVIEW;
 	//repository = historyController.repository;
 	[super awakeFromNib];
 	[historyController.treeController addObserver:self forKeyPath:@"selection" options:0 context:@"treeController"];
@@ -43,16 +46,16 @@
 	
 	NSArray *items = [NSArray arrayWithObjects:
 					  [NSDictionary dictionaryWithObjectsAndKeys:
-					   startFile, ITEM_IDENTIFIER, 
-					   @"Source", ITEM_NAME, 
+					   startFile, ITEM_IDENTIFIER,
+					   @"Source", ITEM_NAME,
 					   nil], 
 					  [NSDictionary dictionaryWithObjectsAndKeys:
-					   @"blame", ITEM_IDENTIFIER, 
-					   @"Blame", ITEM_NAME, 
+					   GROUP_ID_BLAME, ITEM_IDENTIFIER,
+					   @"Blame", ITEM_NAME,
 					   nil], 
 					  [NSDictionary dictionaryWithObjectsAndKeys:
-					   @"log", ITEM_IDENTIFIER, 
-					   @"History", ITEM_NAME, 
+					   GROUP_ID_LOG, ITEM_IDENTIFIER,
+					   @"History", ITEM_NAME,
 					   nil], 
 					  nil];
 	[self.groups addObject:[NSDictionary dictionaryWithObjectsAndKeys:
@@ -75,20 +78,20 @@
 - (void) showFile
 {
 	NSArray *files=[historyController.treeController selectedObjects];
-	if ([files count]>0) {
-		PBGitTree *file=[files objectAtIndex:0];
+	if ([files count] > 0) {
+		PBGitTree *file = [files objectAtIndex:0];
 
 		NSString *fileTxt = @"";
-		if(startFile==@"fileview")
-			fileTxt=[self parseHTML:[file textContents]];
-		else if(startFile==@"blame")
-			fileTxt=[self parseBlame:[file blame]];
-		else if(startFile==@"log")
-			fileTxt=[file log:logFormat];
+		if([startFile isEqualToString:GROUP_ID_FILEVIEW])
+			fileTxt = [self parseHTML:[file textContents]];
+		else if([startFile isEqualToString:GROUP_ID_BLAME])
+			fileTxt = [self parseBlame:[file blame]];
+		else if([startFile isEqualToString:GROUP_ID_LOG])
+			fileTxt = [file log:logFormat];
 
 		id script = [view windowScriptObject];
 		NSString *filePath = [file fullPath];
-    [script callWebScriptMethod:@"showFile" withArguments:[NSArray arrayWithObjects:fileTxt, filePath, nil]];
+        [script callWebScriptMethod:@"showFile" withArguments:[NSArray arrayWithObjects:fileTxt, filePath, nil]];
 	}
 	
 #if 0

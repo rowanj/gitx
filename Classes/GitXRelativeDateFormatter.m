@@ -36,7 +36,7 @@
 		return @"1 minute ago";
 
 	if (secondsAgo < HOUR)
-		return [NSString stringWithFormat:@"%d minutes ago", (secondsAgo / MINUTE)];
+		return [NSString stringWithFormat:@"%ld minutes ago", (long)(secondsAgo / MINUTE)];
 
 	if (secondsAgo < (2 * HOUR))
 		return @"1 hour ago";
@@ -61,20 +61,20 @@
 			// return "hours ago" if it's still today, but "Yesterday" only if more than 6 hours ago
 			// gives people a little time to get used to the idea that yesterday is over :)
 			if ((daysAgo == 0) || (secondsAgo < (6 * HOUR)))
-				return [NSString stringWithFormat:@"%d hours ago", (secondsAgo / HOUR)];
+				return [NSString stringWithFormat:@"%ld hours ago", (long)(secondsAgo / HOUR)];
 			if (daysAgo == 1)
 				return @"Yesterday";
 
 			if (daysAgo >= (2 * WEEK))
-				return [NSString stringWithFormat:@"%d weeks ago", (daysAgo / WEEK)];
+				return [NSString stringWithFormat:@"%ld weeks ago", (long)(daysAgo / WEEK)];
 
-			return [NSString stringWithFormat:@"%d days ago", daysAgo];
+			return [NSString stringWithFormat:@"%ld days ago", (long)daysAgo];
 		}
 
 		if (monthsAgo == 1)
 			return @"1 month ago";
 
-		return [NSString stringWithFormat:@"%d months ago", monthsAgo];
+		return [NSString stringWithFormat:@"%ld months ago", (long)monthsAgo];
 	}
 
 	if (yearsAgo == 1) {
@@ -84,10 +84,10 @@
 		if (monthsAgo == 1)
 			return @"1 year 1 month ago";
 
-		return [NSString stringWithFormat:@"1 year %d months ago", monthsAgo];
+		return [NSString stringWithFormat:@"1 year %ld months ago", (long)monthsAgo];
 	}
 
-	return [NSString stringWithFormat:@"%d years ago", yearsAgo];
+	return [NSString stringWithFormat:@"%ld years ago", (long)yearsAgo];
 }
 
 @end

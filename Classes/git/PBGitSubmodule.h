@@ -7,6 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import <ObjectiveGit/ObjectiveGit.h>
 
 
 @interface PBGitSubmodule : NSObject

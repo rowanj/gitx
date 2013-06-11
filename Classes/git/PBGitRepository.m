@@ -36,7 +36,7 @@
 
 @implementation PBGitRepository
 
-@synthesize revisionList, branchesSet, currentBranch, refs, hasChanged, configuration, submodules;
+@synthesize revisionList, branchesSet, currentBranch, refs, hasChanged, submodules;
 @synthesize currentBranchFilter;
 
 - (BOOL)readFromData:(NSData *)data ofType:(NSString *)typeName error:(NSError **)outError
@@ -108,34 +108,43 @@
 		return NO;
 	}
 
-
-	NSURL* gitDirURL = [GitRepoFinder gitDirForURL:absoluteURL];
-	if (!gitDirURL) {
+    NSError *error = nil;
+    _gtRepo = [GTRepository repositoryWithURL:absoluteURL error:&error];
+	if (!_gtRepo) {
 		if (outError) {
-			NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"%@ does not appear to be a git repository.", [[self fileURL] path]]
-																 forKey:NSLocalizedRecoverySuggestionErrorKey];
+			NSDictionary* userInfo = [NSDictionary dictionaryWithObjectsAndKeys:
+                                      [NSString stringWithFormat:@"%@ does not appear to be a git repository.", [[self fileURL] path]], NSLocalizedRecoverySuggestionErrorKey,
+                                      error, NSUnderlyingErrorKey,
+                                      nil];
 			*outError = [NSError errorWithDomain:PBGitRepositoryErrorDomain code:0 userInfo:userInfo];
 		}
 		return NO;
 	}
-	self.fileURL = [GitRepoFinder fileURLForURL:absoluteURL];
 
-	[self setup];
-  watcher = [[PBGitRepositoryWatcher alloc] initWithRepository:self];
+	revisionList = [[PBGitHistoryList alloc] initWithRepository:self];
+
+	[self reloadRefs];
+
+    // Setup the FSEvents watcher to fire notifications when things change
+    watcher = [[PBGitRepositoryWatcher alloc] initWithRepository:self];
+
 	return YES;
 }
 
 - (NSURL *) gitURL {
     return self.gtRepo.gitDirectoryURL;
 }
-- (void) setup
+
+- (id) init
 {
-	self->configuration = self.gtRepo.configuration;
+    self = [super init];
+    if (!self)
+        return nil;
+
 	self.branchesSet = [NSMutableOrderedSet orderedSet];
     self.submodules = [NSMutableArray array];
-	[self reloadRefs];
 	currentBranchFilter = [PBGitDefaults branchFilter];
-	revisionList = [[PBGitHistoryList alloc] initWithRepository:self];
+    return self;
 }
 
 - (void)close
@@ -150,21 +159,13 @@
 	if (![PBGitBinary path])
 		return nil;
 
-	NSURL* gitDirURL = [GitRepoFinder gitDirForURL:path];
-	if (!gitDirURL)
-		return nil;
-
-	self = [self init];
+    self = [self initWithContentsOfURL:path ofType:@"" error:NULL];
 	if (!self)
 	{
 		NSLog(@"Failed to initWithURL:%@", path);
 		return nil;
 	}
-    
-	[self setFileURL: path];
 
-	[self setup];
-	
 	// We don't want the window controller to display anything yet..
 	// We'll leave that to the caller of this method.
 #ifndef CLI
@@ -172,9 +173,7 @@
 #endif
 
 	[self showWindows];
-    
-  // Setup the FSEvents watcher to fire notifications when things change
-  watcher = [[PBGitRepositoryWatcher alloc] initWithRepository:self];
+
 	return self;
 }
 
@@ -610,7 +609,7 @@ int addSubmoduleName(git_submodule *module, const char* name, void * context)
 
 	NSString *branchName = [branch branchName];
 	if (branchName) {
-		NSString *remoteName = [self.configuration stringForKey:[NSString stringWithFormat:@"branch.%@.remote", branchName]];
+		NSString *remoteName = [self.gtRepo.configuration stringForKey:[NSString stringWithFormat:@"branch.%@.remote", branchName]];
 		if (remoteName && ([remoteName isKindOfClass:[NSString class]] && ![remoteName isEqualToString:@""])) {
 			PBGitRef *remoteRef = [PBGitRef refFromString:[kGitXRemoteRefPrefix stringByAppendingString:remoteName]];
 			// check that the remote is a valid ref and exists
@@ -1222,21 +1221,6 @@ int addSubmoduleName(git_submodule *module, const char* name, void * context)
 	return result;
 }
 
--(GTRepository*) gtRepo
-{
-	if (!_gtRepo)
-	{
-		NSError* error = nil;
-		NSURL* repoURL = [GitRepoFinder gitDirForURL:self.fileURL];
-		_gtRepo = [GTRepository repositoryWithURL:repoURL error:&error];
-		if (error)
-		{
-			_gtRepo = nil;
-			NSLog(@"Error opening GTRepository for %@\n%@", repoURL, [error userInfo]);
-		}
-	}
-	return _gtRepo;
-}
 
 - (void) dealloc
 {

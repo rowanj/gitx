@@ -46,6 +46,8 @@
 - (id) initWithRepository:(PBGitRepository *)repo
 {
     self = [super init];
+    if (!self)
+        return nil;
     
 	commits = [NSMutableArray array];
 	repository = repo;
@@ -60,6 +62,9 @@
 	return self;
 }
 
+- (void)dealloc {
+    [self cleanup];
+}
 
 - (void) forceUpdate
 {
