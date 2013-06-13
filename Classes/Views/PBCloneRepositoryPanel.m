@@ -8,7 +8,6 @@
 
 #import "PBCloneRepositoryPanel.h"
 #import "PBRemoteProgressSheet.h"
-#import "PBRepositoryDocumentController.h"
 #import "PBGitDefaults.h"
 
 
@@ -166,7 +165,7 @@
 	NSURL *documentURL = [NSURL fileURLWithPath:path];
 	
 	NSError *error = nil;
-	id document = [[PBRepositoryDocumentController sharedDocumentController] openDocumentWithContentsOfURL:documentURL display:YES error:&error];
+	id document = [[NSDocumentController sharedDocumentController] openDocumentWithContentsOfURL:documentURL display:YES error:&error];
 	if (!document && error)
 			[self showErrorSheet:error];
 	else {

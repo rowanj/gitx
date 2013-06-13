@@ -13,6 +13,8 @@
 #import "PBGitBinary.h"
 #import "GitRepoFinder.h"
 
+#import <ObjectiveGit/GTRepository.h>
+
 @implementation PBRepositoryDocumentController
 // This method is overridden to configure the open panel to only allow
 // selection of directories
@@ -24,49 +26,7 @@
 	return [openPanel runModal];
 }
 
-// Convert paths to the .git dir before searching for an already open document
-- (id)documentForURL:(NSURL *)URL
-{
-	NSURL* fileURL = [GitRepoFinder fileURLForURL:URL];
-	id result = [super documentForURL:fileURL];
-	return result;
-}
-
-- (void)noteNewRecentDocumentURL:(NSURL*)URL
-{
-	NSURL* fileURL = [GitRepoFinder fileURLForURL:URL];
-	[super noteNewRecentDocumentURL:fileURL];
-}
-
-- (id) documentForLocation:(NSURL*) url
-{
-	id document = [self documentForURL:url];
-	if (!document) {
-		
-		if (!(document = [[PBGitRepository alloc] initWithURL:url]))
-			return nil;
-
-		[self addDocument:document];
-	}
-	else
-		[document showWindows];
-
-	return document;
-}
-
-- (void)initNewRepositoryAtURL:(NSURL *)url
-{
-	int terminationStatus;
-	NSString *result = [PBEasyPipe outputForCommand:[PBGitBinary path] withArgs:[NSArray arrayWithObjects:@"init", @"-q", nil] inDir:[url path] retValue:&terminationStatus];
-
-	if (terminationStatus == 0)
-		[self openDocumentWithContentsOfURL:url display:YES error:NULL];
-	else
-		NSRunAlertPanel(@"Failed to create new Git repository", @"Git returned the following error when trying to create the repository: %@", nil, nil, nil, result);
-}
-
-- (IBAction)newDocument:(id)sender
-{
+- (id)makeUntitledDocumentOfType:(NSString *)typeName error:(NSError *__autoreleasing *)outError {
 	NSOpenPanel *op = [NSOpenPanel openPanel];
 
 	[op setCanChooseFiles:NO];
@@ -74,10 +34,15 @@
 	[op setAllowsMultipleSelection:NO];
 	[op setMessage:@"Initialize a repository here:"];
 	[op setTitle:@"New Repository"];
-	if ([op runModal] == NSFileHandlingPanelOKButton)
-		[self initNewRepositoryAtURL:[op URL]];
-}
+	if ([op runModal] != NSFileHandlingPanelOKButton)
+        return nil;
 
+    BOOL success = [GTRepository initializeEmptyRepositoryAtURL:[op URL] error:outError];
+    if (!success)
+        return nil; // Repo creation failed
+
+    return [[PBGitRepository alloc] initWithContentsOfURL:[op URL] ofType:PBGitRepositoryDocumentType error:outError];
+}
 
 - (BOOL)validateMenuItem:(NSMenuItem *)item
 {

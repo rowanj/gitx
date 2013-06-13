@@ -28,6 +28,8 @@
 #import <ObjectiveGit/GTIndex.h>
 #import <ObjectiveGit/GTConfiguration.h>
 
+NSString *PBGitRepositoryDocumentType = @"Git Repository";
+
 @interface PBGitRepository ()
 
 @property (nonatomic, strong) NSNumber *hasSVNRepoConfig;
@@ -39,27 +41,9 @@
 @synthesize revisionList, branchesSet, currentBranch, refs, hasChanged, submodules;
 @synthesize currentBranchFilter;
 
-- (BOOL)readFromData:(NSData *)data ofType:(NSString *)typeName error:(NSError **)outError
-{
-	if (outError) {
-		*outError = [NSError errorWithDomain:PBGitRepositoryErrorDomain
-                                      code:0
-                                  userInfo:[NSDictionary dictionaryWithObject:@"Reading files is not supported." forKey:NSLocalizedFailureReasonErrorKey]];
-	}
-	return NO;
-}
-
-+ (BOOL) isBareRepository: (NSURL*) url
-{
-	NSError* pError;
-	GTRepository* gitRepo = [[GTRepository alloc] initWithURL:url error:&pError];
-
-	return gitRepo && git_repository_is_bare([gitRepo git_repository]);
-}
-
 - (BOOL) isBareRepository
 {
-	return [PBGitRepository isBareRepository:[self fileURL]];
+    return self.gtRepo.isBare;
 }
 
 - (BOOL) readHasSVNRemoteFromConfig
@@ -154,29 +138,6 @@
 	[super close];
 }
 
-- (id) initWithURL: (NSURL*) path
-{
-	if (![PBGitBinary path])
-		return nil;
-
-    self = [self initWithContentsOfURL:path ofType:@"" error:NULL];
-	if (!self)
-	{
-		NSLog(@"Failed to initWithURL:%@", path);
-		return nil;
-	}
-
-	// We don't want the window controller to display anything yet..
-	// We'll leave that to the caller of this method.
-#ifndef CLI
-	[self addWindowController:[[PBGitWindowController alloc] initWithRepository:self displayDefault:NO]];
-#endif
-
-	[self showWindows];
-
-	return self;
-}
-
 - (void) forceUpdateRevisions
 {
 	[revisionList forceUpdate];
@@ -190,7 +151,7 @@
 // The fileURL the document keeps is to the working dir
 - (NSString *) displayName
 {
-	if (![[PBGitRef refFromString:[[self headRef] simpleRef]] type])
+    if (self.gtRepo.isHeadDetached)
 		return [NSString stringWithFormat:@"%@ (detached HEAD)", [self projectName]];
 
 	return [NSString stringWithFormat:@"%@ (branch: %@)", [self projectName], [[self headRef] description]];

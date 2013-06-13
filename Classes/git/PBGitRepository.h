@@ -15,6 +15,8 @@
 @class GTConfiguration;
 
 extern NSString* PBGitRepositoryErrorDomain;
+extern NSString *PBGitRepositoryDocumentType;
+
 typedef enum branchFilterTypes {
 	kGitXAllBranchesFilter = 0,
 	kGitXLocalRemoteBranchesFilter,
@@ -103,7 +105,6 @@ static NSString * PBStringFromBranchFilterType(PBGitXBranchFilterType type) {
 - (NSString *) projectName;
 - (NSString *)gitIgnoreFilename;
 - (BOOL)isBareRepository;
-+ (BOOL)isBareRepository:(NSURL*)repositoryURL;
 
 - (BOOL)hasSVNRemote;
 
@@ -134,7 +135,6 @@ static NSString * PBStringFromBranchFilterType(PBGitXBranchFilterType type) {
 - (NSString*) parseSymbolicReference:(NSString*) ref;
 - (NSString*) parseReference:(NSString*) ref;
 
-- (id) initWithURL: (NSURL*) path;
 - (void) forceUpdateRevisions;
 - (NSURL*) getIndexURL;
 

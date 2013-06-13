@@ -8,7 +8,6 @@
 
 #import "OpenRecentController.h"
 #import "PBGitDefaults.h"
-#import "PBRepositoryDocumentController.h"
 
 @implementation OpenRecentController
 
@@ -77,9 +76,9 @@
 {
 	[self changeSelection:self];
 	if(selectedResult != nil) {
-		[[PBRepositoryDocumentController sharedDocumentController] openDocumentWithContentsOfURL:selectedResult
-																						 display:YES
-																						   error:nil];
+		[[NSDocumentController sharedDocumentController] openDocumentWithContentsOfURL:selectedResult
+                                                                               display:YES
+                                                                                 error:nil];
 	}
 	[self hide];
 }
@@ -88,9 +87,9 @@
     BOOL result = NO;
     if (commandSelector == @selector(insertNewline:)) {
 		if(selectedResult != nil) {
-			[[PBRepositoryDocumentController sharedDocumentController] openDocumentWithContentsOfURL:selectedResult
-																							 display:YES
-																							   error:nil];
+			[[NSDocumentController sharedDocumentController] openDocumentWithContentsOfURL:selectedResult
+                                                                                   display:YES
+                                                                                     error:nil];
 		}
 		[self hide];
 //		[searchWindow makeKeyAndOrderFront: nil];

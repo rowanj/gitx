@@ -7,7 +7,6 @@
 //
 
 #import "PBCLIProxy.h"
-#import "PBRepositoryDocumentController.h"
 #import "PBGitRevSpecifier.h"
 #import "PBGitRepository.h"
 #import "PBGitWindowController.h"
@@ -38,7 +37,7 @@
 	NSURL* url = [NSURL fileURLWithPath:[repositoryPath path]];
 	NSArray* arguments = [NSArray arrayWithArray:args];
 
-	PBGitRepository *document = [[PBRepositoryDocumentController sharedDocumentController] documentForLocation:url];
+	PBGitRepository *document = [[NSDocumentController sharedDocumentController] documentForURL:url];
 	if (!document) {
 		if (error) {
 			NSString *suggestion = [PBGitBinary path] ? @"this isn't a git repository" : @"GitX can't find your git binary";

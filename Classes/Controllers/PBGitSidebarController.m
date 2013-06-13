@@ -16,7 +16,6 @@
 #import "PBAddRemoteSheet.h"
 #import "PBGitDefaults.h"
 #import "PBHistorySearchController.h"
-#import "PBRepositoryDocumentController.h"
 
 @interface PBGitSidebarController ()
 
@@ -225,9 +224,9 @@
         PBGitSVSubmoduleItem *subModule = [sourceView itemAtRow:rowNumber];
         
         NSURL *url = [NSURL fileURLWithPath:subModule.submodule.path];
-        [[PBRepositoryDocumentController sharedDocumentController] openDocumentWithContentsOfURL:url
-																						 display:YES
-																						   error:nil];
+        [[NSDocumentController sharedDocumentController] openDocumentWithContentsOfURL:url
+                                                                               display:YES
+                                                                                 error:nil];
 
         ;
     }

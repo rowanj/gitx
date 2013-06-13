@@ -9,7 +9,6 @@
 #import "ApplicationController.h"
 #import "PBGitRevisionCell.h"
 #import "PBGitWindowController.h"
-#import "PBRepositoryDocumentController.h"
 #import "PBServicesController.h"
 #import "PBGitXProtocol.h"
 #import "PBPrefsWindowController.h"
@@ -70,7 +69,7 @@ static OpenRecentController* recentsDialog = nil;
 
 - (BOOL)applicationShouldOpenUntitledFile:(NSApplication *)sender
 {
-	if(!started || [[[PBRepositoryDocumentController sharedDocumentController] documents] count])
+	if(!started || [[[NSDocumentController sharedDocumentController] documents] count])
 		return NO;
 	return YES;
 }

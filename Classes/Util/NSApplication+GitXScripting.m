@@ -9,8 +9,10 @@
 #import "NSApplication+GitXScripting.h"
 #import "GitXScriptingConstants.h"
 #import "PBDiffWindowController.h"
-#import "PBRepositoryDocumentController.h"
+#import "PBGitRepository.h"
 #import "PBCloneRepositoryPanel.h"
+
+#import <ObjectiveGit/GTRepository.h>
 
 
 @implementation NSApplication (GitXScripting)
@@ -27,9 +29,24 @@
 
 - (void)initRepositoryScriptCommand:(NSScriptCommand *)command
 {
+    NSError *error = nil;
 	NSURL *repositoryURL = [command directParameter];
-	if (repositoryURL)
-		[[PBRepositoryDocumentController sharedDocumentController] initNewRepositoryAtURL:repositoryURL];
+	if (!repositoryURL)
+        return;
+
+    BOOL success = [GTRepository initializeEmptyRepositoryAtURL:repositoryURL error:&error];
+    if (!success) {
+        NSLog(@"Failed to create repository at %@: %@", repositoryURL, error);
+        return;
+    }
+
+    [[NSDocumentController sharedDocumentController] openDocumentWithContentsOfURL:repositoryURL
+                                                                           display:YES
+                                                                 completionHandler:^(NSDocument *document, BOOL documentWasAlreadyOpen, NSError *error) {
+                                                                     if (error) {
+                                                                         NSLog(@"Failed to open repository at %@: %@", repositoryURL, error);
+                                                                     }
+                                                                 }];
 }
 
 - (void)cloneRepositoryScriptCommand:(NSScriptCommand *)command
