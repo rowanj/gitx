@@ -100,7 +100,10 @@ var gistie = function() {
 			if (success && response.html_url) {
 				notify("Code uploaded to <a target='_new' href='"+response.html_url+"'>"+response.html_url+"</a>", 1);
 			} else {
-				notify("Pasting to Gistie failed :(.", -1);
+                var message = "Pasting to Gistie failed :(.";
+                if (response && response.message)
+                    message += " (" + response.message + ")";
+				notify(message, -1);
 				Controller.log_(t.responseText);
 			}
 		}
