@@ -458,4 +458,8 @@
         [PBGitDefaults suppressDialogWarningForDialog:kDialogAcceptDroppedRef];
 }
 
+- (void)dealloc {
+    historyController = nil;
+}
+
 @end

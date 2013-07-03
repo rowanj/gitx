@@ -12,7 +12,7 @@
 
 @interface PBViewController : NSViewController {
 	__weak PBGitRepository *repository;
-	__weak PBGitWindowController *superController;
+	PBGitWindowController *superController;
 
 	NSString *status;
 	BOOL isBusy;
