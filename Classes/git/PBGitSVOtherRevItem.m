@@ -21,14 +21,9 @@
 	return item;
 }
 
-
-- (NSImage *) icon
+- (NSString*) iconName
 {
-	static NSImage *otherRevImage = nil;
-	if (!otherRevImage)
-		otherRevImage = [NSImage imageNamed:@"Branch"];
-	
-	return otherRevImage;
+    return @"Branch";
 }
 
 @end

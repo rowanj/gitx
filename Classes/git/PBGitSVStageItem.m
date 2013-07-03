@@ -20,13 +20,9 @@
 }
 
 
-- (NSImage *) icon
+- (NSString*) iconName
 {
-	static NSImage *stageImage = nil;
-	if (!stageImage)
-		stageImage = [NSImage imageNamed:@"StageView"];
-	
-	return stageImage;
+    return @"StageView";
 }
 
 @end

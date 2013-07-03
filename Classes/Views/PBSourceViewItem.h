@@ -27,6 +27,7 @@
 
 - (void)addChild:(PBSourceViewItem *)child;
 - (void)removeChild:(PBSourceViewItem *)child;
+- (NSImage*)iconNamed:(NSString*)name;
 
 // This adds the ref to the path, which should match the item's title,
 // so "refs/heads/pu/pb/sidebar" would have the path [@"pu", @"pb", @"sidebare"]
@@ -38,9 +39,11 @@
 
 @property NSString *title;
 @property(nonatomic, readonly) NSArray *sortedChildren;
-@property(assign) BOOL isGroupItem, isUncollapsible;
+@property(assign) BOOL isGroupItem, isUncollapsible, isExpanded;
 @property PBGitRevSpecifier *revSpecifier;
 @property (assign)PBSourceViewItem *parent;
+@property(readonly) NSString *iconName;
 @property(readonly) NSImage *icon;
+@property(readonly) NSImage *highlightedIcon;
 
 @end

@@ -20,14 +20,9 @@
 	return item;
 }
 
-
-- (NSImage *) icon
+- (NSString*) iconName
 {
-	static NSImage *remoteBranchImage = nil;
-	if (!remoteBranchImage)
-		remoteBranchImage = [NSImage imageNamed:@"RemoteBranch"];
-	
-	return remoteBranchImage;
+    return @"RemoteBranch";
 }
 
 @end

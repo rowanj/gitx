@@ -21,13 +21,9 @@
 }
 
 
-- (NSImage *) icon
+- (NSString*) iconName
 {
-	static NSImage *branchImage = nil;
-	if (!branchImage)
-		branchImage = [NSImage imageNamed:@"Branch"];
-	
-	return branchImage;
+    return @"Branch";
 }
 
 @end

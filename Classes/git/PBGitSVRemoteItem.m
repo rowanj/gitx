@@ -20,18 +20,10 @@
 	return item;
 }
 
-
-- (NSImage *) icon
+- (NSString*) iconName
 {
-	static NSImage *networkImage = nil;
-	if (!networkImage) {
-		networkImage = [NSImage imageNamed:@"Remote"];
-		[networkImage setSize:NSMakeSize(16,16)];
-	}
-	
-	return networkImage;
+    return @"Remote";
 }
-
 
 - (PBGitRef *) ref
 {

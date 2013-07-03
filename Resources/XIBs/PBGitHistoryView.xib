@@ -2,9 +2,9 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="8.00">
 	<data>
 		<int key="IBDocument.SystemTarget">1060</int>
-		<string key="IBDocument.SystemVersion">12D78</string>
+		<string key="IBDocument.SystemVersion">12E55</string>
 		<string key="IBDocument.InterfaceBuilderVersion">3084</string>
-		<string key="IBDocument.AppKitVersion">1187.37</string>
+		<string key="IBDocument.AppKitVersion">1187.39</string>
 		<string key="IBDocument.HIToolboxVersion">626.00</string>
 		<dictionary class="NSMutableDictionary" key="IBDocument.PluginVersions">
 			<string key="com.apple.InterfaceBuilder.CocoaPlugin">3084</string>
@@ -120,7 +120,7 @@
 							<object class="NSSegmentedControl" id="802449565">
 								<reference key="NSNextResponder" ref="172148644"/>
 								<int key="NSvFlags">292</int>
-								<string key="NSFrame">{{267, 3}, {71, 25}}</string>
+								<string key="NSFrame">{{266, 3}, {71, 25}}</string>
 								<reference key="NSSuperview" ref="172148644"/>
 								<reference key="NSWindow"/>
 								<reference key="NSNextKeyView" ref="923983319"/>
@@ -147,9 +147,10 @@
 											<int key="NSSegmentItemImageScaling">2</int>
 										</object>
 										<object class="NSSegmentItem">
+											<double key="NSSegmentItemWidth">32</double>
 											<object class="NSCustomResource" key="NSSegmentItemImage">
 												<string key="NSClassName">NSImage</string>
-												<string key="NSResourceName">NSPathTemplate</string>
+												<string key="NSResourceName">TreeViewTemplate</string>
 											</object>
 											<string key="NSSegmentItemLabel"/>
 											<string key="NSSegmentItemTooltip">Tree View</string>
@@ -381,7 +382,7 @@
 														<string key="NSFrameSize">{991, 130}</string>
 														<reference key="NSSuperview" ref="546023969"/>
 														<reference key="NSWindow"/>
-														<reference key="NSNextKeyView" ref="688592759"/>
+														<reference key="NSNextKeyView" ref="452331733"/>
 														<bool key="NSEnabled">YES</bool>
 														<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 														<bool key="NSControlAllowsExpansionToolTips">YES</bool>
@@ -394,11 +395,10 @@
 															<reference key="NSNextKeyView" ref="546023969"/>
 															<reference key="NSTableView" ref="254268962"/>
 														</object>
-														<object class="_NSCornerView" key="NSCornerView" id="688592759">
+														<object class="_NSCornerView" key="NSCornerView">
 															<nil key="NSNextResponder"/>
 															<int key="NSvFlags">-2147483392</int>
 															<string key="NSFrame">{{-26, 0}, {16, 17}}</string>
-															<reference key="NSNextKeyView" ref="906093892"/>
 														</object>
 														<array class="NSMutableArray" key="NSTableColumns">
 															<object class="NSTableColumn" id="760984800">
@@ -544,7 +544,7 @@
 																			<integer value="1040" key="formatterBehavior"/>
 																			<integer value="1" key="timeStyle"/>
 																		</dictionary>
-																		<string key="NS.format">d MMMM y HH:mm</string>
+																		<string key="NS.format">d MMM y HH:mm</string>
 																		<bool key="NS.natural">NO</bool>
 																	</object>
 																	<reference key="NSControlView" ref="254268962"/>
@@ -724,7 +724,7 @@
 										<string key="NSFrameSize">{955, 147}</string>
 										<reference key="NSSuperview" ref="24227530"/>
 										<reference key="NSWindow"/>
-										<reference key="NSNextKeyView" ref="546023969"/>
+										<reference key="NSNextKeyView" ref="906093892"/>
 										<int key="NSsFlags">133808</int>
 										<reference key="NSVScroller" ref="152625445"/>
 										<reference key="NSHScroller" ref="452331733"/>
@@ -964,6 +964,7 @@
 										<string key="NSFrameSize">{955, 233}</string>
 										<reference key="NSSuperview" ref="560436169"/>
 										<reference key="NSWindow"/>
+										<reference key="NSNextKeyView" ref="657042048"/>
 										<array class="NSMutableArray" key="NSTabViewItems">
 											<object class="NSTabViewItem" id="375889551">
 												<string key="NSIdentifier">1</string>
@@ -1038,7 +1039,7 @@
 																					<string key="NSFrameSize">{231, 233}</string>
 																					<reference key="NSSuperview" ref="859661469"/>
 																					<reference key="NSWindow"/>
-																					<reference key="NSNextKeyView" ref="471196443"/>
+																					<reference key="NSNextKeyView" ref="692013536"/>
 																					<bool key="NSEnabled">YES</bool>
 																					<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 																					<bool key="NSControlAllowsExpansionToolTips">YES</bool>
@@ -1131,7 +1132,7 @@
 																	<string key="NSFrameSize">{233, 235}</string>
 																	<reference key="NSSuperview" ref="626906425"/>
 																	<reference key="NSWindow"/>
-																	<reference key="NSNextKeyView" ref="859661469"/>
+																	<reference key="NSNextKeyView" ref="471196443"/>
 																	<int key="NSsFlags">133138</int>
 																	<reference key="NSVScroller" ref="692013536"/>
 																	<reference key="NSHScroller" ref="471196443"/>
@@ -2870,6 +2871,7 @@
 				<string key="493.CustomClassName">GitXTextFieldCell</string>
 				<string key="493.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="50.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<integer value="1" key="51.IBNSSegmentedControlInspectorSelectedSegmentMetadataKey"/>
 				<string key="51.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="6.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="7.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -3432,9 +3434,9 @@
 			<string key="CherryPickTemplate">{128, 128}</string>
 			<string key="DetailViewTemplate">{128, 128}</string>
 			<string key="MergeTemplate">{128, 128}</string>
-			<string key="NSPathTemplate">{13, 10}</string>
 			<string key="NSQuickLookTemplate">{21, 16}</string>
 			<string key="RebaseTemplate">{128, 128}</string>
+			<string key="TreeViewTemplate">{128, 128}</string>
 		</dictionary>
 	</data>
 </archive>

@@ -11,7 +11,6 @@
 
 @implementation PBGitSVFolderItem
 
-
 + (id)folderItemWithTitle:(NSString *)title
 {
 	PBGitSVFolderItem *item = [self itemWithTitle:title];
@@ -19,17 +18,9 @@
 	return item;
 }
 
-
-- (NSImage *) icon
+- (NSString*) iconName
 {
-	static NSImage *folderImage = nil;
-	if (!folderImage) {
-		//folderImage = [[NSWorkspace sharedWorkspace] iconForFileType:NSFileTypeForHFSTypeCode(kGenericFolderIcon)];
-        folderImage = [NSImage imageNamed:@"Folder"];
-		[folderImage setSize:NSMakeSize(16,16)];
-	}
-
-	return folderImage;
+    return (self.isExpanded) ? @"Folder" : @"FolderClosed";
 }
 
 @end

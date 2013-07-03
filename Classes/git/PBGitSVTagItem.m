@@ -20,14 +20,9 @@
 	return item;
 }
 
-
-- (NSImage *) icon
+- (NSString*) iconName
 {
-	static NSImage *tagImage = nil;
-	if (!tagImage)
-		tagImage = [NSImage imageNamed:@"Tag.png"];
-	
-	return tagImage;
+    return @"Tag";
 }
 
 @end
