@@ -83,46 +83,38 @@ var confirm_gist = function(confirmation_message) {
 var gistie = function() {
 	notify("Uploading code to Gistie..", 0);
 
-	parameters = {
-		"file_ext[gistfile1]":      "patch",
-		"file_name[gistfile1]":     commit.object.subject.replace(/[^a-zA-Z0-9]/g, "-") + ".patch",
-		"file_contents[gistfile1]": commit.object.patch(),
-	};
+	var parameters = {public:false, files:{}};
+	var filename = commit.object.subject.replace(/[^a-zA-Z0-9]/g, "-") + ".patch";
+	parameters.files[filename] = {content: commit.object.patch()};
 
+	var accessToken = Controller.getConfig_("github.token"); // obtain a personal access token from https://github.com/settings/applications
 	// TODO: Replace true with private preference
-	token = Controller.getConfig_("github.token");
-	login = Controller.getConfig_("github.user");
-	if (token && login) {
-		parameters.login = login;
-		parameters.token = token;
-	}
-	if (!Controller.isFeatureEnabled_("publicGist"))
-		parameters.private = true;
-
-	var params = [];
-	for (var name in parameters)
-		params.push(encodeURIComponent(name) + "=" + encodeURIComponent(parameters[name]));
-	params = params.join("&");
+	if (Controller.isFeatureEnabled_("publicGist"))
+		parameters.public = true;
 
 	var t = new XMLHttpRequest();
 	t.onreadystatechange = function() {
-		if (t.readyState == 4 && t.status >= 200 && t.status < 300) {
-			if (m = t.responseText.match(/<a href="\/gists\/([a-f0-9]+)\/edit">/))
-				notify("Code uploaded to gistie <a target='_new' href='http://gist.github.com/" + m[1] + "'>#" + m[1] + "</a>", 1);
-			else {
+		if (t.readyState == 4) {
+			var success = t.status >= 200 && t.status < 300;
+			var response = JSON.parse(t.responseText);
+			if (success && response.html_url) {
+				notify("Code uploaded to <a target='_new' href='"+response.html_url+"'>"+response.html_url+"</a>", 1);
+			} else {
 				notify("Pasting to Gistie failed :(.", -1);
 				Controller.log_(t.responseText);
 			}
 		}
 	}
 
-	t.open('POST', "https://gist.github.com/gists");
+	t.open('POST', "https://api.github.com/gists");
+	if (accessToken)
+		t.setRequestHeader('Authorization', 'token '+accessToken);
 	t.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
 	t.setRequestHeader('Accept', 'text/javascript, text/html, application/xml, text/xml, */*');
 	t.setRequestHeader('Content-type', 'application/x-www-form-urlencoded;charset=UTF-8');
 
 	try {
-		t.send(params);
+		t.send(JSON.stringify(parameters));
 	} catch(e) {
 		notify("Pasting to Gistie failed: " + e, -1);
 	}
