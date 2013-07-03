@@ -81,7 +81,7 @@ var confirm_gist = function(confirmation_message) {
 }
 
 var gistie = function() {
-	notify("Uploading code to Gistie..", 0);
+	notify("Uploading code to gist.github.com...", 0);
 
 	var parameters = {public:false, files:{}};
 	var filename = commit.object.subject.replace(/[^a-zA-Z0-9]/g, "-") + ".patch";
@@ -100,7 +100,7 @@ var gistie = function() {
 			if (success && response.html_url) {
 				notify("Code uploaded to <a target='_new' href='"+response.html_url+"'>"+response.html_url+"</a>", 1);
 			} else {
-                var message = "Pasting to Gistie failed :(.";
+                var message = "Pasting to gist.github.com failed :(.";
                 if (response && response.message)
                     message += " (" + response.message + ")";
 				notify(message, -1);
@@ -119,7 +119,7 @@ var gistie = function() {
 	try {
 		t.send(JSON.stringify(parameters));
 	} catch(e) {
-		notify("Pasting to Gistie failed: " + e, -1);
+		notify("Pasting to gist.github.com failed: " + e, -1);
 	}
 }
 
