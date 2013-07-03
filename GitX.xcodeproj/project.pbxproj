@@ -739,8 +739,8 @@
 			isa = PBXGroup;
 			children = (
 				4A4EF0AF142CBAD5001B8CDF /* ObjectiveGit.framework */,
-				4A4EF0B3142CBAD5001B8CDF /* libObjectiveGit-iOS.a */,
 				4ADAA9C21602ADB8007A0E6F /* ObjectiveGitTests.octest */,
+				4A4EF0B3142CBAD5001B8CDF /* libObjectiveGit-iOS.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1164,6 +1164,7 @@
 				8D11072C0486CEB800E47090 /* Sources */,
 				8D11072E0486CEB800E47090 /* Frameworks */,
 				F580E6BD0E73329C009E2D3F /* CopyFiles */,
+				4D265F9E1784AE9C000A51AD /* Fixup ObjectiveGit */,
 				F5CF04A20EAE696C00D75C81 /* Copy HTML files */,
 				D81E15ED121CE83D00269E61 /* Scripting Bridge Header Script  */,
 			);
@@ -1188,6 +1189,7 @@
 			buildPhases = (
 				913D5E460E55644600CECEA2 /* Sources */,
 				913D5E470E55644600CECEA2 /* Frameworks */,
+				4D265FA81784AF77000A51AD /* Fixup ObjectiveGit */,
 			);
 			buildRules = (
 			);
@@ -1407,6 +1409,34 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		4D265F9E1784AE9C000A51AD /* Fixup ObjectiveGit */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Fixup ObjectiveGit";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "install_name_tool -change @rpath/ObjectiveGit.framework/ObjectiveGit @loader_path/../Frameworks/ObjectiveGit.framework/ObjectiveGit $BUILT_PRODUCTS_DIR/$EXECUTABLE_PATH";
+		};
+		4D265FA81784AF77000A51AD /* Fixup ObjectiveGit */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Fixup ObjectiveGit";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "install_name_tool -change @rpath/ObjectiveGit.framework/ObjectiveGit @loader_path/../Frameworks/ObjectiveGit.framework/ObjectiveGit $BUILT_PRODUCTS_DIR/$EXECUTABLE_PATH";
+		};
 		D81E15ED121CE83D00269E61 /* Scripting Bridge Header Script  */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
