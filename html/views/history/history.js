@@ -87,7 +87,7 @@ var gistie = function() {
 	var filename = commit.object.subject.replace(/[^a-zA-Z0-9]/g, "-") + ".patch";
 	parameters.files[filename] = {content: commit.object.patch()};
 
-	var accessToken = Controller.getConfig_("github.token"); // obtain a personal access token from https://github.com/settings/applications
+	var accessToken = Controller.getPreference_("gistAccessToken");
 	// TODO: Replace true with private preference
 	if (Controller.isFeatureEnabled_("publicGist"))
 		parameters.public = true;

@@ -18,6 +18,7 @@
 #define kEnableGravatar @"PBEnableGravatar"
 #define kConfirmPublicGists @"PBConfirmPublicGists"
 #define kPublicGist @"PBGistPublic"
+#define kGistAccessToken @"PBGistAccessToken"
 #define kShowWhitespaceDifferences @"PBShowWhitespaceDifferences"
 #define kOpenCurDirOnLaunch @"PBOpenCurDirOnLaunch"
 #define kShowOpenPanelOnLaunch @"PBShowOpenPanelOnLaunch"
@@ -100,6 +101,11 @@
 + (BOOL) isGistPublic
 {
 	return [[NSUserDefaults standardUserDefaults] boolForKey:kPublicGist];
+}
+
++ (NSString *) gistAccessToken
+{
+	return [[NSUserDefaults standardUserDefaults] stringForKey:kGistAccessToken];
 }
 
 + (BOOL)showWhitespaceDifferences

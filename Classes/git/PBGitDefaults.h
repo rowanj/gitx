@@ -18,6 +18,7 @@
 + (BOOL) isGravatarEnabled;
 + (BOOL) confirmPublicGists;
 + (BOOL) isGistPublic;
++ (NSString *) gistAccessToken;
 + (BOOL)showWhitespaceDifferences;
 + (BOOL) shouldCheckoutBranch;
 + (void) setShouldCheckoutBranch:(BOOL)shouldCheckout;
