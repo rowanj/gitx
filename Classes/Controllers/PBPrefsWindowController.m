@@ -20,7 +20,7 @@
 {
 	// GENERAL
 	[self addView:generalPrefsView label:@"General" image:[NSImage imageNamed:@"gitx"]];
-	// INTERGRATION
+	// INTEGRATION
 	[self addView:integrationPrefsView label:@"Integration" image:[NSImage imageNamed:NSImageNameNetwork]];
 	// UPDATES
 	[self addView:updatesPrefsView label:@"Updates"];
@@ -40,6 +40,25 @@
 		return identifier;
 
 	return [super defaultViewIdentifier];
+}
+
+- (void)windowDidLoad
+{
+    [super windowDidLoad];
+
+    // Linkify the description of how to obtain a personal access token from github :
+    NSMutableAttributedString* description = [[gistAccessTokenDescription attributedStringValue] mutableCopy];
+    NSRange linkRange = [[description string] rangeOfString:@"Personal API Access Token"];
+    NSURL* url = [NSURL URLWithString:@"https://github.com/settings/applications"];
+
+    [description addAttribute:NSLinkAttributeName value:url range:linkRange];
+    [description addAttribute:NSCursorAttributeName value:[NSCursor pointingHandCursor]range:linkRange];
+    [description addAttribute:NSForegroundColorAttributeName value:[NSColor blueColor] range:linkRange];
+
+    [gistAccessTokenDescription setAttributedStringValue:description];
+    // necessary so that the textfield will register clicks :
+    [gistAccessTokenDescription setAllowsEditingTextAttributes:YES];
+    [gistAccessTokenDescription setSelectable:YES];
 }
 
 #pragma mark -

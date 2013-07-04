@@ -81,13 +81,13 @@ var confirm_gist = function(confirmation_message) {
 }
 
 var gistie = function() {
-	notify("Uploading code to Gistie..", 0);
+	notify("Uploading code to gist.github.com...", 0);
 
 	var parameters = {public:false, files:{}};
 	var filename = commit.object.subject.replace(/[^a-zA-Z0-9]/g, "-") + ".patch";
 	parameters.files[filename] = {content: commit.object.patch()};
 
-	var accessToken = Controller.getConfig_("github.token"); // obtain a personal access token from https://github.com/settings/applications
+	var accessToken = Controller.getPreference_("gistAccessToken");
 	// TODO: Replace true with private preference
 	if (Controller.isFeatureEnabled_("publicGist"))
 		parameters.public = true;
@@ -100,7 +100,10 @@ var gistie = function() {
 			if (success && response.html_url) {
 				notify("Code uploaded to <a target='_new' href='"+response.html_url+"'>"+response.html_url+"</a>", 1);
 			} else {
-				notify("Pasting to Gistie failed :(.", -1);
+                var message = "Pasting to gist.github.com failed :(.";
+                if (response && response.message)
+                    message += " (" + response.message + ")";
+				notify(message, -1);
 				Controller.log_(t.responseText);
 			}
 		}
@@ -116,7 +119,7 @@ var gistie = function() {
 	try {
 		t.send(JSON.stringify(parameters));
 	} catch(e) {
-		notify("Pasting to Gistie failed: " + e, -1);
+		notify("Pasting to gist.github.com failed: " + e, -1);
 	}
 }
 

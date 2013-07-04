@@ -172,6 +172,15 @@ contextMenuItemsForElement:(NSDictionary *)element
 	return [config stringForKey:key];
 }
 
+- getPreference:(NSString*)key
+{
+    if ([key isEqualToString:@"gistAccessToken"]) {
+        return [PBGitDefaults gistAccessToken];
+    } else {
+        NSLog(@"Unknown config key %@", key);
+        return nil;
+    }
+}
 
 - (void) preferencesChanged
 {

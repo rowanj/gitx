@@ -21,6 +21,8 @@
 	IBOutlet NSView *gitPathOpenAccessory;
 	NSOpenPanel *gitPathOpenPanel;
 
+	IBOutlet NSTextField *gistAccessTokenDescription;
+
 }
 
 - (IBAction) checkGitValidity: sender;
