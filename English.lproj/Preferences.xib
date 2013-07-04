@@ -885,6 +885,14 @@
 					<int key="connectionID">140</int>
 				</object>
 				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">gistAccessTokenDescription</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="328964945"/>
+					</object>
+					<int key="connectionID">185</int>
+				</object>
+				<object class="IBConnectionRecord">
 					<object class="IBBindingConnection" key="connection">
 						<string key="label">value: automaticallyChecksForUpdates</string>
 						<reference key="source" ref="250497668"/>
@@ -1837,13 +1845,24 @@
 			<nil key="activeLocalization"/>
 			<dictionary class="NSMutableDictionary" key="localizations"/>
 			<nil key="sourceID"/>
-			<int key="maxID">179</int>
+			<int key="maxID">185</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<array class="NSMutableArray" key="referencedPartialClassDescriptions">
 				<object class="IBPartialClassDescription">
 					<string key="className">DBPrefsWindowController</string>
 					<string key="superclassName">NSWindowController</string>
+					<object class="NSMutableDictionary" key="actions">
+						<string key="NS.key.0">showWindow:</string>
+						<string key="NS.object.0">id</string>
+					</object>
+					<object class="NSMutableDictionary" key="actionInfosByName">
+						<string key="NS.key.0">showWindow:</string>
+						<object class="IBActionInfo" key="NS.object.0">
+							<string key="name">showWindow:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+					</object>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
 						<string key="minorKey">./Classes/DBPrefsWindowController.h</string>
@@ -1879,6 +1898,7 @@
 					<dictionary class="NSMutableDictionary" key="outlets">
 						<string key="badGitPathIcon">NSImageView</string>
 						<string key="generalPrefsView">NSView</string>
+						<string key="gistAccessTokenDescription">NSTextField</string>
 						<string key="gitPathController">NSPathControl</string>
 						<string key="gitPathOpenAccessory">NSView</string>
 						<string key="integrationPrefsView">NSView</string>
@@ -1892,6 +1912,10 @@
 						<object class="IBToOneOutletInfo" key="generalPrefsView">
 							<string key="name">generalPrefsView</string>
 							<string key="candidateClassName">NSView</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="gistAccessTokenDescription">
+							<string key="name">gistAccessTokenDescription</string>
+							<string key="candidateClassName">NSTextField</string>
 						</object>
 						<object class="IBToOneOutletInfo" key="gitPathController">
 							<string key="name">gitPathController</string>
