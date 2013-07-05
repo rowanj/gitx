@@ -120,19 +120,23 @@ var gistie = function() {
 	}
 }
 
+var gravatarStyle = function () {
+    return Controller.gravatarStyle_() || "wavatar";
+}
+
 var setGravatar = function(email, image) {
 	if(Controller && !Controller.isFeatureEnabled_("gravatar")) {
 		image.src = "";
 		return;
 	}
-
+    var d = gravatarStyle();
 	if (!email) {
-		image.src = "http://www.gravatar.com/avatar/?d=wavatar&s=60";
+		image.src = "http://www.gravatar.com/avatar/?d="+d+"&s=60";
 		return;
 	}
 
 	image.src = "http://www.gravatar.com/avatar/" +
-		hex_md5(email.toLowerCase().replace(/ /g, "")) + "?d=wavatar&s=60";
+		hex_md5(email.toLowerCase().replace(/ /g, "")) + "?d="+d+"&s=60";
 }
 
 var selectCommit = function(a) {
@@ -286,6 +290,11 @@ var enableFeatures = function()
 	enableFeature("gist", $("gist"))
 	enableFeature("gravatar", $("author_gravatar").parentNode)
 	enableFeature("gravatar", $("committer_gravatar").parentNode)
+	if(Controller && Controller.isFeatureEnabled_("gravatar")) {
+        var d = gravatarStyle();
+        $("author_gravatar").src = ($("author_gravatar").src||"").replace(/\?d=.*?&/,"?d="+d+"&");
+        $("committer_gravatar").src = ($("committer_gravatar").src||"").replace(/\?d=.*?&/,"?d="+d+"&");
+    }
 }
 
 var loadCommitDetails = function(data)
