@@ -288,6 +288,21 @@ var enableFeatures = function()
 	enableFeature("gravatar", $("committer_gravatar").parentNode)
 }
 
+/*
+Just add gitx.ticketurl to your repositories .git/config
+ 
+[gitx]
+ ticketurl = "http://trac.domain.com/ticket/*"
+
+*/
+var formatTicketUrls = function (html) {
+    var ticketUrl = Controller.getConfig_("gitx.ticketurl");
+    if (ticketUrl) {
+        return html.replace(/#([0-9]+)/g,'<a href="'+ticketUrl.replace("*","$1")+'" target="blank">#$1</a>');
+    }
+    return html;
+}
+
 var loadCommitDetails = function(data)
 {
 	commit.parseDetails(data);
@@ -317,7 +332,7 @@ var loadCommitDetails = function(data)
 		$("committerDate").parentNode.style.display = "none";
 	}
 
-	$("message").innerHTML = commit.message.replace(/\b(https?:\/\/[^\s<]*)/ig, "<a href=\"$1\">$1</a>").replace(/\n/g,"<br>");
+	$("message").innerHTML = formatTicketUrls(commit.message.replace(/\b(https?:\/\/[^\s<]*)/ig, "<a href=\"$1\">$1</a>").replace(/\n/g,"<br>"));
 
 	if (commit.diff.length < 200000)
 		showDiff();
