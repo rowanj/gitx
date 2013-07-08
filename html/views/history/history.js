@@ -292,7 +292,7 @@ var enableFeatures = function()
 Just add gitx.ticketurl to your repositories .git/config
  
 [gitx]
- ticketurl = "http://trac.domain.com/ticket/*"
+ ticketurl = "http://trac.domain.com/ticket/{id}"
 
 */
 var formatTicketUrls = function (html) {
