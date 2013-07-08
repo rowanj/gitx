@@ -296,11 +296,19 @@ Just add gitx.ticketurl to your repositories .git/config
 
 */
 var formatTicketUrls = function (html) {
-    var ticketUrl = Controller.getConfig_("gitx.ticketurl");
-    if (ticketUrl) {
-        return html.replace(/#([0-9]+)/g,'<a href="'+ticketUrl.replace("*","$1")+'" target="blank">#$1</a>');
     }
-    return html;
+	if (ticketUrl) {
+		var applyTicketUrl = ticketUrl.indexOf("{id}") >= 0 ? function (id) {
+			return ticketUrl.replace(/\{id\}/g,id);
+		} : function (id) {
+			return ticketUrl+""+id;
+		};
+        var replaceTicketLinks = function(match,id) {
+            return '<a class="ticket" href="'+applyTicketUrl(id)+'" target="blank">'+match+'</a>';
+        };
+		return html.replace(/#([0-9]+)/g, replaceTicketLinks);
+	}
+	return html;
 }
 
 var loadCommitDetails = function(data)
