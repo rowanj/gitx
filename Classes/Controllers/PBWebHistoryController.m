@@ -148,7 +148,11 @@ contextMenuItemsForElement:(NSDictionary *)element
 					return [NSArray arrayWithObject:item];
 			return nil;
         }
-
+        
+        if ([[node className] hasPrefix:@"ticket"]) {
+            return [historyController menuItemsForTicketLink];
+        }
+        
 		node = [node parentNode];
 	}
 
@@ -162,7 +166,14 @@ contextMenuItemsForElement:(NSDictionary *)element
      newFrameName:(NSString *)frameName
  decisionListener:(id < WebPolicyDecisionListener >)listener
 {
-	[[NSWorkspace sharedWorkspace] openURL:[request URL]];
+    if ([[[request URL] scheme] isEqualToString:@"file"]) {
+        if ([[[request URL] fragment] isEqualToString:@"configure-ticketurl"]) {
+            [historyController showConfigureGitxTicketUrl:nil];
+        }
+    }
+    else {
+        [[NSWorkspace sharedWorkspace] openURL:[request URL]];
+    }
 }
 
 - getConfig:(NSString *)key

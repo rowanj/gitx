@@ -640,6 +640,23 @@
 	return menuItems;
 }
 
+- (void) showConfigureGitxTicketUrl:(id)sender
+{
+    NSString *message = @"Configure Ticket/Issue URL:";
+    NSString *info = @"It can be configured via gitx.ticketurl git-config setting.\n\n"
+                      "$ git config gitx.ticketurl 'http://example.org/issues/{id}'\n\n";
+    [self.repository.windowController showMessageSheet:message infoText:info];
+}
+
+- (NSArray *)menuItemsForTicketLink
+{
+    NSMenuItem *configureGitxTicketUrl = [[NSMenuItem alloc] initWithTitle:@"Configure URL..."
+														action:@selector(showConfigureGitxTicketUrl:)
+												 keyEquivalent:@""];
+
+    NSArray *menuItems = [NSArray arrayWithObjects:configureGitxTicketUrl, nil];
+    return menuItems;
+}
 
 #pragma mark NSSplitView delegate methods
 
