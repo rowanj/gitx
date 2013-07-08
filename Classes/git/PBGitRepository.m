@@ -224,28 +224,18 @@ NSString *PBGitRepositoryDocumentType = @"Git Repository";
 		[refs setObject:[NSMutableArray arrayWithObject:ref] forKey:sha];
 }
 
-int addSubmoduleName(git_submodule *module, const char* name, void * context)
-{
-    PBGitRepository *me = (__bridge PBGitRepository *)context;
-    PBGitSubmodule *sub = [[PBGitSubmodule alloc] init];
-    [sub setWorkingDirectory:me.workingDirectory];
-    [sub setSubmodule:module];
-    
-
-    [me.submodules addObject:sub];
-    
-    return 0;
-}
-
 - (void) loadSubmodules
 {
-    self.submodules = [NSMutableArray array];
-	git_repository* theRepo = self.gtRepo.git_repository;
-	if (!theRepo)
-	{
-		return;
-	}
-    git_submodule_foreach(theRepo, addSubmoduleName, (__bridge void *)self);
+    NSMutableArray *newSubmodules = [NSMutableArray array];
+    
+    [self.gtRepo enumerateSubmodulesRecursively: NO usingBlock:^(GTSubmodule *submodule, BOOL *stop) {
+        PBGitSubmodule *sub = [[PBGitSubmodule alloc] init];
+        sub.workingDirectory = self.workingDirectory;
+        sub.submodule = submodule.git_submodule;
+        [newSubmodules addObject: sub];
+    }];
+    
+    self.submodules = newSubmodules;
 }
 
 - (void) reloadRefs
