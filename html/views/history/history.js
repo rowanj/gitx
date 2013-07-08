@@ -296,6 +296,13 @@ Just add gitx.ticketurl to your repositories .git/config
 
 */
 var formatTicketUrls = function (html) {
+	var ticketUrl = Controller.getConfig_("gitx.ticketurl");
+    if (!ticketUrl) {
+       	var origin = Controller.getConfig_("remote.origin.url");
+        var matches = origin && origin.match(/github.com\/([^\/]+\/[^\/]+)\.git$/);
+        if (matches) {
+            ticketUrl = "https://github.com/"+matches[1]+"/issues/";
+        }
     }
 	if (ticketUrl) {
 		var applyTicketUrl = ticketUrl.indexOf("{id}") >= 0 ? function (id) {
