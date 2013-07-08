@@ -48,6 +48,19 @@
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
 	<string>0.12</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>net.phere.GitX.url-scheme</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>gitx</string>
+			</array>
+		</dict>
+	</array>
 	<key>CFBundleVersion</key>
 	<string>0.12</string>
 	<key>LSApplicationCategoryType</key>
