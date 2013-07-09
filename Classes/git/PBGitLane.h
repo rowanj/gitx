@@ -22,17 +22,6 @@ public:
 		d_sha = *sha;
 	}
 
-	PBGitLane(NSString *sha)
-	{
-		git_oid_fromstr(&d_sha, [sha UTF8String]);
-		d_index = s_colorIndex++;
-	}
-	
-	PBGitLane()
-	{
-		d_index = s_colorIndex++;
-	}
-	
 	bool isCommit(git_oid sha) const
 	{
 		return !git_oid_cmp(&d_sha, &sha);
