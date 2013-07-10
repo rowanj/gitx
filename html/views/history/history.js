@@ -288,33 +288,11 @@ var enableFeatures = function()
 	enableFeature("gravatar", $("committer_gravatar").parentNode)
 }
 
-/*
-Just add gitx.ticketurl to your repositories .git/config
- 
-[gitx]
- ticketurl = "http://trac.domain.com/ticket/{id}"
 
-*/
 var formatTicketUrls = function (html) {
-    var ticketUrl = Controller.getConfig_("gitx.ticketurl");
-    if (!ticketUrl) {
-        var origin = Controller.getConfig_("remote.origin.url");
-        var matches = origin && origin.match(/github.com\/([^\/]+\/[^\/]+)\.git$/);
-        if (matches) {
-            ticketUrl = "https://github.com/"+matches[1]+"/issues/";
-        }
-    }
-    var applyTicketUrl = (!ticketUrl) ? function (id) {
-        return '#configure-ticketurl';
-    } : (ticketUrl.indexOf("{id}") >= 0 ? function (id) {
-        return ticketUrl.replace(/\{id\}/g,id);
-    } : function (id) {
-        return ticketUrl+""+id;
+    return html.replace(/#([0-9]+)/g, function(match,id) {
+        return '<a class="ticket" href="#ticket:'+id+'" target="blank">'+match+'</a>';
     });
-    var replaceTicketLinks = function(match,id) {
-        return '<a class="ticket" href="'+applyTicketUrl(id)+'" target="blank">'+match+'</a>';
-    };
-    return html.replace(/#([0-9]+)/g, replaceTicketLinks);
 }
 
 var loadCommitDetails = function(data)

@@ -25,6 +25,11 @@
 #define QLPreviewPanel NSClassFromString(@"QLPreviewPanel")
 #import "PBQLTextView.h"
 #import "GLFileView.h"
+#import "PBGitXConfigureTicketURLSheet.h"
+#import <ObjectiveGit/GTRepository.h>
+#import <ObjectiveGit/GTConfiguration.h>
+#import <AppKit/AppKit.h>
+
 
 
 #define kHistorySelectedDetailIndexKey @"PBHistorySelectedDetailIndex"
@@ -642,20 +647,92 @@
 
 - (void) showConfigureGitxTicketUrl:(id)sender
 {
-    NSString *message = @"Configure Ticket/Issue URL:";
-    NSString *info = @"It can be configured via gitx.ticketurl git-config setting.\n\n"
-                      "$ git config gitx.ticketurl 'http://example.org/issues/{id}'\n\n";
-    [self.repository.windowController showMessageSheet:message infoText:info];
+    [PBGitXConfigureTicketURLSheet beginConfigureTicketURLSheetForRepo:self.repository];
 }
 
-- (NSArray *)menuItemsForTicketLink
+- (NSString *) ticketURLPattern
 {
-    NSMenuItem *configureGitxTicketUrl = [[NSMenuItem alloc] initWithTitle:@"Configure URL..."
+    NSError *error = nil;
+    GTConfiguration* config = [self.repository.gtRepo configurationWithError:&error];
+	NSString * currentTicketURL = [config stringForKey:GITX_TICKET_URL_SETTING];
+    if (currentTicketURL != nil) {
+        return currentTicketURL;
+    }
+    // not configured, but look if remote.origin is github and default to its issues
+    NSString * originURL = [config stringForKey:@"remote.origin.url"];
+    if (originURL != nil) {
+        NSString *regexString = @"github.com/([^/]+/[^/]+)\\.git";
+        NSRegularExpressionOptions options = NSRegularExpressionCaseInsensitive;
+        NSError *error = nil;
+        NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:regexString options:options error:&error];
+        if (error) {
+            NSLog(@"%@", [error description]);
+            return nil;
+        }
+        NSTextCheckingResult *result = [regex firstMatchInString:originURL options:0 range:NSMakeRange(0, [originURL length])];
+        if (result) {
+            NSString* githubRepository = [originURL substringWithRange:[result rangeAtIndex:1]];
+            return [NSString stringWithFormat:@"https://github.com/%@/issues/{id}", githubRepository];
+        }
+    }
+    return nil;
+}
+
+- (NSURL *) assembleTicketUrlWithNumber:(NSString *)ticketNumber
+{
+    NSString * pattern = [self ticketURLPattern];
+    if (pattern != nil) {
+        NSArray * parts = [pattern componentsSeparatedByString:@"{id}"];
+        BOOL found = [parts count] > 1;
+        NSString * urlStr = [parts componentsJoinedByString:ticketNumber];
+        if (!found) {
+            urlStr = [urlStr stringByAppendingString:ticketNumber];
+        }
+        NSLog(@"urlStr: %@", urlStr);
+        return [NSURL URLWithString:urlStr];
+    }
+    return nil;
+}
+
+- (void) showTicketWithNumber:(NSString *)ticketNumber
+{
+	NSURL * url = [self assembleTicketUrlWithNumber:ticketNumber];
+    NSLog(@"URL: %@", url);
+    if (url != nil) {
+        [[NSWorkspace sharedWorkspace] openURL:url];
+    }
+    else {
+        [self showConfigureGitxTicketUrl:nil];
+    }
+}
+
+- (void) copyTicketUrl:(id)sender
+{
+    NSString *ticketNumber = [sender representedObject];
+    NSURL * ticketURL = [self assembleTicketUrlWithNumber:ticketNumber];
+    if (ticketURL != nil) {
+        [[NSPasteboard generalPasteboard] clearContents];
+        [[NSPasteboard generalPasteboard] setString:[ticketURL description] forType:NSPasteboardTypeString];
+    }
+}
+
+- (NSArray *)menuItemsForTicketLink:(NSString *)ticketNumber;
+{
+  	NSMutableArray *menuItems = [NSMutableArray array];
+    
+    NSMenuItem *configureGitxTicketUrl = [[NSMenuItem alloc] initWithTitle:@"Configure Ticket/Issue URL..."
 														action:@selector(showConfigureGitxTicketUrl:)
 												 keyEquivalent:@""];
+    [menuItems addObject:configureGitxTicketUrl];
+    if ([self ticketURLPattern] != nil) {
+        NSMenuItem *copyTicketUrl = [[NSMenuItem alloc] initWithTitle:@"Copy URL"
+                                                                        action:@selector(copyTicketUrl:)
+                                                                 keyEquivalent:@""];
+        copyTicketUrl.representedObject = ticketNumber;
+        [menuItems addObject:copyTicketUrl];
+    }
 
-    NSArray *menuItems = [NSArray arrayWithObjects:configureGitxTicketUrl, nil];
-    return menuItems;
+    return [NSArray arrayWithArray:menuItems];
 }
 
 #pragma mark NSSplitView delegate methods
