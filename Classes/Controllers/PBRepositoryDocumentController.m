@@ -34,8 +34,10 @@
 	[op setAllowsMultipleSelection:NO];
 	[op setMessage:@"Initialize a repository here:"];
 	[op setTitle:@"New Repository"];
-	if ([op runModal] != NSFileHandlingPanelOKButton)
+	if ([op runModal] != NSFileHandlingPanelOKButton) {
+        *outError = nil;
         return nil;
+    }
 
     BOOL success = [GTRepository initializeEmptyRepositoryAtURL:[op URL] error:outError];
     if (!success)
