@@ -12,7 +12,7 @@
 
 @interface PBViewController : NSViewController {
 	__weak PBGitRepository *repository;
-	PBGitWindowController *superController;
+	__unsafe_unretained PBGitWindowController *superController;
 
 	NSString *status;
 	BOOL isBusy;
@@ -38,5 +38,7 @@
 
 - (NSResponder *)firstResponder;
 - (IBAction) refresh:(id)sender;
+
+- (void)didMoveFromSupercontroller;
 
 @end
