@@ -18,8 +18,8 @@
 
 
 @interface PBWebHistoryController : PBWebController {
-	IBOutlet PBGitHistoryController* historyController;
-	IBOutlet id<PBRefContextDelegate> contextMenuDelegate;
+	IBOutlet __unsafe_unretained PBGitHistoryController* historyController;
+	IBOutlet __weak id<PBRefContextDelegate> contextMenuDelegate;
 
 	PBGitSHA* currentSha;
 	NSString* diff;

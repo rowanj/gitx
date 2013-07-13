@@ -16,12 +16,12 @@
 @class PBGitGradientBarView;
 
 @interface GLFileView : PBWebController <MGScopeBarDelegate> {
-	IBOutlet PBGitHistoryController* historyController;
-	IBOutlet MGScopeBar *typeBar;
+	IBOutlet __unsafe_unretained PBGitHistoryController* historyController;
+	IBOutlet __weak MGScopeBar *typeBar;
 	NSMutableArray *groups;
 	NSString *logFormat;
-	IBOutlet NSView *accessoryView;
-	IBOutlet NSSplitView *fileListSplitView;
+	IBOutlet __weak NSView *accessoryView;
+	IBOutlet __weak NSSplitView *fileListSplitView;
 }
 
 - (void)showFile;

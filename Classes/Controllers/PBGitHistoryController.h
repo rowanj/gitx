@@ -62,7 +62,7 @@
 @property (readonly) NSArrayController *commitController;
 @property (readonly) PBRefController *refController;
 @property (readonly) PBHistorySearchController *searchController;
-@property (readonly) PBCommitList *commitList;
+@property (weak, readonly) PBCommitList *commitList;
 
 - (IBAction) setDetailedView:(id)sender;
 - (IBAction) setTreeView:(id)sender;

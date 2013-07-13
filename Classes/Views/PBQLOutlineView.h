@@ -10,7 +10,7 @@
 #import "PBGitHistoryController.h"
 
 @interface PBQLOutlineView : NSOutlineView {
-	IBOutlet PBGitHistoryController* controller;
+	IBOutlet __unsafe_unretained PBGitHistoryController* controller;
 }
 
 @end
