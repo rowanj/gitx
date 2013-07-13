@@ -213,6 +213,7 @@ NSString *PBGitRepositoryDocumentType = @"Git Repository";
 //			NSLog(@"peeled sha:%@", peeledObject.sha);
 			sha = [PBGitSHA shaWithString:peeledObject.sha];
 		}
+        git_tag_free(gitTag);
 	}
 	
 	PBGitRef* ref = [[PBGitRef alloc] initWithString:gtRef.name];
