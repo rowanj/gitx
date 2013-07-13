@@ -10,9 +10,9 @@
 
 
 @interface OpenRecentController : NSWindowController<NSTableViewDataSource, NSTableViewDelegate> {
-	IBOutlet NSSearchField* searchField;
+	IBOutlet __weak NSSearchField* searchField;
 	NSURL* selectedResult;
-	IBOutlet NSTableView* resultViewer;	
+	IBOutlet __weak NSTableView* resultViewer;
 }
 
 @property (strong) NSMutableArray* currentResults;
