@@ -132,7 +132,6 @@
 		4A5D771D14A9A9CC00DF6C68 /* NSApplication+GitXScripting.m in Sources */ = {isa = PBXBuildFile; fileRef = 4A5D76A614A9A9CC00DF6C68 /* NSApplication+GitXScripting.m */; };
 		4A5D771E14A9A9CC00DF6C68 /* NSFileHandleExt.m in Sources */ = {isa = PBXBuildFile; fileRef = 4A5D76A814A9A9CC00DF6C68 /* NSFileHandleExt.m */; };
 		4A5D771F14A9A9CC00DF6C68 /* NSOutlineViewExt.m in Sources */ = {isa = PBXBuildFile; fileRef = 4A5D76AA14A9A9CC00DF6C68 /* NSOutlineViewExt.m */; };
-		4A5D772014A9A9CC00DF6C68 /* NSString_RegEx.m in Sources */ = {isa = PBXBuildFile; fileRef = 4A5D76AC14A9A9CC00DF6C68 /* NSString_RegEx.m */; };
 		4A5D772114A9A9CC00DF6C68 /* NSString_Truncate.m in Sources */ = {isa = PBXBuildFile; fileRef = 4A5D76AE14A9A9CC00DF6C68 /* NSString_Truncate.m */; };
 		4A5D772214A9A9CC00DF6C68 /* PBEasyFS.m in Sources */ = {isa = PBXBuildFile; fileRef = 4A5D76B014A9A9CC00DF6C68 /* PBEasyFS.m */; };
 		4A5D772314A9A9CC00DF6C68 /* PBEasyPipe.m in Sources */ = {isa = PBXBuildFile; fileRef = 4A5D76B214A9A9CC00DF6C68 /* PBEasyPipe.m */; };
@@ -563,8 +562,6 @@
 		4A5D76A814A9A9CC00DF6C68 /* NSFileHandleExt.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NSFileHandleExt.m; sourceTree = "<group>"; };
 		4A5D76A914A9A9CC00DF6C68 /* NSOutlineViewExt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NSOutlineViewExt.h; sourceTree = "<group>"; };
 		4A5D76AA14A9A9CC00DF6C68 /* NSOutlineViewExt.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NSOutlineViewExt.m; sourceTree = "<group>"; };
-		4A5D76AB14A9A9CC00DF6C68 /* NSString_RegEx.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NSString_RegEx.h; sourceTree = "<group>"; };
-		4A5D76AC14A9A9CC00DF6C68 /* NSString_RegEx.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NSString_RegEx.m; sourceTree = "<group>"; };
 		4A5D76AD14A9A9CC00DF6C68 /* NSString_Truncate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NSString_Truncate.h; sourceTree = "<group>"; };
 		4A5D76AE14A9A9CC00DF6C68 /* NSString_Truncate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NSString_Truncate.m; sourceTree = "<group>"; };
 		4A5D76AF14A9A9CC00DF6C68 /* PBEasyFS.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PBEasyFS.h; sourceTree = "<group>"; };
@@ -751,7 +748,6 @@
 		29B97314FDCFA39411CA2CEA /* GitTest */ = {
 			isa = PBXGroup;
 			children = (
-				4AC42F7B16BFBAD2007CCA3A /* Foundation.framework */,
 				4A5D762114A9A9CC00DF6C68 /* Classes */,
 				4A5D773E14A9AB3A00DF6C68 /* External Sources */,
 				4A5D757C14A9A90500DF6C68 /* Resources */,
@@ -764,6 +760,7 @@
 		29B97323FDCFA39411CA2CEA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				4AC42F7B16BFBAD2007CCA3A /* Foundation.framework */,
 				29B97324FDCFA39411CA2CEA /* AppKit.framework */,
 				4A40159814067B7A00DB9C07 /* AppKit.framework */,
 				1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */,
@@ -1110,8 +1107,6 @@
 				4A5D76A814A9A9CC00DF6C68 /* NSFileHandleExt.m */,
 				4A5D76A914A9A9CC00DF6C68 /* NSOutlineViewExt.h */,
 				4A5D76AA14A9A9CC00DF6C68 /* NSOutlineViewExt.m */,
-				4A5D76AB14A9A9CC00DF6C68 /* NSString_RegEx.h */,
-				4A5D76AC14A9A9CC00DF6C68 /* NSString_RegEx.m */,
 				4A5D76AD14A9A9CC00DF6C68 /* NSString_Truncate.h */,
 				4A5D76AE14A9A9CC00DF6C68 /* NSString_Truncate.m */,
 				4A5D76AF14A9A9CC00DF6C68 /* PBEasyFS.h */,
@@ -1610,7 +1605,6 @@
 				4A5D771D14A9A9CC00DF6C68 /* NSApplication+GitXScripting.m in Sources */,
 				4A5D771E14A9A9CC00DF6C68 /* NSFileHandleExt.m in Sources */,
 				4A5D771F14A9A9CC00DF6C68 /* NSOutlineViewExt.m in Sources */,
-				4A5D772014A9A9CC00DF6C68 /* NSString_RegEx.m in Sources */,
 				4A5D772114A9A9CC00DF6C68 /* NSString_Truncate.m in Sources */,
 				4A5D772214A9A9CC00DF6C68 /* PBEasyFS.m in Sources */,
 				4A5D772314A9A9CC00DF6C68 /* PBEasyPipe.m in Sources */,

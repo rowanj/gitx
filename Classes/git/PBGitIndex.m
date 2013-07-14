@@ -10,7 +10,6 @@
 #import "PBGitRepository.h"
 #import "PBGitBinary.h"
 #import "PBEasyPipe.h"
-#import "NSString_RegEx.h"
 #import "PBChangedFile.h"
 
 NSString *PBGitIndexIndexRefreshStatus = @"PBGitIndexIndexRefreshStatus";
@@ -96,12 +95,16 @@ NSString *PBGitIndexOperationFailed = @"PBGitIndexOperationFailed";
 	// We do this by reading in the previous commit, and storing the information
 	// in a dictionary. This dictionary will then later be read by [self commit:]
 	NSString *message = [repository outputForCommand:@"cat-file commit HEAD"];
-	NSArray *match = [message substringsMatchingRegularExpression:@"\nauthor ([^\n]*) <([^\n>]*)> ([0-9]+[^\n]*)\n" count:3 options:0 ranges:nil error:nil];
-	if (match)
-		amendEnvironment = [NSDictionary dictionaryWithObjectsAndKeys:[match objectAtIndex:1], @"GIT_AUTHOR_NAME",
-							[match objectAtIndex:2], @"GIT_AUTHOR_EMAIL",
-							[match objectAtIndex:3], @"GIT_AUTHOR_DATE",
-							nil];
+
+	NSRegularExpression *regex = [[NSRegularExpression alloc] initWithPattern: @"\nauthor ([^\n]*) <([^\n>]*)> ([0-9]+[^\n]*)\n" options:0 error: NULL];
+	NSTextCheckingResult *result = [regex firstMatchInString: message options: 0 range: NSMakeRange( 0,  message.length )];
+	if (result.numberOfRanges == 4) {
+		amendEnvironment = @{
+			@"GIT_AUTHOR_NAME": [message substringWithRange: [result rangeAtIndex: 1]],
+			@"GIT_AUTHOR_EMAIL": [message substringWithRange: [result rangeAtIndex: 2]],
+			@"GIT_AUTHOR_DATE": [message substringWithRange: [result rangeAtIndex: 3]]
+		};
+	}
 
 	// Find the commit message
 	NSRange r = [message rangeOfString:@"\n\n"];
