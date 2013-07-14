@@ -267,9 +267,10 @@ using namespace std;
 		}
 		
 		if (![currentThread isCancelled]) {
+#if DEBUG
 			NSTimeInterval duration = [[NSDate date] timeIntervalSinceDate:start];
-			//NSLog(@"Loaded %i commits in %f seconds (%f/sec)", num, duration, num/duration);
-			
+			NSLog(@"Loaded %i commits in %f seconds (%f/sec)", num, duration, num/duration);
+#endif
 			// Make sure the commits are stored before exiting.
 			NSDictionary *update = [NSDictionary dictionaryWithObjectsAndKeys:currentThread, kRevListThreadKey, revisions, kRevListRevisionsKey, nil];
 			[self performSelectorOnMainThread:@selector(updateCommits:) withObject:update waitUntilDone:YES];
