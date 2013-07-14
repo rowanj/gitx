@@ -430,13 +430,12 @@
 	NSString *subject = [dropCommit subject];
 	if ([subject length] > 99)
 		subject = [[subject substringToIndex:99] stringByAppendingString:@"…"];
-	NSString *infoText = [NSString stringWithFormat:@"Move the %@ to point to the commit: %@", [ref refishType], subject];
 
 	NSAlert *alert = [NSAlert alertWithMessageText:[NSString stringWithFormat:@"Move %@: %@", [ref refishType], [ref shortName]]
 									 defaultButton:@"Move"
 								   alternateButton:@"Cancel"
 									   otherButton:nil
-						 informativeTextWithFormat:infoText];
+						 informativeTextWithFormat:@"Move the %@ to point to the commit: %@", [ref refishType], subject];
     [alert setShowsSuppressionButton:YES];
 
 	[alert beginSheetModalForWindow:[historyController.repository.windowController window]
