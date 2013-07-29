@@ -8,12 +8,21 @@
 
 #import "PBGitRevSpecifier.h"
 
-
 @implementation PBGitRevSpecifier
 
 @synthesize parameters, description, workingDirectory;
 @synthesize isSimpleRef;
 
+// I believe this relates loosely to parts of git-check-ref-format.
+// cf. https://www.kernel.org/pub/software/scm/git/docs/git-check-ref-format.html
+//
+BOOL ContainsComplexRefCharSequence(NSString *refString)
+{
+    return [refString hasPrefix:@"-"] ||
+     [refString rangeOfCharacterFromSet:[NSCharacterSet characterSetWithCharactersInString:@" ~^:"]].location != NSNotFound ||
+     [refString rangeOfString:@".."].location != NSNotFound ||
+     [refString rangeOfString:@"@{"].location != NSNotFound;
+}
 
 // internal designated init
 - (id) initWithParameters:(NSArray *)params description:(NSString *)descrip
@@ -21,18 +30,7 @@
     self = [super init];
 	parameters = params;
 	description = descrip;
-
-	if (([parameters count] > 1) || ([parameters count] == 0))
-		isSimpleRef =  NO;
-	else {
-		NSString *param = [parameters objectAtIndex:0];
-		if ([param hasPrefix:@"-"] ||
-			[param rangeOfCharacterFromSet:[NSCharacterSet characterSetWithCharactersInString:@"^@{}~:"]].location != NSNotFound ||
-			[param rangeOfString:@".."].location != NSNotFound)
-			isSimpleRef =  NO;
-		else
-			isSimpleRef =  YES;
-	}
+    isSimpleRef = (parameters.count == 1) && !ContainsComplexRefCharSequence(parameters[0]);
 
 	return self;
 }
