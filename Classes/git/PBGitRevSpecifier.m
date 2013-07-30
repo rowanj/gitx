@@ -59,7 +59,7 @@ BOOL ContainsComplexRefCharSequence(NSString *refString)
 + (PBGitRevSpecifier *)allBranchesRevSpec
 {
     // Using --all here would include refs like refs/notes/commits, which probably isn't what we want.
-	return [[PBGitRevSpecifier alloc] initWithParameters:[NSArray arrayWithObjects:@"--branches", @"--remotes", @"--tags", @"--glob=refs/stash*", nil] description:@"All branches"];
+	return [[PBGitRevSpecifier alloc] initWithParameters:@[@"HEAD", @"--branches", @"--remotes", @"--tags", @"--glob=refs/stash*"] description:@"All branches"];
 }
 
 + (PBGitRevSpecifier *)localBranchesRevSpec
