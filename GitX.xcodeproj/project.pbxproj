@@ -181,6 +181,8 @@
 		8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
 		911112370E5A097800BF76B4 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 911112360E5A097800BF76B4 /* Security.framework */; };
 		913D5E500E55645900CECEA2 /* gitx in Resources */ = {isa = PBXBuildFile; fileRef = 913D5E490E55644600CECEA2 /* gitx */; };
+		A2EA3604178ECB5300636291 /* PBGitXConfigureTicketURLSheet.xib in Resources */ = {isa = PBXBuildFile; fileRef = A2EA3603178ECB5300636291 /* PBGitXConfigureTicketURLSheet.xib */; };
+		A2EA3610178ED22A00636291 /* PBGitXConfigureTicketURLSheet.m in Sources */ = {isa = PBXBuildFile; fileRef = A2EA360F178ED22A00636291 /* PBGitXConfigureTicketURLSheet.m */; };
 		BC0444AD17648CC900353E6D /* AddRemoteTemplate.png in Resources */ = {isa = PBXBuildFile; fileRef = BC0444AC17648CC900353E6D /* AddRemoteTemplate.png */; };
 		BC0444B817648D0200353E6D /* BranchHighlighted.png in Resources */ = {isa = PBXBuildFile; fileRef = BC0444B717648D0200353E6D /* BranchHighlighted.png */; };
 		BC0444BA17648DA800353E6D /* FolderHighlighted.png in Resources */ = {isa = PBXBuildFile; fileRef = BC0444B917648DA700353E6D /* FolderHighlighted.png */; };
@@ -643,6 +645,9 @@
 		8D1107320486CEB800E47090 /* GitX.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GitX.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		911112360E5A097800BF76B4 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = /System/Library/Frameworks/Security.framework; sourceTree = "<absolute>"; };
 		913D5E490E55644600CECEA2 /* gitx */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = gitx; sourceTree = BUILT_PRODUCTS_DIR; };
+		A2EA3603178ECB5300636291 /* PBGitXConfigureTicketURLSheet.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = PBGitXConfigureTicketURLSheet.xib; sourceTree = "<group>"; };
+		A2EA360E178ED22A00636291 /* PBGitXConfigureTicketURLSheet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PBGitXConfigureTicketURLSheet.h; sourceTree = "<group>"; };
+		A2EA360F178ED22A00636291 /* PBGitXConfigureTicketURLSheet.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PBGitXConfigureTicketURLSheet.m; sourceTree = "<group>"; };
 		BC0444AC17648CC900353E6D /* AddRemoteTemplate.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = AddRemoteTemplate.png; sourceTree = "<group>"; };
 		BC0444B717648D0200353E6D /* BranchHighlighted.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = BranchHighlighted.png; sourceTree = "<group>"; };
 		BC0444B917648DA700353E6D /* FolderHighlighted.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = FolderHighlighted.png; sourceTree = "<group>"; };
@@ -933,6 +938,7 @@
 				4A5D75BE14A9A90500DF6C68 /* PBGitHistoryView.xib */,
 				4A5D75BF14A9A90500DF6C68 /* PBGitSidebarView.xib */,
 				4A5D75C014A9A90500DF6C68 /* PBGitXMessageSheet.xib */,
+				A2EA3603178ECB5300636291 /* PBGitXConfigureTicketURLSheet.xib */,
 			);
 			path = XIBs;
 			sourceTree = "<group>";
@@ -1174,6 +1180,8 @@
 				4A5D777014A9AEB000DF6C68 /* PBSourceViewItems.h */,
 				4A5D777114A9AEB000DF6C68 /* PBSourceViewRemote.h */,
 				4A5D777214A9AEB000DF6C68 /* PBSourceViewRemote.m */,
+				A2EA360E178ED22A00636291 /* PBGitXConfigureTicketURLSheet.h */,
+				A2EA360F178ED22A00636291 /* PBGitXConfigureTicketURLSheet.m */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -1497,6 +1505,7 @@
 				BC0444C617648EBE00353E6D /* TagHighlighted.png in Resources */,
 				BC77578C176766B60048BB48 /* BranchTemplate@2x.png in Resources */,
 				BC775797176766C60048BB48 /* RemoteBranchTemplate@2x.png in Resources */,
+				A2EA3604178ECB5300636291 /* PBGitXConfigureTicketURLSheet.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1640,6 +1649,7 @@
 				643952741603E9BC00BB7AFF /* PBGitSubmodule.m in Sources */,
 				643952771603EF9B00BB7AFF /* PBGitSVSubmoduleItem.m in Sources */,
 				4AB057E31652652000DE751D /* GitRepoFinder.m in Sources */,
+				A2EA3610178ED22A00636291 /* PBGitXConfigureTicketURLSheet.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -80,6 +80,9 @@
 - (void)showCommitsFromTree:(id)sender;
 - (void)showInFinderAction:(id)sender;
 - (void)openFilesAction:(id)sender;
+- (void) showConfigureGitxTicketUrl:(id)sender;
+- (void) showTicketWithNumber:(NSString *)ticketNumber;
+- (NSArray *)menuItemsForTicketLink:(NSString *)ticketNumber;
 
 // Repository Methods
 - (IBAction) createBranch:(id)sender;

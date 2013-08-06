@@ -288,6 +288,13 @@ var enableFeatures = function()
 	enableFeature("gravatar", $("committer_gravatar").parentNode)
 }
 
+
+var formatTicketUrls = function (html) {
+    return html.replace(/#([0-9]+)/g, function(match,id) {
+        return '<a class="ticket" href="#ticket:'+id+'" target="blank">'+match+'</a>';
+    });
+}
+
 var loadCommitDetails = function(data)
 {
 	commit.parseDetails(data);
@@ -317,7 +324,7 @@ var loadCommitDetails = function(data)
 		$("committerDate").parentNode.style.display = "none";
 	}
 
-	$("message").innerHTML = commit.message.replace(/\b(https?:\/\/[^\s<]*)/ig, "<a href=\"$1\">$1</a>").replace(/\n/g,"<br>");
+	$("message").innerHTML = formatTicketUrls(commit.message.replace(/\b(https?:\/\/[^\s<]*)/ig, "<a href=\"$1\">$1</a>").replace(/\n/g,"<br>"));
 
 	if (commit.diff.length < 200000)
 		showDiff();

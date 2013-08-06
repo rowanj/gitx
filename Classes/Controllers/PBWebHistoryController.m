@@ -148,7 +148,12 @@ contextMenuItemsForElement:(NSDictionary *)element
 					return [NSArray arrayWithObject:item];
 			return nil;
         }
-
+        
+        if ([[node className] hasPrefix:@"ticket"]) {
+            NSString *ticketNumber = [[[[node childNodes] item:0] textContent] substringFromIndex:1];
+            return [historyController menuItemsForTicketLink:ticketNumber];
+        }
+        
 		node = [node parentNode];
 	}
 
@@ -162,7 +167,15 @@ contextMenuItemsForElement:(NSDictionary *)element
      newFrameName:(NSString *)frameName
  decisionListener:(id < WebPolicyDecisionListener >)listener
 {
-	[[NSWorkspace sharedWorkspace] openURL:[request URL]];
+    if ([[[request URL] scheme] isEqualToString:@"file"]) {
+        if ([[[request URL] fragment] hasPrefix:@"ticket:"]) {
+            NSString * ticketNumber = [[[request URL] fragment] substringFromIndex:7];
+            [historyController showTicketWithNumber:ticketNumber];
+        }
+    }
+    else {
+        [[NSWorkspace sharedWorkspace] openURL:[request URL]];
+    }
 }
 
 - getConfig:(NSString *)key
