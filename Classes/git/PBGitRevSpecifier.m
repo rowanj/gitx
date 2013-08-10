@@ -112,8 +112,6 @@
 		title = [self.description substringFromIndex:[@"HEAD -- " length]];
 	else if ([self.description hasPrefix:@"-- "])
 		title = [self.description substringFromIndex:[@"-- " length]];
-	else if ([self.description hasPrefix:@"--left-right "])
-		title = [self.description substringFromIndex:[@"--left-right " length]];
 	else
 		title = self.description;
 	
@@ -124,14 +122,6 @@
 {
 	for (NSString* param in parameters)
 		if ([param isEqualToString:@"--"])
-			return YES;
-	return NO;
-}
-
-- (BOOL) hasLeftRight
-{
-	for (NSString* param in parameters)
-		if ([param isEqualToString:@"--left-right"])
 			return YES;
 	return NO;
 }

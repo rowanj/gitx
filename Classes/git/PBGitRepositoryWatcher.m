@@ -24,21 +24,27 @@ NSString *kPBGitRepositoryEventPathsUserInfoKey = @"kPBGitRepositoryEventPathsUs
 void PBGitRepositoryWatcherCallback(ConstFSEventStreamRef streamRef,
 									void *clientCallBackInfo,
 									size_t numEvents,
-									void *eventPaths,
+									void *_eventPaths,
 									const FSEventStreamEventFlags eventFlags[],
 									const FSEventStreamEventId eventIds[]){
     PBGitRepositoryWatcher *watcher = (__bridge PBGitRepositoryWatcher*)clientCallBackInfo;
 	NSMutableArray *changePaths = [[NSMutableArray alloc] init];
+	NSArray *eventPaths = (__bridge NSArray*)_eventPaths;
 	for (int i = 0; i < numEvents; ++i) {
 //		NSLog(@"FSEvent Watcher: %@ Change %llu in %s, flags %lu", watcher, eventIds[i], paths[i], eventFlags[i]);
-
+		NSString *path = [eventPaths objectAtIndex:i];
+		if ([path hasSuffix:@".lock"]) {
+			continue;
+		}
 		PBGitRepositoryWatcherEventPath *ep = [[PBGitRepositoryWatcherEventPath alloc] init];
-		ep.path = [(__bridge NSArray*)eventPaths objectAtIndex:i];
+		ep.path = path;
 		ep.flag = eventFlags[i];
 		[changePaths addObject:ep];
 		
 	}
-    [watcher _handleEventCallback:changePaths];
+	if (changePaths.count) {
+		[watcher _handleEventCallback:changePaths];
+	}
 }
 
 @implementation PBGitRepositoryWatcher
@@ -81,6 +87,9 @@ void PBGitRepositoryWatcherCallback(ConstFSEventStreamRef streamRef,
 }
 
 - (BOOL) _indexChanged {
+	if (self.repository.isBareRepository) {
+		return NO;
+	}
     NSDate *newTouchDate = [self _fileModificationDateAtPath:[repository.gitURL.path stringByAppendingPathComponent:@"index"]];
 	if (![newTouchDate isEqual:indexTouchDate]) {
 		indexTouchDate = newTouchDate;
@@ -137,13 +146,6 @@ void PBGitRepositoryWatcherCallback(ConstFSEventStreamRef streamRef,
 	for (PBGitRepositoryWatcherEventPath *eventPath in eventPaths) {
 		// .git dir
 		if ([[eventPath.path stringByStandardizingPath] isEqual:[repository.gitURL.path stringByStandardizingPath]]) {
-			// ignore changes to lock files
-			if ([eventPath.path hasSuffix:@".lock"])
-			{
-//				NSLog(@"Watcher: ignoring change to lock file: %@", eventPath.path);
-				continue;
-			}
-			
 			if ([self _gitDirectoryChanged] || eventPath.flag != kFSEventStreamEventFlagNone) {
 				event |= PBGitRepositoryWatcherEventTypeGitDirectory;
                 [paths addObject:eventPath.path];

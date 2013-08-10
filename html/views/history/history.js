@@ -6,11 +6,11 @@ var Commit = function(obj) {
 	this.object = obj;
 
 	this.refs = obj.refs();
-	this.author_name = obj.author;
-	this.committer_name = obj.committer;
+	this.author_name = obj.author();
+	this.committer_name = obj.committer();
 	this.sha = obj.realSha();
-	this.parents = obj.parents;
-	this.subject = obj.subject;
+	this.parents = obj.parents();
+	this.subject = obj.subject();
 	this.notificationID = null;
 
 	// TODO:

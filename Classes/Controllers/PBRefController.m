@@ -14,6 +14,7 @@
 #import "PBGitDefaults.h"
 #import "PBDiffWindowController.h"
 
+#import <ObjectiveGit/ObjectiveGit.h>
 
 #define kDialogAcceptDroppedRef @"Accept Dropped Ref"
 #define kDialogConfirmPush @"Confirm Push"
@@ -247,15 +248,21 @@
 	if ([[sender refish] refishType] != kGitXTagType)
 		return;
 
+	NSError *error = nil;
 	NSString *tagName = [(PBGitRef *)[sender refish] tagName];
-
-	int retValue = 1;
-	NSArray *args = [NSArray arrayWithObjects:@"tag", @"-n50", @"-l", tagName, nil];
-	NSString *info = [historyController.repository outputInWorkdirForArguments:args retValue:&retValue];
-	if (!retValue) {
-		NSString *message = [NSString stringWithFormat:@"Info for tag: %@", tagName];
-		[historyController.repository.windowController showMessageSheet:message infoText:info];
+	NSString *tagRef = [@"refs/tags/" stringByAppendingString:tagName];
+	GTObject *object = [historyController.repository.gtRepo lookupObjectByRefspec:tagRef error:&error];
+	if (!object) {
+		NSLog(@"Couldn't look up ref %@:%@", tagRef, [error debugDescription]);
+		return;
 	}
+	NSString* title = [NSString stringWithFormat:@"Info for tag: %@", tagName];
+	NSString* info = @"";
+	if ([object isKindOfClass:[GTTag class]]) {
+		GTTag *tag = (GTTag*)object;
+		info = tag.message;
+	}
+	[historyController.repository.windowController showMessageSheet:title infoText:info];
 }
 
 

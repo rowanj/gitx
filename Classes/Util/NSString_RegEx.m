@@ -29,7 +29,7 @@
 		goto catch_error;	// regcomp error
 	
 	// Match the regular expression against substring self
-	pmatch = calloc(sizeof(regmatch_t), nmatch+1);
+	pmatch = calloc(nmatch+1, sizeof(regmatch_t));
 	errcode = regexec(&preg, [self UTF8String], (nmatch<0 ? 0 : nmatch+1), pmatch, 0);
 
 	/*if (errcode == REG_NOMATCH)
