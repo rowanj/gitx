@@ -10,6 +10,7 @@
 #import "PBGitHistoryList.h"
 #import "PBGitRevSpecifier.h"
 #import "PBGitRefish.h"
+#import "PBGitStash.h"
 
 @class GTRepository;
 @class GTConfiguration;
@@ -60,6 +61,7 @@ static NSString * PBStringFromBranchFilterType(PBGitXBranchFilterType type) {
 @property (readonly, getter = getIndexURL) NSURL* indexURL;
 
 @property (nonatomic, strong) PBGitHistoryList *revisionList;
+@property (nonatomic, readonly, strong) NSArray* stashes;
 @property (nonatomic, readonly, strong) NSArray* branches;
 @property (nonatomic, strong) NSMutableOrderedSet* branchesSet;
 @property (nonatomic, strong) PBGitRevSpecifier* currentBranch;
@@ -82,6 +84,11 @@ static NSString * PBStringFromBranchFilterType(PBGitXBranchFilterType type) {
 - (BOOL) createTag:(NSString *)tagName message:(NSString *)message atRefish:(id <PBGitRefish>)commitSHA;
 - (BOOL) deleteRemote:(PBGitRef *)ref;
 - (BOOL) deleteRef:(PBGitRef *)ref;
+- (BOOL) stashPop:(PBGitStash *)stash;
+- (BOOL) stashApply:(PBGitStash *)stash;
+- (BOOL) stashDrop:(PBGitStash *)stash;
+- (BOOL) stashSave;
+- (BOOL) stashSaveWithKeepIndex:(BOOL)keepIndex;
 
 - (NSURL *) gitURL ;
 
@@ -116,6 +123,7 @@ static NSString * PBStringFromBranchFilterType(PBGitXBranchFilterType type) {
 - (PBGitSHA *)shaForRef:(PBGitRef *)ref;
 - (PBGitCommit *)commitForRef:(PBGitRef *)ref;
 - (PBGitCommit *)commitForSHA:(PBGitSHA *)sha;
+- (PBGitStash *)stashForRef:(PBGitRef *)ref;
 - (BOOL)isOnSameBranch:(PBGitSHA *)baseSHA asSHA:(PBGitSHA *)testSHA;
 - (BOOL)isSHAOnHeadBranch:(PBGitSHA *)testSHA;
 - (BOOL)isRefOnHeadBranch:(PBGitRef *)testRef;

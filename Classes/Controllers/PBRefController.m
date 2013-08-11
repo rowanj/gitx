@@ -235,6 +235,41 @@
 	[PBDiffWindowController showDiffWindowWithFiles:nil fromCommit:commit diffCommit:nil];
 }
 
+#pragma mark Stash
+
+-(void) stashPop:(id)sender
+{
+    PBGitStash * stash = [historyController.repository stashForRef:[sender refish]];
+    BOOL ok = [historyController.repository stashPop:stash];
+    if (ok) {
+        [historyController.repository.windowController showCommitView:sender];
+    }
+}
+
+-(void) stashApply:(id)sender
+{
+    PBGitStash * stash = [historyController.repository stashForRef:[sender refish]];
+    BOOL ok = [historyController.repository stashApply:stash];
+    if (ok) {
+        [historyController.repository.windowController showCommitView:sender];
+    }
+}
+
+-(void) stashDrop:(id)sender
+{
+    PBGitStash * stash = [historyController.repository stashForRef:[sender refish]];
+    BOOL ok = [historyController.repository stashDrop:stash];
+    if (ok) {
+        [historyController.repository.windowController showHistoryView:sender];
+    }
+}
+
+-(void) stashViewDiff:(id)sender
+{
+    PBGitStash * stash = [historyController.repository stashForRef:[sender refish]];
+    [PBDiffWindowController showDiffWindowWithFiles:nil fromCommit:stash.ancesterCommit diffCommit:stash.commit];
+}
+
 #pragma mark Tags
 
 - (void) createTag:(PBRefMenuItem *)sender

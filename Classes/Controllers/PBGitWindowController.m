@@ -254,6 +254,27 @@
 	}
 }
 
+#pragma mark SplitView Delegates
+
+- (IBAction) stashSave:(id) sender
+{
+    [repository stashSaveWithKeepIndex:NO];
+}
+
+- (IBAction) stashSaveWithKeepIndex:(id) sender
+{
+    [repository stashSaveWithKeepIndex:YES];
+}
+
+- (IBAction) stashPop:(id) sender
+{
+    if ([repository.stashes count] > 0) {
+        PBGitStash * latestStash = [repository.stashes objectAtIndex:0];
+        [repository stashPop:latestStash];
+    }
+}
+
+
 #pragma mark -
 #pragma mark SplitView Delegates
 

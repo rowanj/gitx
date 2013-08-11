@@ -30,11 +30,48 @@
 }
 
 
++ (NSArray *) defaultMenuItemsForStashRef:(PBGitRef *)ref inRepository:(PBGitRepository *)repo target:(id)target
+{
+    NSMutableArray *items = [NSMutableArray array];
+	NSString *targetRefName = [ref shortName];
+    BOOL isCleanWorkingCopy = YES;
+    
+    // pop
+    NSString *stashPopTitle = [NSString stringWithFormat:@"Pop %@", targetRefName];
+    [items addObject:[PBRefMenuItem itemWithTitle:stashPopTitle action:@selector(stashPop:) enabled:isCleanWorkingCopy]];
+    
+    // apply
+    NSString *stashApplyTitle = @"Apply";
+    [items addObject:[PBRefMenuItem itemWithTitle:stashApplyTitle action:@selector(stashApply:) enabled:YES]];
+    
+    // view diff
+    NSString *stashDiffTitle = @"View Diff";
+    [items addObject:[PBRefMenuItem itemWithTitle:stashDiffTitle action:@selector(stashViewDiff:) enabled:YES]];
+
+    [items addObject:[PBRefMenuItem separatorItem]];
+
+    // drop
+    NSString *stashDropTitle = @"Drop";
+    [items addObject:[PBRefMenuItem itemWithTitle:stashDropTitle action:@selector(stashDrop:) enabled:YES]];
+    
+	for (PBRefMenuItem *item in items) {
+		[item setTarget:target];
+		[item setRefish:ref];
+	}
+    
+	return items;
+}
+
+
 + (NSArray *) defaultMenuItemsForRef:(PBGitRef *)ref inRepository:(PBGitRepository *)repo target:(id)target
 {
 	if (!ref || !repo || !target) {
 		return nil;
 	}
+    
+    if ([ref isStash]) {
+        return [self defaultMenuItemsForStashRef:ref inRepository:repo target:target];
+    }
 
 	NSMutableArray *items = [NSMutableArray array];
 

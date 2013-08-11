@@ -16,11 +16,17 @@
 	// This might have to transfer over to the PBGitRepository
 	// object sometime
 	PBGitIndex *index;
+    
+    BOOL stashKeepIndex;
 	
 	IBOutlet NSTextView *commitMessageView;
 	IBOutlet NSArrayController *unstagedFilesController;
 	IBOutlet NSArrayController *cachedFilesController;
+    IBOutlet NSArrayController *trackedFilesController;
+    
+    IBOutlet NSTabView *controlsTabView;
 	IBOutlet NSButton *commitButton;
+	IBOutlet NSButton *stashButton;
 
 	IBOutlet PBGitIndexController *indexController;
 	IBOutlet PBWebChangesController *webController;
@@ -28,9 +34,11 @@
 }
 
 @property(readonly) PBGitIndex *index;
+@property(assign) BOOL stashKeepIndex;
 
 - (IBAction) refresh:(id) sender;
 - (IBAction) commit:(id) sender;
 - (IBAction) forceCommit:(id) sender;
-- (IBAction)signOff:(id)sender;
+- (IBAction) signOff:(id)sender;
+- (IBAction) stashChanges:(id) sender;
 @end

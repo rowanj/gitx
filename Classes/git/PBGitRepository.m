@@ -23,10 +23,13 @@
 #import "PBGitRepositoryWatcher.h"
 #import "GitRepoFinder.h"
 #import "PBGitSubmodule.h"
+#import "PBGitStash.h"
 
 #import <ObjectiveGit/GTRepository.h>
 #import <ObjectiveGit/GTIndex.h>
 #import <ObjectiveGit/GTConfiguration.h>
+#import "git2.h"
+
 
 NSString *PBGitRepositoryDocumentType = @"Git Repository";
 
@@ -295,7 +298,9 @@ int addSubmoduleName(git_submodule *module, const char* name, void * context)
     [self loadSubmodules];
     
 	[self willChangeValueForKey:@"refs"];
+	[self willChangeValueForKey:@"stashes"];
 	[self didChangeValueForKey:@"refs"];
+	[self didChangeValueForKey:@"stashes"];
 
 	[[[self windowController] window] setTitle:[self displayName]];
 }
@@ -550,6 +555,104 @@ int addSubmoduleName(git_submodule *module, const char* name, void * context)
 	{
         return self.fileURL.path;
 	}
+}
+
+#pragma mark Stashes
+
+typedef void (^PBRepositoryStashEnumerationBlock)(PBGitStash *stash, BOOL *stop);
+
+typedef struct {
+	__unsafe_unretained id repository;
+	__unsafe_unretained PBRepositoryStashEnumerationBlock block;
+} PBRepositoryStashEnumerationInfo;
+
+
+static int stashEnumerationCallback(size_t index,
+                                    const char* message,
+                                    const git_oid *stash_id,
+                                    void *payload) {
+	PBRepositoryStashEnumerationInfo *info = payload;
+    
+    NSString* stashMsg = [NSString stringWithUTF8String:message];
+    PBGitStash * stash = [[PBGitStash alloc] initWithRepository:info->repository stashOID:*stash_id index:index message:stashMsg];
+	BOOL stop = NO;
+	info->block(stash, &stop);
+	if (stop) return 1;
+    
+	return 0;
+}
+
+
+- (void)enumerateStashesUsingBlock:(void (^)(PBGitStash *stash, BOOL *stop))block {
+	NSParameterAssert(block != nil);
+
+	// Enumeration is synchronous, so it's okay for the objects here to be
+	// unretained for the duration.
+	PBRepositoryStashEnumerationInfo info = {
+		.repository = self,
+		.block = block
+	};
+    
+	git_stash_foreach(self.gtRepo.git_repository, &stashEnumerationCallback, &info);
+}
+
+- (NSArray *) stashes
+{
+    NSMutableArray * stashes = [NSMutableArray array];
+    [self enumerateStashesUsingBlock:^(PBGitStash *stash, BOOL *stop) {
+        [stashes addObject:stash];
+    }];
+    return [NSArray arrayWithArray:stashes];
+}
+
+- (PBGitStash *)stashForRef:(PBGitRef *)ref {
+    __block PBGitStash * found = nil;
+    [self enumerateStashesUsingBlock:^(PBGitStash *stash, BOOL *stop) {
+        if ([stash.ref isEqualToRef:ref]) {
+            found = stash;
+            stop = YES;
+        }
+    }];
+    return found;
+}
+
+-(BOOL)stashRunCommand:(NSString *)command withStash:(PBGitStash *)stash
+{
+    int retValue;
+    [self outputInWorkdirForArguments:@[@"stash", command, stash.ref.refishName] retValue:&retValue];
+    [self willChangeValueForKey:@"stashes"];
+	[self didChangeValueForKey:@"stashes"];
+    return retValue ? NO : YES;
+}
+
+-(BOOL)stashPop:(PBGitStash *)stash
+{
+    return [self stashRunCommand:@"pop" withStash:stash];
+}
+
+-(BOOL)stashApply:(PBGitStash *)stash
+{
+    return [self stashRunCommand:@"apply" withStash:stash];
+}
+
+-(BOOL)stashDrop:(PBGitStash *)stash
+{
+    return [self stashRunCommand:@"drop" withStash:stash];
+}
+
+-(BOOL)stashSave
+{
+    return [self stashSaveWithKeepIndex:NO];
+}
+
+-(BOOL)stashSaveWithKeepIndex:(BOOL)keepIndex
+{
+    NSArray * args = @[@"stash", @"save", keepIndex?@"--keep-index":@"--no-keep-index"];
+    int retValue;
+    NSString * output = [self outputInWorkdirForArguments:args retValue:&retValue];
+    [self willChangeValueForKey:@"stashes"];
+	[self didChangeValueForKey:@"stashes"];
+    return retValue ? NO : YES;
 }
 
 #pragma mark Remotes

@@ -25,7 +25,7 @@
 	/* Specific things */
 	PBSourceViewItem *stage;
 
-	PBSourceViewItem *branches, *remotes, *tags, *others, *submodules;
+	PBSourceViewItem *branches, *remotes, *tags, *others, *submodules, *stashes;
 
 	PBGitHistoryController *historyViewController;
 	PBGitCommitController *commitViewController;

@@ -16,6 +16,8 @@
 #import "PBAddRemoteSheet.h"
 #import "PBGitDefaults.h"
 #import "PBHistorySearchController.h"
+#import "PBGitStash.h"
+#import "PBGitSVStashItem.h"
 
 @interface PBGitSidebarController ()
 
@@ -53,6 +55,7 @@
 
 	[repository addObserver:self forKeyPath:@"currentBranch" options:0 context:@"currentBranchChange"];
 	[repository addObserver:self forKeyPath:@"branches" options:(NSKeyValueObservingOptionOld | NSKeyValueObservingOptionNew) context:@"branchesModified"];
+   	[repository addObserver:self forKeyPath:@"stashes" options:0 context:@"stashesModified"];
 
     [sourceView setTarget:self];
     [sourceView setDoubleAction:@selector(doubleClicked:)];
@@ -82,6 +85,7 @@
 
 	[repository removeObserver:self forKeyPath:@"currentBranch"];
 	[repository removeObserver:self forKeyPath:@"branches"];
+	[repository removeObserver:self forKeyPath:@"stashes"];
 
 	[super closeView];
 }
@@ -112,6 +116,20 @@
 		}
 		return;
 	}
+    
+	if ([@"stashesModified" isEqualToString:(__bridge NSString*)context]) {
+        
+        for (PBGitSVStashItem *stashItem in stashes.sortedChildren)
+            [stashes removeChild:stashItem];
+        
+        for (PBGitStash *stash in repository.stashes)
+            [stashes addChild: [PBGitSVStashItem itemWithStash:stash]];
+
+        [sourceView expandItem:stashes];
+        [sourceView reloadItem:stashes reloadChildren:YES];
+        
+        return;
+    }
 
 	[super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
 }
@@ -288,9 +306,13 @@
 	branches = [PBSourceViewItem groupItemWithTitle:@"Branches"];
 	remotes = [PBSourceViewItem groupItemWithTitle:@"Remotes"];
 	tags = [PBSourceViewItem groupItemWithTitle:@"Tags"];
+    stashes = [PBSourceViewItem groupItemWithTitle:@"Stashes"];
 	submodules = [PBSourceViewItem groupItemWithTitle:@"Submodules"];
 	others = [PBSourceViewItem groupItemWithTitle:@"Other"];
 
+    for (PBGitStash *stash in repository.stashes)
+        [stashes addChild: [PBGitSVStashItem itemWithStash:stash]];
+    
 	for (PBGitRevSpecifier *rev in repository.branches)
 		[self addRevSpec:rev];
     
@@ -301,6 +323,7 @@
 	[items addObject:branches];
 	[items addObject:remotes];
 	[items addObject:tags];
+	[items addObject:stashes];
 	[items addObject:submodules];
 	[items addObject:others];
 
@@ -308,6 +331,7 @@
 	[sourceView expandItem:project];
 	[sourceView expandItem:branches expandChildren:YES];
 	[sourceView expandItem:remotes];
+    [sourceView expandItem:stashes];
     [sourceView expandItem:submodules];
 
 	[sourceView reloadItem:nil reloadChildren:YES];

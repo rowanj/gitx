@@ -181,6 +181,8 @@
 		8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
 		911112370E5A097800BF76B4 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 911112360E5A097800BF76B4 /* Security.framework */; };
 		913D5E500E55645900CECEA2 /* gitx in Resources */ = {isa = PBXBuildFile; fileRef = 913D5E490E55644600CECEA2 /* gitx */; };
+		A2F8D0DF17AAB32500580B84 /* PBGitStash.m in Sources */ = {isa = PBXBuildFile; fileRef = A2F8D0DE17AAB32500580B84 /* PBGitStash.m */; };
+		A2F8D0EB17AAB95E00580B84 /* PBGitSVStashItem.m in Sources */ = {isa = PBXBuildFile; fileRef = A2F8D0EA17AAB95E00580B84 /* PBGitSVStashItem.m */; };
 		BC0444AD17648CC900353E6D /* AddRemoteTemplate.png in Resources */ = {isa = PBXBuildFile; fileRef = BC0444AC17648CC900353E6D /* AddRemoteTemplate.png */; };
 		BC0444B817648D0200353E6D /* BranchHighlighted.png in Resources */ = {isa = PBXBuildFile; fileRef = BC0444B717648D0200353E6D /* BranchHighlighted.png */; };
 		BC0444BA17648DA800353E6D /* FolderHighlighted.png in Resources */ = {isa = PBXBuildFile; fileRef = BC0444B917648DA700353E6D /* FolderHighlighted.png */; };
@@ -644,6 +646,10 @@
 		8D1107320486CEB800E47090 /* GitX.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GitX.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		911112360E5A097800BF76B4 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = /System/Library/Frameworks/Security.framework; sourceTree = "<absolute>"; };
 		913D5E490E55644600CECEA2 /* gitx */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = gitx; sourceTree = BUILT_PRODUCTS_DIR; };
+		A2F8D0DD17AAB32500580B84 /* PBGitStash.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PBGitStash.h; sourceTree = "<group>"; };
+		A2F8D0DE17AAB32500580B84 /* PBGitStash.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PBGitStash.m; sourceTree = "<group>"; };
+		A2F8D0E917AAB95E00580B84 /* PBGitSVStashItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PBGitSVStashItem.h; sourceTree = "<group>"; };
+		A2F8D0EA17AAB95E00580B84 /* PBGitSVStashItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PBGitSVStashItem.m; sourceTree = "<group>"; };
 		BC0444AC17648CC900353E6D /* AddRemoteTemplate.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = AddRemoteTemplate.png; sourceTree = "<group>"; };
 		BC0444B717648D0200353E6D /* BranchHighlighted.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = BranchHighlighted.png; sourceTree = "<group>"; };
 		BC0444B917648DA700353E6D /* FolderHighlighted.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = FolderHighlighted.png; sourceTree = "<group>"; };
@@ -1084,6 +1090,8 @@
 				4A5D767C14A9A9CC00DF6C68 /* PBGitSVStageItem.m */,
 				4A5D767D14A9A9CC00DF6C68 /* PBGitSVTagItem.h */,
 				4A5D767E14A9A9CC00DF6C68 /* PBGitSVTagItem.m */,
+				A2F8D0E917AAB95E00580B84 /* PBGitSVStashItem.h */,
+				A2F8D0EA17AAB95E00580B84 /* PBGitSVStashItem.m */,
 				4A5D767F14A9A9CC00DF6C68 /* PBGitTree.h */,
 				4A5D768014A9A9CC00DF6C68 /* PBGitTree.m */,
 				4A5D768114A9A9CC00DF6C68 /* PBGitXErrors.h */,
@@ -1092,6 +1100,8 @@
 				4A5D768414A9A9CC00DF6C68 /* PBGitXProtocol.m */,
 				643952721603E9BC00BB7AFF /* PBGitSubmodule.h */,
 				643952731603E9BC00BB7AFF /* PBGitSubmodule.m */,
+				A2F8D0DD17AAB32500580B84 /* PBGitStash.h */,
+				A2F8D0DE17AAB32500580B84 /* PBGitStash.m */,
 				643952751603EF9B00BB7AFF /* PBGitSVSubmoduleItem.h */,
 				643952761603EF9B00BB7AFF /* PBGitSVSubmoduleItem.m */,
 				4AB057E11652652000DE751D /* GitRepoFinder.h */,
@@ -1642,6 +1652,8 @@
 				643952741603E9BC00BB7AFF /* PBGitSubmodule.m in Sources */,
 				643952771603EF9B00BB7AFF /* PBGitSVSubmoduleItem.m in Sources */,
 				4AB057E31652652000DE751D /* GitRepoFinder.m in Sources */,
+				A2F8D0DF17AAB32500580B84 /* PBGitStash.m in Sources */,
+				A2F8D0EB17AAB95E00580B84 /* PBGitSVStashItem.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
