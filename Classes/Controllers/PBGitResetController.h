@@ -7,6 +7,7 @@
 //
 
 #import <Cocoa/Cocoa.h>
+#import <ObjectiveGit/ObjectiveGit.h>
 #import "PBResetSheet.h"
 
 @class PBGitRepository;
@@ -17,10 +18,8 @@
 }
 - (id) initWithRepository:(PBGitRepository *) repo;
 
-- (NSArray *) menuItems;
-
 // actions
-- (void) resetToRefish: (id<PBGitRefish>) spec type: (PBResetType) type;
+- (void) resetToRefish: (id<PBGitRefish>) spec type: (GTRepositoryResetType) type;
 - (void) resetHardToHead;
 
 @end

@@ -7,6 +7,7 @@
 //
 
 #import <Cocoa/Cocoa.h>
+#import <ObjectiveGit/ObjectiveGit.h>
 
 @protocol PBGitRefish;
 @class PBGitRepository;
@@ -28,8 +29,9 @@ typedef enum PBResetType {
     PBGitRepository* repository;
 }
 
-+ (void) beginResetSheetForRepository:(PBGitRepository*) repo refish:(id<PBGitRefish>)refish andType:(PBResetType)type;
++ (void) beginResetSheetForRepository:(PBGitRepository*) repo refish:(id<PBGitRefish>)refish andType:(GTRepositoryResetType)type;
 - (IBAction)resetBranch:(id)sender;
 - (IBAction)cancel:(id)sender;
+- (GTRepositoryResetType) getSelectedResetType;
 
 @end

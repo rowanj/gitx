@@ -8,7 +8,6 @@
 
 #import "PBGitResetController.h"
 #import "PBGitRepository.h"
-#import "PBCommand.h"
 #import "PBGitRefish.h"
 #import "PBResetSheet.h"
 
@@ -23,36 +22,11 @@
 }
 
 - (void) resetHardToHead {
-    [self resetToRefish: [PBGitRef refFromString: @"HEAD"] type: PBResetTypeHard];
+    [self resetToRefish: [PBGitRef refFromString: @"HEAD"] type: GTRepositoryResetTypeMixed];
 }
 
-- (void) resetToRefish:(id<PBGitRefish>) refish type:(PBResetType)type {
+- (void) resetToRefish:(id<PBGitRefish>) refish type:(GTRepositoryResetType)type {
     [PBResetSheet beginResetSheetForRepository: repository refish: refish andType: type];
 }
-
-- (void) reset {
-	//TODO missing implementation
-}
-
-- (NSArray *) menuItems {
-	NSMenuItem *resetHeadHardly = [[NSMenuItem alloc] initWithTitle:@"Reset hard to HEAD" action:@selector(resetHardToHead) keyEquivalent:@""];
-	[resetHeadHardly setTarget:self];
-	
-	NSMenuItem *reset = [[NSMenuItem alloc] initWithTitle:@"Reset..." action:@selector(reset) keyEquivalent:@""];
-	[reset setTarget:self];
-	
-	return [NSArray arrayWithObjects:resetHeadHardly, reset, nil];
-}
-
-- (BOOL) validateMenuItem:(NSMenuItem *)menuItem {
-	BOOL shouldBeEnabled = YES;
-	SEL action = [menuItem action];
-	if (action == @selector(reset)) {
-		shouldBeEnabled = NO;
-		//TODO missing implementation
-	}
-	return shouldBeEnabled;
-}
-
 
 @end

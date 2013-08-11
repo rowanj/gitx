@@ -1,28 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="7.10">
 	<data>
-		<int key="IBDocument.SystemTarget">1070</int>
-		<string key="IBDocument.SystemVersion">11D50</string>
-		<string key="IBDocument.InterfaceBuilderVersion">2177</string>
-		<string key="IBDocument.AppKitVersion">1138.32</string>
-		<string key="IBDocument.HIToolboxVersion">568.00</string>
+		<int key="IBDocument.SystemTarget">1080</int>
+		<string key="IBDocument.SystemVersion">12E55</string>
+		<string key="IBDocument.InterfaceBuilderVersion">3084</string>
+		<string key="IBDocument.AppKitVersion">1187.39</string>
+		<string key="IBDocument.HIToolboxVersion">626.00</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginVersions">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin</string>
-			<string key="NS.object.0">2177</string>
+			<string key="NS.object.0">3084</string>
 		</object>
 		<object class="NSArray" key="IBDocument.IntegratedClassDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<string>NSTabViewItem</string>
-			<string>NSView</string>
-			<string>NSWindowTemplate</string>
-			<string>NSTabView</string>
-			<string>NSSegmentedControl</string>
+			<string>NSButton</string>
+			<string>NSButtonCell</string>
+			<string>NSCustomObject</string>
 			<string>NSSegmentedCell</string>
+			<string>NSSegmentedControl</string>
+			<string>NSTabView</string>
+			<string>NSTabViewItem</string>
 			<string>NSTextField</string>
 			<string>NSTextFieldCell</string>
-			<string>NSButtonCell</string>
-			<string>NSButton</string>
-			<string>NSCustomObject</string>
+			<string>NSView</string>
+			<string>NSWindowTemplate</string>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -62,8 +62,7 @@
 							<int key="NSvFlags">18</int>
 							<string key="NSFrame">{{16, 56}, {448, 78}}</string>
 							<reference key="NSSuperview" ref="1006"/>
-							<reference key="NSWindow"/>
-							<int key="NSViewLayerContentsRedrawPolicy">2</int>
+							<reference key="NSNextKeyView" ref="425232410"/>
 							<object class="NSMutableArray" key="NSTabViewItems">
 								<bool key="EncodedWithXMLCoder">YES</bool>
 								<object class="NSTabViewItem" id="319044161">
@@ -79,10 +78,9 @@
 												<string key="NSFrame">{{0, 45}, {428, 13}}</string>
 												<reference key="NSSuperview" ref="311468611"/>
 												<reference key="NSNextKeyView" ref="920814700"/>
-												<int key="NSViewLayerContentsRedrawPolicy">2</int>
 												<bool key="NSEnabled">YES</bool>
 												<object class="NSTextFieldCell" key="NSCell" id="200733112">
-													<int key="NSCellFlags">67239488</int>
+													<int key="NSCellFlags">67108928</int>
 													<int key="NSCellFlags2">1346635776</int>
 													<string key="NSContents">Resets the head but does not touch the index file nor the working tree at all.</string>
 													<object class="NSFont" key="NSSupport" id="24">
@@ -110,6 +108,7 @@
 														</object>
 													</object>
 												</object>
+												<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 											</object>
 											<object class="NSTextField" id="920814700">
 												<reference key="NSNextResponder" ref="311468611"/>
@@ -117,10 +116,9 @@
 												<string key="NSFrame">{{0, 21}, {428, 16}}</string>
 												<reference key="NSSuperview" ref="311468611"/>
 												<reference key="NSNextKeyView" ref="647563733"/>
-												<int key="NSViewLayerContentsRedrawPolicy">2</int>
 												<bool key="NSEnabled">YES</bool>
 												<object class="NSTextFieldCell" key="NSCell" id="703239873">
-													<int key="NSCellFlags">68288064</int>
+													<int key="NSCellFlags">68157504</int>
 													<int key="NSCellFlags2">272892928</int>
 													<string key="NSContents">This leaves all your changes intact - as changes to be committed.</string>
 													<object class="NSFont" key="NSSupport" id="29">
@@ -132,11 +130,11 @@
 													<reference key="NSBackgroundColor" ref="186361434"/>
 													<reference key="NSTextColor" ref="10119833"/>
 												</object>
+												<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 											</object>
 										</object>
 										<string key="NSFrame">{{10, 7}, {428, 58}}</string>
 										<reference key="NSNextKeyView" ref="799174624"/>
-										<int key="NSViewLayerContentsRedrawPolicy">2</int>
 									</object>
 									<string key="NSLabel">soft</string>
 									<reference key="NSColor" ref="186361434"/>
@@ -157,7 +155,7 @@
 												<reference key="NSNextKeyView" ref="961105728"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="NSTextFieldCell" key="NSCell" id="990510166">
-													<int key="NSCellFlags">67239488</int>
+													<int key="NSCellFlags">67108928</int>
 													<int key="NSCellFlags2">272893952</int>
 													<string key="NSContents">Resets the index but not the working tree and reports what has not been updated.</string>
 													<reference key="NSSupport" ref="24"/>
@@ -165,16 +163,16 @@
 													<reference key="NSBackgroundColor" ref="186361434"/>
 													<reference key="NSTextColor" ref="10119833"/>
 												</object>
+												<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 											</object>
 											<object class="NSTextField" id="961105728">
 												<reference key="NSNextResponder" ref="188572805"/>
 												<int key="NSvFlags">268</int>
 												<string key="NSFrame">{{0, 21}, {428, 16}}</string>
 												<reference key="NSSuperview" ref="188572805"/>
-												<reference key="NSNextKeyView" ref="647563733"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="NSTextFieldCell" key="NSCell" id="291701580">
-													<int key="NSCellFlags">68288064</int>
+													<int key="NSCellFlags">68157504</int>
 													<int key="NSCellFlags2">272892928</int>
 													<string key="NSContents">This preserves changes but they are not marked for commit.</string>
 													<reference key="NSSupport" ref="29"/>
@@ -182,6 +180,7 @@
 													<reference key="NSBackgroundColor" ref="186361434"/>
 													<reference key="NSTextColor" ref="10119833"/>
 												</object>
+												<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 											</object>
 										</object>
 										<string key="NSFrame">{{10, 7}, {428, 58}}</string>
@@ -202,11 +201,10 @@
 												<int key="NSvFlags">274</int>
 												<string key="NSFrame">{{0, 32}, {428, 26}}</string>
 												<reference key="NSSuperview" ref="425232410"/>
-												<reference key="NSWindow"/>
 												<reference key="NSNextKeyView" ref="945760797"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="NSTextFieldCell" key="NSCell" id="190614279">
-													<int key="NSCellFlags">67239424</int>
+													<int key="NSCellFlags">67108864</int>
 													<int key="NSCellFlags2">272891904</int>
 													<string key="NSContents">Resets the index and working tree. Any changes to tracked files in the working tree are discarded.</string>
 													<reference key="NSSupport" ref="24"/>
@@ -214,17 +212,17 @@
 													<reference key="NSBackgroundColor" ref="186361434"/>
 													<reference key="NSTextColor" ref="10119833"/>
 												</object>
+												<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 											</object>
 											<object class="NSTextField" id="945760797">
 												<reference key="NSNextResponder" ref="425232410"/>
 												<int key="NSvFlags">268</int>
 												<string key="NSFrame">{{0, 8}, {437, 16}}</string>
 												<reference key="NSSuperview" ref="425232410"/>
-												<reference key="NSWindow"/>
 												<reference key="NSNextKeyView" ref="647563733"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="NSTextFieldCell" key="NSCell" id="88095017">
-													<int key="NSCellFlags">68288064</int>
+													<int key="NSCellFlags">68157504</int>
 													<int key="NSCellFlags2">272892928</int>
 													<string key="NSContents">Warning! This discards all changes. It may be hard to recover them.</string>
 													<reference key="NSSupport" ref="29"/>
@@ -232,11 +230,11 @@
 													<reference key="NSBackgroundColor" ref="186361434"/>
 													<reference key="NSTextColor" ref="10119833"/>
 												</object>
+												<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 											</object>
 										</object>
 										<string key="NSFrame">{{10, 7}, {428, 58}}</string>
 										<reference key="NSSuperview" ref="858336503"/>
-										<reference key="NSWindow"/>
 										<reference key="NSNextKeyView" ref="118385951"/>
 									</object>
 									<string key="NSLabel">hard</string>
@@ -256,7 +254,7 @@
 												<reference key="NSSuperview" ref="1069150432"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="NSTextFieldCell" key="NSCell" id="918647192">
-													<int key="NSCellFlags">67239424</int>
+													<int key="NSCellFlags">67108864</int>
 													<int key="NSCellFlags2">272891904</int>
 													<string key="NSContents">Resets the index and updates the files in the working tree that are different between target and HEAD, but keeps those which are different between the index and working tree (i.e. which have changes which have not been added). If a file that is different between target and the index has unstaged changes, reset is aborted.</string>
 													<reference key="NSSupport" ref="24"/>
@@ -264,6 +262,7 @@
 													<reference key="NSBackgroundColor" ref="186361434"/>
 													<reference key="NSTextColor" ref="10119833"/>
 												</object>
+												<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 											</object>
 										</object>
 										<string key="NSFrame">{{10, 7}, {428, 58}}</string>
@@ -286,7 +285,7 @@
 												<reference key="NSSuperview" ref="594518853"/>
 												<bool key="NSEnabled">YES</bool>
 												<object class="NSTextFieldCell" key="NSCell" id="103129775">
-													<int key="NSCellFlags">67239424</int>
+													<int key="NSCellFlags">67108864</int>
 													<int key="NSCellFlags2">272891904</int>
 													<string type="base64-UTF8" key="NSContents">UmVzZXRzIHRoZSBpbmRleCwgdXBkYXRlcyBmaWxlcyBpbiB0aGUgd29ya2luZyB0cmVlIHRoYXQgYXJl
 IGRpZmZlcmVudCBiZXR3ZWVuIHRhcmdldCBhbmQgSEVBRCwgYnV0IGtlZXBzIHRob3NlIHdoaWNoIGFy
@@ -298,6 +297,7 @@ dCBhbmQgSEVBRCBoYXMgbG9jYWwgY2hhbmdlcywgcmVzZXQgaXMgYWJvcnRlZC4KA</string>
 													<reference key="NSBackgroundColor" ref="186361434"/>
 													<reference key="NSTextColor" ref="10119833"/>
 												</object>
+												<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 											</object>
 										</object>
 										<string key="NSFrame">{{10, 7}, {428, 58}}</string>
@@ -325,14 +325,12 @@ dCBhbmQgSEVBRCBoYXMgbG9jYWwgY2hhbmdlcywgcmVzZXQgaXMgYWJvcnRlZC4KA</string>
 						<object class="NSSegmentedControl" id="861282253">
 							<reference key="NSNextResponder" ref="1006"/>
 							<int key="NSvFlags">268</int>
-							<string key="NSFrame">{{189, 138}, {271, 25}}</string>
+							<string key="NSFrame">{{100, 138}, {158, 25}}</string>
 							<reference key="NSSuperview" ref="1006"/>
-							<reference key="NSWindow"/>
 							<reference key="NSNextKeyView" ref="858336503"/>
-							<int key="NSViewLayerContentsRedrawPolicy">2</int>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSSegmentedCell" key="NSCell" id="1033359670">
-								<int key="NSCellFlags">67239424</int>
+								<int key="NSCellFlags">67108864</int>
 								<int key="NSCellFlags2">0</int>
 								<object class="NSFont" key="NSSupport" id="801576130">
 									<string key="NSName">LucidaGrande</string>
@@ -356,30 +354,21 @@ dCBhbmQgSEVBRCBoYXMgbG9jYWwgY2hhbmdlcywgcmVzZXQgaXMgYWJvcnRlZC4KA</string>
 										<string key="NSSegmentItemLabel">hard</string>
 										<int key="NSSegmentItemImageScaling">0</int>
 									</object>
-									<object class="NSSegmentItem">
-										<string key="NSSegmentItemLabel">merge</string>
-										<int key="NSSegmentItemImageScaling">0</int>
-									</object>
-									<object class="NSSegmentItem">
-										<string key="NSSegmentItemLabel">keep</string>
-										<int key="NSSegmentItemImageScaling">0</int>
-									</object>
 								</object>
 								<int key="NSSelectedSegment">1</int>
 								<int key="NSSegmentStyle">4</int>
 							</object>
+							<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 						</object>
 						<object class="NSTextField" id="931319512">
 							<reference key="NSNextResponder" ref="1006"/>
 							<int key="NSvFlags">268</int>
 							<string key="NSFrame">{{17, 143}, {83, 17}}</string>
 							<reference key="NSSuperview" ref="1006"/>
-							<reference key="NSWindow"/>
 							<reference key="NSNextKeyView" ref="861282253"/>
-							<int key="NSViewLayerContentsRedrawPolicy">2</int>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="69698464">
-								<int key="NSCellFlags">68288064</int>
+								<int key="NSCellFlags">68157504</int>
 								<int key="NSCellFlags2">272630784</int>
 								<string key="NSContents">Reset type:</string>
 								<reference key="NSSupport" ref="801576130"/>
@@ -388,63 +377,61 @@ dCBhbmQgSEVBRCBoYXMgbG9jYWwgY2hhbmdlcywgcmVzZXQgaXMgYWJvcnRlZC4KA</string>
 								<reference key="NSBackgroundColor" ref="186361434"/>
 								<reference key="NSTextColor" ref="10119833"/>
 							</object>
+							<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 						</object>
 						<object class="NSButton" id="443654798">
 							<reference key="NSNextResponder" ref="1006"/>
 							<int key="NSvFlags">289</int>
 							<string key="NSFrame">{{370, 12}, {96, 32}}</string>
 							<reference key="NSSuperview" ref="1006"/>
-							<reference key="NSWindow"/>
-							<int key="NSViewLayerContentsRedrawPolicy">2</int>
+							<reference key="NSNextKeyView"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSButtonCell" key="NSCell" id="465183478">
-								<int key="NSCellFlags">67239424</int>
+								<int key="NSCellFlags">67108864</int>
 								<int key="NSCellFlags2">134217728</int>
 								<string key="NSContents">Reset</string>
 								<reference key="NSSupport" ref="545954420"/>
 								<reference key="NSControlView" ref="443654798"/>
-								<int key="NSButtonFlags">-2038284033</int>
+								<int key="NSButtonFlags">-2038284288</int>
 								<int key="NSButtonFlags2">129</int>
 								<string key="NSAlternateContents"/>
 								<string type="base64-UTF8" key="NSKeyEquivalent">DQ</string>
 								<int key="NSPeriodicDelay">200</int>
 								<int key="NSPeriodicInterval">25</int>
 							</object>
+							<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 						</object>
 						<object class="NSButton" id="647563733">
 							<reference key="NSNextResponder" ref="1006"/>
 							<int key="NSvFlags">289</int>
 							<string key="NSFrame">{{274, 12}, {96, 32}}</string>
 							<reference key="NSSuperview" ref="1006"/>
-							<reference key="NSWindow"/>
 							<reference key="NSNextKeyView" ref="443654798"/>
-							<int key="NSViewLayerContentsRedrawPolicy">2</int>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSButtonCell" key="NSCell" id="35932997">
-								<int key="NSCellFlags">67239424</int>
+								<int key="NSCellFlags">67108864</int>
 								<int key="NSCellFlags2">134217728</int>
 								<string key="NSContents">Cancel</string>
 								<reference key="NSSupport" ref="545954420"/>
 								<reference key="NSControlView" ref="647563733"/>
-								<int key="NSButtonFlags">-2038284033</int>
+								<int key="NSButtonFlags">-2038284288</int>
 								<int key="NSButtonFlags2">129</int>
 								<string key="NSAlternateContents"/>
 								<string type="base64-UTF8" key="NSKeyEquivalent">Gw</string>
 								<int key="NSPeriodicDelay">200</int>
 								<int key="NSPeriodicInterval">25</int>
 							</object>
+							<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 						</object>
 						<object class="NSTextField" id="415617446">
 							<reference key="NSNextResponder" ref="1006"/>
 							<int key="NSvFlags">268</int>
 							<string key="NSFrame">{{17, 168}, {446, 17}}</string>
 							<reference key="NSSuperview" ref="1006"/>
-							<reference key="NSWindow"/>
 							<reference key="NSNextKeyView" ref="931319512"/>
-							<int key="NSViewLayerContentsRedrawPolicy">2</int>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="271086457">
-								<int key="NSCellFlags">68288064</int>
+								<int key="NSCellFlags">68157504</int>
 								<int key="NSCellFlags2">272630784</int>
 								<string key="NSContents">Are you sure you want to reset current branch?</string>
 								<object class="NSFont" key="NSSupport">
@@ -456,15 +443,14 @@ dCBhbmQgSEVBRCBoYXMgbG9jYWwgY2hhbmdlcywgcmVzZXQgaXMgYWJvcnRlZC4KA</string>
 								<reference key="NSBackgroundColor" ref="186361434"/>
 								<reference key="NSTextColor" ref="10119833"/>
 							</object>
+							<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 						</object>
 					</object>
 					<string key="NSFrameSize">{480, 205}</string>
 					<reference key="NSSuperview"/>
-					<reference key="NSWindow"/>
 					<reference key="NSNextKeyView" ref="415617446"/>
-					<int key="NSViewLayerContentsRedrawPolicy">2</int>
 				</object>
-				<string key="NSScreenRect">{{0, 0}, {1280, 778}}</string>
+				<string key="NSScreenRect">{{0, 0}, {1440, 878}}</string>
 				<string key="NSMaxSize">{10000000000000, 10000000000000}</string>
 				<bool key="NSWindowIsRestorable">YES</bool>
 			</object>
@@ -559,10 +545,10 @@ dCBhbmQgSEVBRCBoYXMgbG9jYWwgY2hhbmdlcywgcmVzZXQgaXMgYWJvcnRlZC4KA</string>
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<reference ref="415617446"/>
 							<reference ref="931319512"/>
-							<reference ref="861282253"/>
 							<reference ref="858336503"/>
 							<reference ref="443654798"/>
 							<reference ref="647563733"/>
+							<reference ref="861282253"/>
 						</object>
 						<reference key="parent" ref="1005"/>
 					</object>
@@ -1027,83 +1013,7 @@ dCBhbmQgSEVBRCBoYXMgbG9jYWwgY2hhbmdlcywgcmVzZXQgaXMgYWJvcnRlZC4KA</string>
 			<nil key="sourceID"/>
 			<int key="maxID">60</int>
 		</object>
-		<object class="IBClassDescriber" key="IBDocument.Classes">
-			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
-				<bool key="EncodedWithXMLCoder">YES</bool>
-				<object class="IBPartialClassDescription">
-					<string key="className">PBResetSheet</string>
-					<string key="superclassName">NSWindowController</string>
-					<object class="NSMutableDictionary" key="actions">
-						<bool key="EncodedWithXMLCoder">YES</bool>
-						<object class="NSArray" key="dict.sortedKeys">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>cancel:</string>
-							<string>resetBranch:</string>
-						</object>
-						<object class="NSArray" key="dict.values">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>id</string>
-							<string>id</string>
-						</object>
-					</object>
-					<object class="NSMutableDictionary" key="actionInfosByName">
-						<bool key="EncodedWithXMLCoder">YES</bool>
-						<object class="NSArray" key="dict.sortedKeys">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>cancel:</string>
-							<string>resetBranch:</string>
-						</object>
-						<object class="NSArray" key="dict.values">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<object class="IBActionInfo">
-								<string key="name">cancel:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">resetBranch:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-						</object>
-					</object>
-					<object class="NSMutableDictionary" key="outlets">
-						<bool key="EncodedWithXMLCoder">YES</bool>
-						<object class="NSArray" key="dict.sortedKeys">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>resetDesc</string>
-							<string>resetType</string>
-						</object>
-						<object class="NSArray" key="dict.values">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>NSTabView</string>
-							<string>NSSegmentedControl</string>
-						</object>
-					</object>
-					<object class="NSMutableDictionary" key="toOneOutletInfosByName">
-						<bool key="EncodedWithXMLCoder">YES</bool>
-						<object class="NSArray" key="dict.sortedKeys">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>resetDesc</string>
-							<string>resetType</string>
-						</object>
-						<object class="NSArray" key="dict.values">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<object class="IBToOneOutletInfo">
-								<string key="name">resetDesc</string>
-								<string key="candidateClassName">NSTabView</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">resetType</string>
-								<string key="candidateClassName">NSSegmentedControl</string>
-							</object>
-						</object>
-					</object>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">./Classes/PBResetSheet.h</string>
-					</object>
-				</object>
-			</object>
-		</object>
+		<object class="IBClassDescriber" key="IBDocument.Classes"/>
 		<int key="IBDocument.localizationMode">0</int>
 		<string key="IBDocument.TargetRuntimeIdentifier">IBCocoaFramework</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginDeclaredDevelopmentDependencies">
