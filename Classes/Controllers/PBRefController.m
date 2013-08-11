@@ -13,6 +13,7 @@
 #import "PBCreateTagSheet.h"
 #import "PBGitDefaults.h"
 #import "PBDiffWindowController.h"
+#include "PBGitResetController.h"
 
 #import <ObjectiveGit/ObjectiveGit.h>
 
@@ -149,6 +150,13 @@
 	[historyController.repository checkoutRefish:refish];
 }
 
+#pragma mark Reset
+
+- (void) reset:(PBRefMenuItem *)sender
+{
+	id <PBGitRefish> refish = [sender refish];
+	[historyController.repository.resetController resetToRefish: refish type: GTRepositoryResetTypeMixed];
+}
 
 #pragma mark Cherry Pick
 

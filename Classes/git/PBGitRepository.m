@@ -23,6 +23,7 @@
 #import "PBGitRepositoryWatcher.h"
 #import "GitRepoFinder.h"
 #import "PBGitSubmodule.h"
+#import "PBGitResetController.h"
 
 #import <ObjectiveGit/GTRepository.h>
 #import <ObjectiveGit/GTIndex.h>
@@ -40,6 +41,7 @@ NSString *PBGitRepositoryDocumentType = @"Git Repository";
 
 @synthesize revisionList, branchesSet, currentBranch, refs, hasChanged, submodules;
 @synthesize currentBranchFilter;
+@synthesize resetController;
 
 - (BOOL) isBareRepository
 {
@@ -130,6 +132,7 @@ NSString *PBGitRepositoryDocumentType = @"Git Repository";
 	self.branchesSet = [NSMutableOrderedSet orderedSet];
     self.submodules = [NSMutableArray array];
 	currentBranchFilter = [PBGitDefaults branchFilter];
+    resetController = [[PBGitResetController alloc] initWithRepository:self];
     return self;
 }
 

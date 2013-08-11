@@ -58,6 +58,10 @@
 		[items addObject:[PBRefMenuItem itemWithTitle:checkoutTitle action:@selector(checkout:) enabled:!isHead]];
 		[items addObject:[PBRefMenuItem separatorItem]];
 
+        NSString *resetTitle = [NSString stringWithFormat:@"Reset %@ to %@…", headRefName, targetRefName];
+        [items addObject:[PBRefMenuItem itemWithTitle: resetTitle action:@selector(reset:) enabled:YES]];
+        [items addObject:[PBRefMenuItem separatorItem]];
+
 		// create branch
 		NSString *createBranchTitle = [ref isRemoteBranch] ? [NSString stringWithFormat:@"Create branch that tracks %@…", targetRefName] : @"Create branch…";
 		[items addObject:[PBRefMenuItem itemWithTitle:createBranchTitle action:@selector(createBranch:) enabled:YES]];
@@ -152,6 +156,10 @@
 	BOOL isHead = [[commit sha] isEqual:[commit.repository headSHA]];
 
 	[items addObject:[PBRefMenuItem itemWithTitle:@"Checkout Commit" action:@selector(checkout:) enabled:YES]];
+	[items addObject:[PBRefMenuItem separatorItem]];
+    
+    NSString *resetTitle = [NSString stringWithFormat:@"Reset %@ to here…", headBranchName];
+    [items addObject:[PBRefMenuItem itemWithTitle: resetTitle action:@selector(reset:) enabled:YES]];
 	[items addObject:[PBRefMenuItem separatorItem]];
 
     [items addObject:[PBRefMenuItem itemWithTitle:@"Create Branch…" action:@selector(createBranch:) enabled:YES]];
