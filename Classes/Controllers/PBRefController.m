@@ -149,6 +149,13 @@
 	[historyController.repository checkoutRefish:refish];
 }
 
+#pragma mark Reset
+
+- (void) reset:(PBRefMenuItem *)sender
+{
+	id <PBGitRefish> refish = [sender refish];
+	[historyController.repository.resetController resetToRefish: refish type: PBResetTypeMixed];
+}
 
 #pragma mark Cherry Pick
 

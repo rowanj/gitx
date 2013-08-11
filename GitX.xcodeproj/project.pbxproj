@@ -226,6 +226,9 @@
 		D87127011229A21C00012334 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D87127001229A21C00012334 /* QuartzCore.framework */; };
 		D89E9B141218BA260097A90B /* ScriptingBridge.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D89E9AB21218A9DA0097A90B /* ScriptingBridge.framework */; };
 		D8E3B2B810DC9FB2001096A3 /* ScriptingBridge.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D8E3B2B710DC9FB2001096A3 /* ScriptingBridge.framework */; };
+		F4D7EF8C17B7A68C002B30A2 /* PBGitResetController.m in Sources */ = {isa = PBXBuildFile; fileRef = F4D7EF8B17B7A68C002B30A2 /* PBGitResetController.m */; };
+		F4D7EF9817B7A6AB002B30A2 /* PBResetSheet.m in Sources */ = {isa = PBXBuildFile; fileRef = F4D7EF9717B7A6AB002B30A2 /* PBResetSheet.m */; };
+		F4D7EF9A17B7A6E9002B30A2 /* PBResetSheet.xib in Resources */ = {isa = PBXBuildFile; fileRef = F4D7EF9917B7A6E9002B30A2 /* PBResetSheet.xib */; };
 		F56526240E03D85900F03B52 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F56526230E03D85900F03B52 /* WebKit.framework */; };
 		F5E4DBFB0EAB58D90013FAFC /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F5E4DBFA0EAB58D90013FAFC /* SystemConfiguration.framework */; };
 /* End PBXBuildFile section */
@@ -689,6 +692,11 @@
 		D87127001229A21C00012334 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		D89E9AB21218A9DA0097A90B /* ScriptingBridge.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ScriptingBridge.framework; path = System/Library/Frameworks/ScriptingBridge.framework; sourceTree = SDKROOT; };
 		D8E3B2B710DC9FB2001096A3 /* ScriptingBridge.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ScriptingBridge.framework; path = /System/Library/Frameworks/ScriptingBridge.framework; sourceTree = "<absolute>"; };
+		F4D7EF8A17B7A68C002B30A2 /* PBGitResetController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PBGitResetController.h; sourceTree = "<group>"; };
+		F4D7EF8B17B7A68C002B30A2 /* PBGitResetController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PBGitResetController.m; sourceTree = "<group>"; };
+		F4D7EF9617B7A6AB002B30A2 /* PBResetSheet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PBResetSheet.h; sourceTree = "<group>"; };
+		F4D7EF9717B7A6AB002B30A2 /* PBResetSheet.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PBResetSheet.m; sourceTree = "<group>"; };
+		F4D7EF9917B7A6E9002B30A2 /* PBResetSheet.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = PBResetSheet.xib; sourceTree = "<group>"; };
 		F56526230E03D85900F03B52 /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = /System/Library/Frameworks/WebKit.framework; sourceTree = "<absolute>"; };
 		F5D619ED0EAE62EA00341D73 /* html */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = folder; name = html; path = ../html; sourceTree = "<group>"; };
 		F5E4DBFA0EAB58D90013FAFC /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = /System/Library/Frameworks/SystemConfiguration.framework; sourceTree = "<absolute>"; };
@@ -927,6 +935,7 @@
 		4A5D75B914A9A90500DF6C68 /* XIBs */ = {
 			isa = PBXGroup;
 			children = (
+				F4D7EF9917B7A6E9002B30A2 /* PBResetSheet.xib */,
 				4A5D75BA14A9A90500DF6C68 /* OpenRecentPopup.xib */,
 				4A5D75BB14A9A90500DF6C68 /* PBCommitHookFailedSheet.xib */,
 				4A5D75BC14A9A90500DF6C68 /* PBDiffWindow.xib */,
@@ -992,6 +1001,8 @@
 		4A5D762514A9A9CC00DF6C68 /* Controllers */ = {
 			isa = PBXGroup;
 			children = (
+				F4D7EF8A17B7A68C002B30A2 /* PBGitResetController.h */,
+				F4D7EF8B17B7A68C002B30A2 /* PBGitResetController.m */,
 				4A5D762614A9A9CC00DF6C68 /* ApplicationController.h */,
 				4A5D762714A9A9CC00DF6C68 /* ApplicationController.m */,
 				4A5D762814A9A9CC00DF6C68 /* DBPrefsWindowController.h */,
@@ -1126,6 +1137,8 @@
 		4A5D76B314A9A9CC00DF6C68 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				F4D7EF9617B7A6AB002B30A2 /* PBResetSheet.h */,
+				F4D7EF9717B7A6AB002B30A2 /* PBResetSheet.m */,
 				4A5D76B414A9A9CC00DF6C68 /* GitXTextFieldCell.h */,
 				4A5D76B514A9A9CC00DF6C68 /* GitXTextFieldCell.m */,
 				4A5D76B614A9A9CC00DF6C68 /* GLFileView.h */,
@@ -1499,6 +1512,7 @@
 				BC0444C617648EBE00353E6D /* TagHighlighted.png in Resources */,
 				BC77578C176766B60048BB48 /* BranchTemplate@2x.png in Resources */,
 				BC775797176766C60048BB48 /* RemoteBranchTemplate@2x.png in Resources */,
+				F4D7EF9A17B7A6E9002B30A2 /* PBResetSheet.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1642,6 +1656,8 @@
 				643952741603E9BC00BB7AFF /* PBGitSubmodule.m in Sources */,
 				643952771603EF9B00BB7AFF /* PBGitSVSubmoduleItem.m in Sources */,
 				4AB057E31652652000DE751D /* GitRepoFinder.m in Sources */,
+				F4D7EF8C17B7A68C002B30A2 /* PBGitResetController.m in Sources */,
+				F4D7EF9817B7A6AB002B30A2 /* PBResetSheet.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -31,6 +31,7 @@
 - (void) showConfirmPushRefSheet:(PBGitRef *)ref remote:(PBGitRef *)remoteRef;
 
 - (void) checkout:(PBRefMenuItem *)sender;
+- (void) reset:(PBRefMenuItem *)sender;
 - (void) merge:(PBRefMenuItem *)sender;
 - (void) cherryPick:(PBRefMenuItem *)sender;
 - (void) rebaseHeadBranch:(PBRefMenuItem *)sender;
