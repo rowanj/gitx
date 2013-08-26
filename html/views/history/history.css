@@ -48,21 +48,13 @@ a.servicebutton:hover {
 	border: 2px solid #3465a4;
 }
 
-#gravatar {
-	margin-left: 5px;
-	padding: 2px;
-	width: 60px;
-	height: 60px;
-
-	border: solid gray 1px;
-	-webkit-border-radius: 2px;
-}
-
 .gravatar img {
 	width: 2.9em;
 	height: 2.9em;
 	max-height: 60px;
 	max-width: 60px;
+	-webkit-border-radius: 3px;
+	-webkit-box-shadow: 0px 0px 2px 1px rgba(0, 0, 0, 0.25);
 }
 
 .property_name {
