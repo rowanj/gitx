@@ -544,6 +544,7 @@
     [rewindPanel setAnimations:[NSDictionary dictionaryWithObject:alphaAnimation forKey:@"alphaValue"]];
 	[[rewindPanel animator] setAlphaValue:0.0f];
 
+    [[self class] cancelPreviousPerformRequestsWithTarget:self selector:@selector(closeRewindPanel) object:nil];
 	[self performSelector:@selector(closeRewindPanel) withObject:nil afterDelay:0.7f];
 }
 
