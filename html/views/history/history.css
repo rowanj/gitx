@@ -114,6 +114,16 @@ a.servicebutton:hover {
 	margin-bottom: 0.25em;
 }
 
+#files a .renamed .meta,
+#files a .renamed .old {
+	color: #888888;
+	border-bottom: 1px solid #ffffff;
+}
+
+#files a .renamed .meta {
+	font-weight: bold;
+}
+
 .clear_both {
 	clear:both;
 	display:block;
