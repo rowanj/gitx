@@ -95,7 +95,7 @@ NSString *PBGitRepositoryDocumentType = @"Git Repository";
 	}
 
     NSError *error = nil;
-    _gtRepo = [GTRepository repositoryWithURL:absoluteURL error:&error];
+    _gtRepo = [GTRepository repositoryWithURL:([GitRepoFinder gitDirForURL:absoluteURL]) error:&error];
 	if (!_gtRepo) {
 		if (outError) {
 			NSDictionary* userInfo = [NSDictionary dictionaryWithObjectsAndKeys:
