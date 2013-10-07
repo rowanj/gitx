@@ -12,7 +12,8 @@
 
 @interface PBGitSHA ()
 
-- (id)initWithOID:(git_oid)g_oid;
+@property (nonatomic, assign) git_oid oid;
+@property (nonatomic, strong) NSString *string;
 
 @end
 
@@ -20,11 +21,7 @@
 @implementation PBGitSHA
 
 
-@synthesize oid;
-@synthesize string;
-
-
-+ (PBGitSHA *)shaWithOID:(git_oid)oid
++ (PBGitSHA *)shaWithOID:(git_oid const *)oid
 {
 	return [[PBGitSHA alloc] initWithOID:oid];
 }
@@ -34,10 +31,11 @@
 {
 	git_oid oid;
 	int err = git_oid_fromstr(&oid, [shaString UTF8String]);
-	if (err != GIT_OK)
+	if (err != GIT_OK) {
 		return nil;
+	}
 
-	return [self shaWithOID:oid];
+	return [self shaWithOID:&oid];
 }
 
 
@@ -48,7 +46,7 @@
 	if (err != GIT_OK)
 		return nil;
 
-	return [self shaWithOID:oid];
+	return [self shaWithOID:&oid];
 }
 
 
@@ -68,13 +66,18 @@
 #pragma mark -
 #pragma mark PBGitSHA
 
-- (id)initWithOID:(git_oid)g_oid
+- (id)initWithOID:(git_oid const *)g_oid
 {
-	self = [super init];
-	if (!self)
+	if (!g_oid) {
 		return nil;
+	}
 
-	oid = g_oid;
+	self = [super init];
+	if (!self) {
+		return nil;
+	}
+
+	_oid = *g_oid;
 
 	return self;
 }
@@ -82,15 +85,16 @@
 
 - (NSString *)string
 {
-	if (!string) {
-		const size_t buffer_size = GIT_OID_HEXSZ + 1;
-		char hex[buffer_size] = {0};
-
-		const char* result = git_oid_tostr(hex, buffer_size, &oid);
-		string = [NSString stringWithUTF8String:result];
+	if (_string) {
+		return _string;
 	}
 
-	return string;
+	const size_t buffer_size = GIT_OID_HEXSZ + 1;
+	char hex[buffer_size] = {0};
+
+	const char* result = git_oid_tostr(hex, buffer_size, &_oid);
+	_string = [NSString stringWithUTF8String:result];
+	return _string;
 }
 
 
@@ -102,21 +106,23 @@
 	if  (!otherSHA)
 		return NO;
 
-	git_oid other_oid = ((PBGitSHA *)otherSHA)->oid;
-	return git_oid_cmp(&oid, &other_oid) == 0;
+	return git_oid_cmp(&_oid, &((PBGitSHA *)otherSHA)->_oid) == 0;
 }
 
 
-- (BOOL)isEqualToOID:(git_oid)other_oid
+- (BOOL)isEqualToOID:(git_oid const *)other_oid
 {
-	return git_oid_cmp(&oid, &other_oid) == 0;
+	if (!other_oid) {
+		return nil;
+	}
+	return git_oid_cmp(&_oid, other_oid) == 0;
 }
 
 
 - (NSUInteger)hash
 {
 	NSUInteger hash;
-	memcpy(&hash, &(oid.id), sizeof(NSUInteger));
+	memcpy(&hash, &(_oid.id), sizeof(NSUInteger));
 
 	return hash;
 }
@@ -133,9 +139,7 @@
 
 - (id)copyWithZone:(NSZone *)zone
 {
-	git_oid oidCopy;
-	git_oid_cpy(&oidCopy, &oid);
-    PBGitSHA *copy = [[[self class] allocWithZone:zone] initWithOID:oidCopy];
+    PBGitSHA *copy = [[[self class] allocWithZone:zone] initWithOID:&(self->_oid)];
 
 	return copy;
 }

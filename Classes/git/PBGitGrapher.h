@@ -6,17 +6,12 @@
 //  Copyright 2008 __MyCompanyName__. All rights reserved.
 //
 
-#import <Cocoa/Cocoa.h>
-#import "PBGitCommit.h"
-#import "PBGitGraphLine.h"
-#import "PBGraphCellInfo.h"
+@class PBGitRepository;
+@class PBGitCommit;
 
-@interface PBGitGrapher : NSObject {
-	PBGraphCellInfo *previous;
-	void *pl;
-	int curLane;
-}
+@interface PBGitGrapher : NSObject
 
 - (id) initWithRepository:(PBGitRepository *)repo;
 - (void) decorateCommit:(PBGitCommit *)commit;
+
 @end

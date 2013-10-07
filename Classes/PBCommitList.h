@@ -12,6 +12,8 @@
 
 @class PBWebHistoryController;
 
+typedef void(^PBFindPanelActionBlock)(id sender);
+
 @interface PBCommitList : NSTableView {
 	IBOutlet WebView* webView;
 	IBOutlet PBWebHistoryController *webController;
@@ -24,4 +26,5 @@
 
 @property (readonly) NSPoint mouseDownPoint;
 @property (assign) BOOL useAdjustScroll;
+@property (copy) PBFindPanelActionBlock findPanelActionBlock;
 @end

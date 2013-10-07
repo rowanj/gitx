@@ -185,4 +185,13 @@
 	[super highlightSelectionInClipRect:tableViewClipRect];
 }
 
+
+- (IBAction)performFindPanelAction:(id)sender
+{
+	PBFindPanelActionBlock block = self.findPanelActionBlock;
+	if (block) {
+		block(sender);
+	}
+}
+
 @end

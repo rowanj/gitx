@@ -23,7 +23,6 @@
 - (NSString*) simpleRef;
 - (PBGitRef *) ref;
 - (BOOL) hasPathLimiter;
-- (BOOL) hasLeftRight;
 - (NSString *) title;
 
 - (BOOL) isEqual: (PBGitRevSpecifier*) other;

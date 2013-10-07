@@ -6,6 +6,7 @@
 //  Copyright 2008 __MyCompanyName__. All rights reserved.
 //
 
+#import "PBGraphCellInfo.h"
 #import "PBGitGrapher.h"
 #import "PBGitCommit.h"
 #import "PBGitLane.h"
@@ -18,12 +19,24 @@
 using namespace std;
 typedef std::vector<PBGitLane *> LaneCollection;
 
+@interface PBGitGrapher ()
+
+@property (nonatomic, strong) PBGraphCellInfo *previous;
+@property (nonatomic, assign) LaneCollection *pl;
+@property (nonatomic, assign) int curLane;
+
+@end
 
 @implementation PBGitGrapher
 
 - (id) initWithRepository: (PBGitRepository*) repo
 {
-	pl = new LaneCollection;
+	self = [super init];
+	if (!self) {
+		return nil;
+	}
+	
+	self.pl = new LaneCollection;
 
 	PBGitLane::resetColors();
 	return self;
@@ -40,7 +53,7 @@ void add_line(struct PBGitGraphLine *lines, int *nLines, int upper, int from, in
 {
 	int i = 0, newPos = -1;
 	LaneCollection *currentLanes = new LaneCollection;
-	LaneCollection *previousLanes = (LaneCollection *)pl;
+	LaneCollection *previousLanes = self.pl;
 	NSArray *parents = [commit parents];
 	int nParents = [parents count];
 
@@ -53,7 +66,7 @@ void add_line(struct PBGitGraphLine *lines, int *nLines, int upper, int from, in
 	git_oid commit_oid = [[commit sha] oid];
 	
 	// First, iterate over earlier columns and pass through any that don't want this commit
-	if (previous != nil) {
+	if (self.previous != nil) {
 		// We can't count until numColumns here, as it's only used for the width of the cell.
 		LaneCollection::iterator it = previousLanes->begin();
 		for (; it != previousLanes->end(); ++it) {
@@ -131,24 +144,24 @@ void add_line(struct PBGitGraphLine *lines, int *nLines, int upper, int from, in
 	}
 
 	if (commit.lineInfo) {
-		previous = commit.lineInfo;
-		previous.position = newPos;
-		previous.lines = lines;
+		self.previous = commit.lineInfo;
+		self.previous.position = newPos;
+		self.previous.lines = lines;
 	}
 	else
-		previous = [[PBGraphCellInfo alloc] initWithPosition:newPos andLines:lines];
+		self.previous = [[PBGraphCellInfo alloc] initWithPosition:newPos andLines:lines];
 
 	if (currentLine > maxLines)
 		NSLog(@"Number of lines: %i vs allocated: %i", currentLine, maxLines);
 
-	previous.nLines = currentLine;
-	previous.sign = commit.sign;
+	self.previous.nLines = currentLine;
+	self.previous.sign = commit.sign;
 
 	// If a parent was added, we have room to not indent.
 	if (addedParent)
-		previous.numColumns = currentLanes->size() - 1;
+		self.previous.numColumns = currentLanes->size() - 1;
 	else
-		previous.numColumns = currentLanes->size();
+		self.previous.numColumns = currentLanes->size();
 
 	// Update the current lane to point to the new parent
 	if (currentLane) {
@@ -168,18 +181,17 @@ void add_line(struct PBGitGraphLine *lines, int *nLines, int upper, int from, in
 
 	delete previousLanes;
 
-	pl = currentLanes;
-	commit.lineInfo = previous;
+	self.pl = currentLanes;
+	commit.lineInfo = self.previous;
 }
 
 - (void) dealloc
 {
-	LaneCollection *lanes = (LaneCollection *)pl;
+	LaneCollection *lanes = self.pl;
 	LaneCollection::iterator it = lanes->begin();
 	for (; it != lanes->end(); ++it)
 		delete *it;
 
 	delete lanes;
-
 }
 @end

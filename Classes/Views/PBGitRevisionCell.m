@@ -11,6 +11,8 @@
 #import "RoundedRectangle.h"
 #import "GitXTextFieldCell.h"
 
+const int COLUMN_WIDTH = 10;
+
 @implementation PBGitRevisionCell
 
 
@@ -39,12 +41,10 @@
 
 - (void) drawLineFromColumn: (int) from toColumn: (int) to inRect: (NSRect) r offset: (int) offset color: (int) c
 {
-
-	int columnWidth = 10;
 	NSPoint origin = r.origin;
 	
-	NSPoint source = NSMakePoint(origin.x + columnWidth* from, origin.y + offset);
-	NSPoint center = NSMakePoint( origin.x + columnWidth * to, origin.y + r.size.height * 0.5 + 0.5);
+	NSPoint source = NSMakePoint(origin.x + COLUMN_WIDTH * from, origin.y + offset);
+	NSPoint center = NSMakePoint( origin.x + COLUMN_WIDTH * to, origin.y + r.size.height * 0.5 + 0.5);
 
 	NSArray* colors = [PBGitRevisionCell laneColors];
 	[(NSColor*)[colors objectAtIndex: (c % [colors count])] set];
@@ -72,9 +72,8 @@
 {
 
 	int c = cellInfo.position;
-	int columnWidth = 10;
 	NSPoint origin = r.origin;
-	NSPoint columnOrigin = { origin.x + columnWidth * c, origin.y};
+	NSPoint columnOrigin = { origin.x + COLUMN_WIDTH * c, origin.y};
 
 	NSRect oval = { columnOrigin.x - 5, columnOrigin.y + r.size.height * 0.5 - 5, 10, 10};
 
@@ -232,7 +231,7 @@
 	cellInfo = [self.objectValue lineInfo];
 	
 	if (cellInfo && ![controller hasNonlinearPath]) {
-		float pathWidth = 10 + 10 * cellInfo.numColumns;
+		float pathWidth = 10 + COLUMN_WIDTH * cellInfo.numColumns;
 
 		NSRect ownRect;
 		NSDivideRect(rect, &ownRect, &rect, pathWidth, NSMinXEdge);

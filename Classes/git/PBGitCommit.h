@@ -12,29 +12,41 @@
 #import "PBGitRefish.h"
 #import "PBGitSHA.h"
 
+#import <ObjectiveGit/git2/oid.h>
 
 extern NSString * const kGitXCommitType;
 
+@class PBGraphCellInfo;
+@class GTCommit;
 
-@interface PBGitCommit : NSObject <PBGitRefish> {
-	PBGitSHA *sha;
+@interface PBGitCommit : NSObject <PBGitRefish>
 
-	NSString* subject;
-	NSString* author;
-	NSString *committer;
-	NSString* details;
-	NSString *_patch;
-	NSArray *parents;
-	NSString *realSHA;
-    NSString *SVNRevision;
+@property (nonatomic, weak, readonly) PBGitRepository* repository;
 
-	int timestamp;
-	char sign;
-	id lineInfo;
-}
+@property (nonatomic, strong, readonly) PBGitSHA *sha;
 
-+ (PBGitCommit *)commitWithRepository:(PBGitRepository*)repo andSha:(PBGitSHA *)newSha;
-- (id)initWithRepository:(PBGitRepository *)repo andSha:(PBGitSHA *)newSha;
+@property (nonatomic, strong, readonly) NSDate *date;
+@property (nonatomic, strong, readonly) NSString *subject;
+@property (nonatomic, strong, readonly) NSString *author;
+@property (nonatomic, strong, readonly) NSString *committer;
+@property (nonatomic, strong, readonly) NSString *details;
+@property (nonatomic, strong, readonly) NSString *patch;
+@property (nonatomic, strong, readonly) NSString *realSHA;
+@property (nonatomic, strong, readonly) NSString *SVNRevision;
+
+@property (nonatomic, strong, readonly) NSArray *parents;
+@property  NSMutableArray* refs;
+
+@property (nonatomic, assign)	char sign;
+@property (nonatomic, strong) PBGraphCellInfo *lineInfo;
+
+@property (nonatomic, readonly) PBGitTree* tree;
+@property (readonly) NSArray* treeContents;
+
+
+//+ (PBGitCommit *)commitWithRepository:(PBGitRepository*)repo andSha:(PBGitSHA *)newSha;
+
+- (id)initWithRepository:(PBGitRepository *)repo andCommit:(GTCommit *)gtCommit;
 
 - (void) addRef:(PBGitRef *)ref;
 - (void) removeRef:(id)ref;
@@ -49,24 +61,4 @@ extern NSString * const kGitXCommitType;
 - (NSString *) shortName;
 - (NSString *) refishType;
 
-@property (readonly) PBGitSHA *sha;
-@property (copy) NSString* subject;
-@property (copy) NSString* author;
-@property (copy) NSString *committer;
-@property (copy) NSString *SVNRevision;
-@property  NSArray *parents;
-
-@property (assign) int timestamp;
-
-@property  NSMutableArray* refs;
-@property (readonly) NSDate *date;
-@property (readonly) NSString* dateString;
-@property (readonly) NSString* patch;
-@property (assign) char sign;
-
-@property (readonly) NSString* details;
-@property (readonly) PBGitTree* tree;
-@property (readonly) NSArray* treeContents;
-@property (nonatomic, weak) PBGitRepository* repository;
-@property  id lineInfo;
 @end

@@ -6,11 +6,11 @@ var Commit = function(obj) {
 	this.object = obj;
 
 	this.refs = obj.refs();
-	this.author_name = obj.author;
-	this.committer_name = obj.committer;
+	this.author_name = obj.author();
+	this.committer_name = obj.committer();
 	this.sha = obj.realSha();
-	this.parents = obj.parents;
-	this.subject = obj.subject;
+	this.parents = obj.parents();
+	this.subject = obj.subject();
 	this.notificationID = null;
 
 	// TODO:
@@ -197,8 +197,8 @@ var loadCommit = function(commitObject, currentRef) {
 	for (var i = 0; i < commit.parents.length; i++) {
 		var newRow = $("commit_header").insertRow(-1);
 		newRow.innerHTML = "<td class='property_name'>Parent:</td><td>" +
-			"<a href='' onclick='selectCommit(this.innerHTML); return false;'>" +
-			commit.parents[i].string + "</a></td>";
+			"<a class=\"SHA\" href='' onclick='selectCommit(this.innerHTML); return false;'>" +
+			commit.parents[i].string() + "</a></td>";
 	}
 
 	commit.notificationID = setTimeout(function() { 

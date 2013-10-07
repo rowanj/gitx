@@ -100,6 +100,15 @@
   // listen for updates
   [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_repositoryUpdatedNotification:) name:PBGitRepositoryEventNotification object:repository];
 
+	__weak PBGitHistoryController *weakSelf = self;
+	commitList.findPanelActionBlock = ^(id sender){
+		PBGitHistoryController *controller = weakSelf;
+		if (!controller) {
+			return;
+		}
+		[controller.view.window makeFirstResponder:controller->searchField];
+	};
+
 	[super awakeFromNib];
 }
 
