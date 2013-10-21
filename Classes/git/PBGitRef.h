@@ -9,7 +9,6 @@
 #import <Cocoa/Cocoa.h>
 #import "PBGitRefish.h"
 
-
 extern NSString * const kGitXTagType;
 extern NSString * const kGitXBranchType;
 extern NSString * const kGitXRemoteType;

@@ -15,6 +15,7 @@
 #import "NSOutlineViewExt.h"
 #import "PBAddRemoteSheet.h"
 #import "PBGitDefaults.h"
+#import "PBGitSubmodule.h"
 #import "PBHistorySearchController.h"
 
 @interface PBGitSidebarController ()

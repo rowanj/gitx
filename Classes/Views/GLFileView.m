@@ -6,9 +6,14 @@
 //  Copyright 2010 __MyCompanyName__. All rights reserved.
 //
 
-#import "GLFileView.h"
-#import "PBGitGradientBarView.h"
 #import <MGScopeBar/MGScopeBar.h>
+
+#import "GLFileView.h"
+#import "PBGitTree.h"
+#import "PBGitSHA.h"
+#import "PBGitCommit.h"
+#import "PBGitHistoryController.h"
+
 
 #define GROUP_LABEL				@"Label"			// string
 #define GROUP_SEPARATOR			@"HasSeparator"		// BOOL as NSNumber

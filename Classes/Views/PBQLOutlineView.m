@@ -7,7 +7,7 @@
 //
 
 #import "PBQLOutlineView.h"
-
+#import "PBGitTree.h"
 
 @implementation PBQLOutlineView
 

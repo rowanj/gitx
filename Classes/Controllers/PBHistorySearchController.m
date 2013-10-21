@@ -6,6 +6,8 @@
 //  Copyright 2010 Nathan Kinsinger. All rights reserved.
 //
 
+#import <QuartzCore/CoreAnimation.h>
+
 #import "PBHistorySearchController.h"
 #import "PBGitHistoryController.h"
 #import "PBGitRepository.h"
@@ -13,9 +15,8 @@
 #import "PBCommitList.h"
 #import "PBEasyPipe.h"
 #import "PBGitBinary.h"
-
-#import <QuartzCore/CoreAnimation.h>
-
+#import "PBGitCommit.h"
+#import "PBGitSHA.h"
 
 @interface PBHistorySearchController ()
 

@@ -13,6 +13,7 @@
 #import "PBCreateTagSheet.h"
 #import "PBGitDefaults.h"
 #import "PBDiffWindowController.h"
+#import "PBGitRevSpecifier.h"
 
 #import <ObjectiveGit/ObjectiveGit.h>
 

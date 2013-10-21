@@ -6,15 +6,17 @@
 //  Copyright 2008 __MyCompanyName__. All rights reserved.
 //
 
+#import <ObjectiveGit/git2.h>
+
+#include <vector>
+#include <algorithm>
+
 #import "PBGraphCellInfo.h"
 #import "PBGitGrapher.h"
 #import "PBGitCommit.h"
+#import "PBGitSHA.h"
 #import "PBGitLane.h"
 #import "PBGitGraphLine.h"
-
-#import <vector>
-#import <git2/oid.h>
-#include <algorithm>
 
 using namespace std;
 typedef std::vector<PBGitLane *> LaneCollection;

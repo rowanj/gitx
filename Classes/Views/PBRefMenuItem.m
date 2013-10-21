@@ -7,7 +7,9 @@
 //
 
 #import "PBRefMenuItem.h"
-
+#import "PBGitRepository.h"
+#import "PBGitRevSpecifier.h"
+#import "PBGitSHA.h"
 
 @implementation PBRefMenuItem
 @synthesize refish;

@@ -7,10 +7,11 @@
 //
 
 #import <Cocoa/Cocoa.h>
-#import "PBGitHistoryList.h"
-#import "PBGitRevSpecifier.h"
-#import "PBGitRefish.h"
 
+@class PBGitHistoryList;
+@class PBGitRevSpecifier;
+@protocol PBGitRefish;
+@class PBGitRef;
 @class GTRepository;
 @class GTConfiguration;
 

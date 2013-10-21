@@ -7,13 +7,11 @@
 //
 
 #import <Cocoa/Cocoa.h>
-#import "PBWebController.h"
 #import <MGScopeBar/MGScopeBarDelegateProtocol.h>
-#import "PBGitCommit.h"
-#import "PBGitHistoryController.h"
-#import "PBRefContextDelegate.h"
 
-@class PBGitGradientBarView;
+#import "PBWebController.h"
+
+@class PBGitHistoryController;
 
 @interface GLFileView : PBWebController <MGScopeBarDelegate> {
 	IBOutlet PBGitHistoryController* historyController;
