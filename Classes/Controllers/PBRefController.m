@@ -444,7 +444,7 @@
 									 defaultButton:@"Move"
 								   alternateButton:@"Cancel"
 									   otherButton:nil
-						 informativeTextWithFormat:infoText];
+						 informativeTextWithFormat:@"%@", infoText];
     [alert setShowsSuppressionButton:YES];
 
 	[alert beginSheetModalForWindow:[historyController.repository.windowController window]
