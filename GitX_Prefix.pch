@@ -7,4 +7,8 @@
 	#endif
 #endif
 
-#define DEPRECATED __attribute__ ((deprecated))
+#ifdef GITX_NO_DEPRECATE
+#define GITX_DEPRECATED
+#else
+#define GITX_DEPRECATED __attribute__ ((deprecated))
+#endif
