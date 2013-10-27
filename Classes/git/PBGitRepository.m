@@ -623,6 +623,27 @@ int addSubmoduleName(git_submodule *module, const char* name, void * context)
 	[PBRemoteProgressSheet beginRemoteProgressSheetForArguments:arguments title:title description:description inRepository:self];
 }
 
+- (void) beginPruneRemoteForRef:(PBGitRef *)ref
+{
+	NSMutableArray *arguments = [NSMutableArray arrayWithObject:@"prune"];
+
+	if (![ref isRemote]) {
+		NSError *error = nil;
+		ref = [self remoteRefForBranch:ref error:&error];
+		if (!ref) {
+			if (error)
+				[self.windowController showErrorSheet:error];
+			return;
+		}
+	}
+	NSString *remoteName = [ref remoteName];
+	[arguments addObject:remoteName];
+
+	NSString *description = [NSString stringWithFormat:@"Deleting all stale remote-tracking branches from %@", remoteName];
+	NSString *title = @"Pruning remote";
+	[PBRemoteProgressSheet beginRemoteProgressSheetForArguments:arguments title:title description:description inRepository:self];
+}
+
 - (void) beginFetchFromRemoteForRef:(PBGitRef *)ref
 {
 	NSMutableArray *arguments = [NSMutableArray arrayWithObject:@"fetch"];

@@ -23,6 +23,7 @@
 	IBOutlet NSPopUpButton *branchPopUp;
 }
 
+- (void) pruneRemote:(PBRefMenuItem *)sender;
 - (void) fetchRemote:(PBRefMenuItem *)sender;
 - (void) pullRemote:(PBRefMenuItem *)sender;
 - (void) pushUpdatesToRemote:(PBRefMenuItem *)sender;
