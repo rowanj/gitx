@@ -6,17 +6,17 @@
 //  Copyright 2009 __MyCompanyName__. All rights reserved.
 //
 #import <CoreServices/CoreServices.h>
+#import <ObjectiveGit/ObjectiveGit.h>
+
 #import "PBGitRepositoryWatcher.h"
+#import "PBGitRepository.h"
 #import "PBEasyPipe.h"
 #import "PBGitDefaults.h"
 #import "PBGitRepositoryWatcherEventPath.h"
 
-#import <ObjectiveGit/ObjectiveGit.h>
-
 NSString *PBGitRepositoryEventNotification = @"PBGitRepositoryModifiedNotification";
 NSString *kPBGitRepositoryEventTypeUserInfoKey = @"kPBGitRepositoryEventTypeUserInfoKey";
 NSString *kPBGitRepositoryEventPathsUserInfoKey = @"kPBGitRepositoryEventPathsUserInfoKey";
-
 
 @interface PBGitRepositoryWatcher ()
 

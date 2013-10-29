@@ -7,6 +7,7 @@
 //
 
 #import "PBGitSVSubmoduleItem.h"
+#import "PBGitSubmodule.h"
 
 @implementation PBGitSVSubmoduleItem
 

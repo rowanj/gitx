@@ -6,11 +6,14 @@
 //  Copyright 2008 __MyCompanyName__. All rights reserved.
 //
 
-#import "PBGitCommit.h"
-#import "PBGitSHA.h"
-#import "PBGitDefaults.h"
-
 #import <ObjectiveGit/ObjectiveGit.h>
+
+#import "PBGitRepository.h"
+#import "PBGitCommit.h"
+#import "PBGitTree.h"
+#import "PBGitSHA.h"
+#import "PBGitRef.h"
+#import "PBGitDefaults.h"
 
 NSString * const kGitXCommitType = @"commit";
 

@@ -9,7 +9,7 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "PBGitRepository.h"
+@class PBGitRepository;
 
 typedef UInt32 PBGitRepositoryWatcherEventType;
 enum {

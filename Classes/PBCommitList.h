@@ -8,9 +8,10 @@
 
 #import <Cocoa/Cocoa.h>
 #import <WebKit/WebView.h>
-#import "PBGitHistoryController.h"
 
+@class PBGitHistoryController;
 @class PBWebHistoryController;
+@class PBHistorySearchController;
 
 typedef void(^PBFindPanelActionBlock)(id sender);
 

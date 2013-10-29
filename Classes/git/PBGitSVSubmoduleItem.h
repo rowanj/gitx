@@ -8,7 +8,9 @@
 
 #import <Foundation/Foundation.h>
 #import "PBSourceViewItem.h"
-#import "PBGitSubmodule.h"
+
+@class PBGitSubmodule;
+
 @interface PBGitSVSubmoduleItem : PBSourceViewItem
 + (id) itemWithSubmodule:(PBGitSubmodule*)submodule;
 @property (nonatomic, strong) PBGitSubmodule* submodule;

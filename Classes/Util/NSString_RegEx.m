@@ -42,7 +42,7 @@
 
 	if (nmatch == -1)
 	{
-		outMatches = [NSArray arrayWithObject:self];
+		outMatches = [NSMutableArray arrayWithObject:self];
 		goto catch_exit;	// simple match
 	}
 

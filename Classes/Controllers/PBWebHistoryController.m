@@ -6,10 +6,13 @@
 //  Copyright 2008 __MyCompanyName__. All rights reserved.
 //
 
+#import <ObjectiveGit/GTConfiguration.h>
+
 #import "PBWebHistoryController.h"
 #import "PBGitDefaults.h"
 #import "PBGitSHA.h"
-#import <ObjectiveGit/GTConfiguration.h>
+#import "PBGitRef.h"
+#import "PBGitRevSpecifier.h"
 
 @implementation PBWebHistoryController
 

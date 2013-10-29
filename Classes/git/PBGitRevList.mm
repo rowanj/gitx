@@ -225,6 +225,11 @@ using namespace std;
 	
 	dispatch_group_wait(loadGroup, DISPATCH_TIME_FOREVER);
 	dispatch_group_wait(decorateGroup, DISPATCH_TIME_FOREVER);
+
+    dispatch_release(loadGroup);
+    dispatch_release(decorateGroup);
+    dispatch_release(loadQueue);
+    dispatch_release(decorateQueue);
 	
 	// Make sure the commits are stored before exiting.
 	NSDictionary *update = [NSDictionary dictionaryWithObjectsAndKeys:currentThread, kRevListThreadKey, revisions, kRevListRevisionsKey, nil];

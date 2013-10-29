@@ -13,6 +13,7 @@
 #import "PBCreateTagSheet.h"
 #import "PBGitDefaults.h"
 #import "PBDiffWindowController.h"
+#import "PBGitRevSpecifier.h"
 
 #import <ObjectiveGit/ObjectiveGit.h>
 
@@ -443,7 +444,7 @@
 									 defaultButton:@"Move"
 								   alternateButton:@"Cancel"
 									   otherButton:nil
-						 informativeTextWithFormat:infoText];
+						 informativeTextWithFormat:@"%@", infoText];
     [alert setShowsSuppressionButton:YES];
 
 	[alert beginSheetModalForWindow:[historyController.repository.windowController window]
