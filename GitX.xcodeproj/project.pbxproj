@@ -181,6 +181,8 @@
 		8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
 		911112370E5A097800BF76B4 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 911112360E5A097800BF76B4 /* Security.framework */; };
 		913D5E500E55645900CECEA2 /* gitx in Resources */ = {isa = PBXBuildFile; fileRef = 913D5E490E55644600CECEA2 /* gitx */; };
+		A27BDC65182267E600251A23 /* NSFileManager+DirectoryLocations.m in Sources */ = {isa = PBXBuildFile; fileRef = A27BDC64182267E600251A23 /* NSFileManager+DirectoryLocations.m */; };
+		A27BDC66182267E600251A23 /* NSFileManager+DirectoryLocations.m in Sources */ = {isa = PBXBuildFile; fileRef = A27BDC64182267E600251A23 /* NSFileManager+DirectoryLocations.m */; };
 		BC0444AD17648CC900353E6D /* AddRemoteTemplate.png in Resources */ = {isa = PBXBuildFile; fileRef = BC0444AC17648CC900353E6D /* AddRemoteTemplate.png */; };
 		BC0444B817648D0200353E6D /* BranchHighlighted.png in Resources */ = {isa = PBXBuildFile; fileRef = BC0444B717648D0200353E6D /* BranchHighlighted.png */; };
 		BC0444BA17648DA800353E6D /* FolderHighlighted.png in Resources */ = {isa = PBXBuildFile; fileRef = BC0444B917648DA700353E6D /* FolderHighlighted.png */; };
@@ -644,6 +646,8 @@
 		8D1107320486CEB800E47090 /* GitX.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GitX.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		911112360E5A097800BF76B4 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = /System/Library/Frameworks/Security.framework; sourceTree = "<absolute>"; };
 		913D5E490E55644600CECEA2 /* gitx */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = gitx; sourceTree = BUILT_PRODUCTS_DIR; };
+		A27BDC63182267E600251A23 /* NSFileManager+DirectoryLocations.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSFileManager+DirectoryLocations.h"; sourceTree = "<group>"; };
+		A27BDC64182267E600251A23 /* NSFileManager+DirectoryLocations.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSFileManager+DirectoryLocations.m"; sourceTree = "<group>"; };
 		BC0444AC17648CC900353E6D /* AddRemoteTemplate.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = AddRemoteTemplate.png; sourceTree = "<group>"; };
 		BC0444B717648D0200353E6D /* BranchHighlighted.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = BranchHighlighted.png; sourceTree = "<group>"; };
 		BC0444B917648DA700353E6D /* FolderHighlighted.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = FolderHighlighted.png; sourceTree = "<group>"; };
@@ -1104,6 +1108,8 @@
 		4A5D76A414A9A9CC00DF6C68 /* Util */ = {
 			isa = PBXGroup;
 			children = (
+				A27BDC63182267E600251A23 /* NSFileManager+DirectoryLocations.h */,
+				A27BDC64182267E600251A23 /* NSFileManager+DirectoryLocations.m */,
 				4A5D76A514A9A9CC00DF6C68 /* NSApplication+GitXScripting.h */,
 				4A5D76A614A9A9CC00DF6C68 /* NSApplication+GitXScripting.m */,
 				4A5D76A714A9A9CC00DF6C68 /* NSFileHandleExt.h */,
@@ -1564,6 +1570,7 @@
 				4A5D76E914A9A9CC00DF6C68 /* PBGitWindowController.m in Sources */,
 				4A5D76EA14A9A9CC00DF6C68 /* PBHistorySearchController.m in Sources */,
 				4A5D76EB14A9A9CC00DF6C68 /* PBPrefsWindowController.m in Sources */,
+				A27BDC65182267E600251A23 /* NSFileManager+DirectoryLocations.m in Sources */,
 				4A5D76EC14A9A9CC00DF6C68 /* PBRefController.m in Sources */,
 				4A5D76ED14A9A9CC00DF6C68 /* PBRepositoryDocumentController.m in Sources */,
 				4A5D76EE14A9A9CC00DF6C68 /* PBServicesController.m in Sources */,
@@ -1650,6 +1657,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4A5D773A14A9A9F600DF6C68 /* gitx.m in Sources */,
+				A27BDC66182267E600251A23 /* NSFileManager+DirectoryLocations.m in Sources */,
 				4A5D773C14A9AA2F00DF6C68 /* PBGitBinary.m in Sources */,
 				4A5D773D14A9AA3700DF6C68 /* PBEasyPipe.m in Sources */,
 				4AB057E41652652000DE751D /* GitRepoFinder.m in Sources */,
