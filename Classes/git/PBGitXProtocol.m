@@ -8,6 +8,7 @@
 
 #import "PBGitXProtocol.h"
 
+#import "NSFileManager+DirectoryLocations.h"
 
 @implementation PBGitXProtocol
 
@@ -43,7 +44,7 @@
 
 - (void)startLoadingCustomCSS
 {
-    NSString * filepath = @"~/.gitxcustom.css";
+    NSString * filepath = [[[NSFileManager defaultManager] applicationSupportDirectory] stringByAppendingPathComponent:@"Custom.css"];
     NSFileHandle * filehandle = [NSFileHandle fileHandleForReadingAtPath:[filepath stringByExpandingTildeInPath]];
     [self startLoadingToEndOfFileHandle:filehandle];
 }
