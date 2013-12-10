@@ -14,5 +14,7 @@
 #define kGitXCloneDestinationURLKey @"destinationURL"
 #define kGitXCloneIsBareKey @"isBare"
 
+#define kGitXOpenArgumentsStringKey @"openArguments"
+
 #define kGitXFindSearchStringKey @"searchString"
 #define kGitXFindInModeKey @"inMode"

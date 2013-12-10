@@ -173,6 +173,14 @@
 			</parameter>
 		</command>
 
+		<command name="open" code="GitXOpen" description="Open a repository and optionally select given refs.">
+			<direct-parameter type="specifier" description="The repository document to open."/>
+			<parameter name="arguments" code="ARGS" description="The arguments">
+				<type type="text" list="yes"/>
+				<cocoa key="openArguments"/>
+			</parameter>
+		</command>
+
 		<command name="search" code="GitXSrch" description="Highlight commits that match the given search string.">
 			<direct-parameter type="specifier" description="The repository document to search."/>
 			<parameter name="string" code="SRCH" type="text" optional="yes" description="The string to search for.">
@@ -197,6 +205,9 @@
 
 		<class-extension extends="document" code="docu" description="A document.">
 			<cocoa class="PBGitRepository"/>
+			<responds-to name="open">
+				<cocoa method="openWithScriptCommand:"/>
+			</responds-to>
 			<responds-to name="search">
 				<cocoa method="findInModeScriptCommand:"/>
 			</responds-to>

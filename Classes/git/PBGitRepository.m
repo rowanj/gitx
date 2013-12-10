@@ -943,7 +943,7 @@ int addSubmoduleName(git_submodule *module, const char* name, void * context)
 	[self.windowController showHistoryView:self];
 }
 
-- (void)handleBranchFilterEventForFilter:(PBGitXBranchFilterType)filter additionalArguments:(NSMutableArray *)arguments
+- (void)handleBranchFilterEventForFilter:(PBGitXBranchFilterType)filter additionalArguments:(NSArray *)arguments
 {
 	self.currentBranchFilter = filter;
 	[PBGitDefaults setShowStageView:NO];
@@ -951,23 +951,14 @@ int addSubmoduleName(git_submodule *module, const char* name, void * context)
 
 	// treat any additional arguments as a rev-list specifier
 	if ([arguments count] > 1) {
-		[arguments removeObjectAtIndex:0];
-		[self handleRevListArguments:arguments];
+		NSMutableArray *argumentsButFirst = [arguments mutableCopy];
+		[argumentsButFirst removeObjectAtIndex:0];
+		[self handleRevListArguments:argumentsButFirst];
 	}
 }
 
-- (void)handleGitXScriptingArguments:(NSAppleEventDescriptor *)argumentsList
+- (void)handleGitXScriptingArguments:(NSArray *)arguments
 {
-	NSMutableArray *arguments = [NSMutableArray array];
-	uint argumentsIndex = 1; // AppleEvent list descriptor's are one based
-	while(1) {
-		NSAppleEventDescriptor *arg = [argumentsList descriptorAtIndex:argumentsIndex++];
-		if (arg)
-			[arguments addObject:[arg stringValue]];
-		else
-			break;
-	}
-
 	if (![arguments count])
 		return;
 
@@ -998,32 +989,12 @@ int addSubmoduleName(git_submodule *module, const char* name, void * context)
 	[self handleRevListArguments:arguments];
 }
 
-// see if the current appleEvent has the command line arguments from the gitx cli
-// this could be from an openApplication or an openDocument apple event
-// when opening a repository this is called before the sidebar controller gets it's awakeFromNib: message
-// if the repository is already open then this is also a good place to catch the event as the window is about to be brought forward
-- (void)showWindows
+// for the scripting bridge
+- (void)openWithScriptCommand:(NSScriptCommand *)command
 {
-	NSAppleEventDescriptor *currentAppleEvent = [[NSAppleEventManager sharedAppleEventManager] currentAppleEvent];
-
-	if (currentAppleEvent) {
-		NSAppleEventDescriptor *eventRecord = [currentAppleEvent paramDescriptorForKeyword:keyAEPropData];
-
-		// on app launch there may be many repositories opening, so double check that this is the right repo
-		NSString *path = [[eventRecord paramDescriptorForKeyword:typeFileURL] stringValue];
-		if (path) {
-			NSURL *workingDirectory = [NSURL URLWithString:path];
-			if ([[GitRepoFinder gitDirForURL:workingDirectory] isEqual:[self fileURL]]) {
-				NSAppleEventDescriptor *argumentsList = [eventRecord paramDescriptorForKeyword:kGitXAEKeyArgumentsList];
-				[self handleGitXScriptingArguments:argumentsList];
-
-				// showWindows may be called more than once during app launch so remove the CLI data after we handle the event
-				[currentAppleEvent removeDescriptorWithKeyword:keyAEPropData];
-			}
-		}
-	}
-
-	[super showWindows];
+	NSDictionary *commandArguments = [command arguments];
+	NSArray *arguments = [commandArguments objectForKey:kGitXOpenArgumentsStringKey];
+	[self handleGitXScriptingArguments:arguments];
 }
 
 // for the scripting bridge

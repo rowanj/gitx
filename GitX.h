@@ -43,6 +43,7 @@
 - (void) delete;  // Delete an object.
 - (void) duplicateTo:(SBObject *)to withProperties:(NSDictionary *)withProperties;  // Copy an object.
 - (void) moveTo:(SBObject *)to;  // Move an object to a new location.
+- (void) openArguments:(NSArray *)arguments;  // Open a repository and optionally select given refs.
 - (void) searchString:(NSString *)string inMode:(NSInteger)inMode;  // Highlight commits that match the given search string.
 
 @end
@@ -67,6 +68,7 @@
 - (void) delete;  // Delete an object.
 - (void) duplicateTo:(SBObject *)to withProperties:(NSDictionary *)withProperties;  // Copy an object.
 - (void) moveTo:(SBObject *)to;  // Move an object to a new location.
+- (void) openArguments:(NSArray *)arguments;  // Open a repository and optionally select given refs.
 - (void) searchString:(NSString *)string inMode:(NSInteger)inMode;  // Highlight commits that match the given search string.
 
 @end
