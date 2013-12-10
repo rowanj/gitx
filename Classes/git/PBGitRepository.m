@@ -538,6 +538,11 @@ int addSubmoduleName(git_submodule *module, const char* name, void * context)
 	}
 }
 
+- (NSURL *) workingDirectoryURL
+{
+	return [NSURL fileURLWithPath:[self workingDirectory]];
+}
+
 #pragma mark Remotes
 
 - (NSArray *) remotes
@@ -912,7 +917,7 @@ int addSubmoduleName(git_submodule *module, const char* name, void * context)
 
 #pragma mark GitX Scripting
 
-- (void)handleRevListArguments:(NSArray *)arguments inWorkingDirectory:(NSURL *)workingDirectory
+- (void)handleRevListArguments:(NSArray *)arguments
 {
 	if (![arguments count])
 		return;
@@ -924,13 +929,13 @@ int addSubmoduleName(git_submodule *module, const char* name, void * context)
 		PBGitRef *refArgument = [self refForName:[arguments lastObject]];
 		if (refArgument) {
 			revListSpecifier = [[PBGitRevSpecifier alloc] initWithRef:refArgument];
-			revListSpecifier.workingDirectory = workingDirectory;
+			revListSpecifier.workingDirectory = [self workingDirectoryURL];
 		}
 	}
 
 	if (!revListSpecifier) {
 		revListSpecifier = [[PBGitRevSpecifier alloc] initWithParameters:arguments];
-		revListSpecifier.workingDirectory = workingDirectory;
+		revListSpecifier.workingDirectory = [self workingDirectoryURL];
 	}
 
 	self.currentBranch = [self addBranch:revListSpecifier];
@@ -938,7 +943,7 @@ int addSubmoduleName(git_submodule *module, const char* name, void * context)
 	[self.windowController showHistoryView:self];
 }
 
-- (void)handleBranchFilterEventForFilter:(PBGitXBranchFilterType)filter additionalArguments:(NSMutableArray *)arguments inWorkingDirectory:(NSURL *)workingDirectory
+- (void)handleBranchFilterEventForFilter:(PBGitXBranchFilterType)filter additionalArguments:(NSMutableArray *)arguments
 {
 	self.currentBranchFilter = filter;
 	[PBGitDefaults setShowStageView:NO];
@@ -947,11 +952,11 @@ int addSubmoduleName(git_submodule *module, const char* name, void * context)
 	// treat any additional arguments as a rev-list specifier
 	if ([arguments count] > 1) {
 		[arguments removeObjectAtIndex:0];
-		[self handleRevListArguments:arguments inWorkingDirectory:workingDirectory];
+		[self handleRevListArguments:arguments];
 	}
 }
 
-- (void)handleGitXScriptingArguments:(NSAppleEventDescriptor *)argumentsList inWorkingDirectory:(NSURL *)workingDirectory
+- (void)handleGitXScriptingArguments:(NSAppleEventDescriptor *)argumentsList
 {
 	NSMutableArray *arguments = [NSMutableArray array];
 	uint argumentsIndex = 1; // AppleEvent list descriptor's are one based
@@ -975,22 +980,22 @@ int addSubmoduleName(git_submodule *module, const char* name, void * context)
 	}
 
 	if ([firstArgument isEqualToString:@"--all"]) {
-		[self handleBranchFilterEventForFilter:kGitXAllBranchesFilter additionalArguments:arguments inWorkingDirectory:workingDirectory];
+		[self handleBranchFilterEventForFilter:kGitXAllBranchesFilter additionalArguments:arguments];
 		return;
 	}
 
 	if ([firstArgument isEqualToString:@"--local"]) {
-		[self handleBranchFilterEventForFilter:kGitXLocalRemoteBranchesFilter additionalArguments:arguments inWorkingDirectory:workingDirectory];
+		[self handleBranchFilterEventForFilter:kGitXLocalRemoteBranchesFilter additionalArguments:arguments];
 		return;
 	}
 
 	if ([firstArgument isEqualToString:@"--branch"]) {
-		[self handleBranchFilterEventForFilter:kGitXSelectedBranchFilter additionalArguments:arguments inWorkingDirectory:workingDirectory];
+		[self handleBranchFilterEventForFilter:kGitXSelectedBranchFilter additionalArguments:arguments];
 		return;
 	}
 
 	// if the argument is not a known command then treat it as a rev-list specifier
-	[self handleRevListArguments:arguments inWorkingDirectory:workingDirectory];
+	[self handleRevListArguments:arguments];
 }
 
 // see if the current appleEvent has the command line arguments from the gitx cli
@@ -1010,7 +1015,7 @@ int addSubmoduleName(git_submodule *module, const char* name, void * context)
 			NSURL *workingDirectory = [NSURL URLWithString:path];
 			if ([[GitRepoFinder gitDirForURL:workingDirectory] isEqual:[self fileURL]]) {
 				NSAppleEventDescriptor *argumentsList = [eventRecord paramDescriptorForKeyword:kGitXAEKeyArgumentsList];
-				[self handleGitXScriptingArguments:argumentsList inWorkingDirectory:workingDirectory];
+				[self handleGitXScriptingArguments:argumentsList];
 
 				// showWindows may be called more than once during app launch so remove the CLI data after we handle the event
 				[currentAppleEvent removeDescriptorWithKeyword:keyAEPropData];

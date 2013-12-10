@@ -102,6 +102,7 @@ static NSString * PBStringFromBranchFilterType(PBGitXBranchFilterType type) {
 - (BOOL)executeHook:(NSString *)name withArgs:(NSArray*) arguments output:(NSString **)output DEPRECATED;
 
 - (NSString *)workingDirectory;
+- (NSURL *) workingDirectoryURL;
 - (NSString *) projectName;
 - (NSString *)gitIgnoreFilename;
 - (BOOL)isBareRepository;
