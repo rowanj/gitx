@@ -156,9 +156,12 @@
 	resetCommits = YES;
 	self.isUpdating = YES;
 
-	[graphQueue cancelAllOperations];
-	graphQueue = [[NSOperationQueue alloc] init];
-	[graphQueue setMaxConcurrentOperationCount:1];
+	if (graphQueue) {
+		[graphQueue cancelAllOperations];
+	} else {
+		graphQueue = [[NSOperationQueue alloc] init];
+		[graphQueue setMaxConcurrentOperationCount:1];
+	}
 
 	grapher = [self grapher];
 }
