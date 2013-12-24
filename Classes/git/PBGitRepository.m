@@ -344,25 +344,11 @@ int addSubmoduleName(git_submodule *module, const char* name, void * context)
     
 	
 	NSError* error = nil;
-	GTReference* gtRef = [GTReference referenceByLookingUpReferencedNamed:ref.ref
-															 inRepository:self.gtRepo
-																	error:&error];
-	if (error)
-	{
-		NSLog(@"Error looking up ref for %@", ref.ref);
-		return nil;
-	}
-	const git_oid* refOid = gtRef.git_oid;
+	GTObject *object = [self.gtRepo lookupObjectByRevParse:ref.ref error:&error];
+	if (object)
+		return [PBGitSHA shaWithString:object.SHA];
 	
-	if (refOid)
-	{
-		char buffer[41];
-		buffer[40] = '\0';
-		git_oid_fmt(buffer, refOid);
-		NSString* shaForRef = [NSString stringWithUTF8String:buffer];
-		PBGitSHA* result = [PBGitSHA shaWithString:shaForRef];
-		return result;
-	}
+	NSLog(@"Error looking up ref for %@", ref.ref);
 	return nil;
 }
 
