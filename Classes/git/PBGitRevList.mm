@@ -167,7 +167,11 @@ using namespace std;
 			} else if ([param hasPrefix:@"--glob="]) {
 				[enumerator pushGlob:[param substringFromIndex:@"--glob=".length] error:&error];
 			} else {
-				[enumerator pushGlob:param error:&error];
+				GTObject *obj = [repo lookupObjectByRevParse:param error:&error];
+				GTCommit *commit = [obj objectByPeelingToType:GTObjectTypeCommit error:&error];
+				if (commit) {
+					[enumerator pushSHA:commit.SHA error:&error];
+				}
 			}
 		}
 	}
