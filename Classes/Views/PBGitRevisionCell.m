@@ -194,11 +194,8 @@ const BOOL SHUFFLE_COLORS = NO;
 	
 	[style setAlignment:NSCenterTextAlignment];
 	[attributes setObject:style forKey:NSParagraphStyleAttributeName];
-	[attributes setObject:[NSFont fontWithName:@"LucidaGrande" size:10] forKey:NSFontAttributeName];
-
-	if (selected && false) { // white text is a bit too hard to read (even with shadow) on refs
-		[attributes setObject:[NSColor alternateSelectedControlTextColor] forKey:NSForegroundColorAttributeName];
-	}
+	[attributes setObject:[NSFont boldSystemFontOfSize:9] forKey:NSFontAttributeName];
+	[attributes setObject:[NSColor colorWithWhite:0 alpha:.6] forKey:NSForegroundColorAttributeName];
 
 	if (ENABLE_SHADOW) {
 		attributes[NSShadowAttributeName] = [[self class] textInsetShadow];
@@ -244,8 +241,8 @@ const BOOL SHUFFLE_COLORS = NO;
 		
 		NSRect newRect = lastRect;
 		newRect.size.width = textSize.width + ref_padding;
-		newRect.size.height = textSize.height;
-		newRect.origin.y = rect.origin.y + (rect.size.height - newRect.size.height) / 2;
+		newRect.size.height = textSize.height + 1;
+		newRect.origin.y = ceil(rect.origin.y + (rect.size.height - newRect.size.height) / 2);
 		
 		if (NSContainsRect(rect, newRect)) {
 			[array addObject:[NSValue valueWithRect:newRect]];
