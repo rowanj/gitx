@@ -17,7 +17,7 @@
 #import "NSColor+RGB.h"
 
 const int COLUMN_WIDTH = 10;
-const BOOL ENABLE_SHADOW = YES;
+const BOOL ENABLE_SHADOW = NO;
 const BOOL SHUFFLE_COLORS = NO;
 
 @implementation PBGitRevisionCell
@@ -55,23 +55,35 @@ const BOOL SHUFFLE_COLORS = NO;
 	return laneColors;
 }
 
-+ (NSColor *)shadowColor
++ (NSShadow *)shadow
 {
-	static NSColor *shadowColor = nil;
-	if (!shadowColor) {
-		uint8_t l = 64;
-		shadowColor = [NSColor colorWithR:l G:l B:l];
+	static NSShadow *shadow = nil;
+	if (!shadow) {
+		shadow = [NSShadow new];
+		[shadow setShadowOffset:NSMakeSize(.5, -.5)];
+		[shadow setShadowBlurRadius:2];
+		[shadow setShadowColor:[NSColor colorWithWhite:0 alpha:.7]];
 	}
-	return shadowColor;
+	return shadow;
 }
-+ (NSColor *)lineShadowColor
++ (NSShadow *)textInsetShadow
 {
-	static NSColor *shadowColor = nil;
-	if (!shadowColor) {
-		uint8_t l = 200;
-		shadowColor = [NSColor colorWithR:l G:l B:l];
+	static NSShadow *shadow = nil;
+	if (!shadow) {
+		shadow = [NSShadow new];
+		[shadow setShadowOffset:NSMakeSize(0, -.5)];
+		[shadow setShadowBlurRadius:0];
+		[shadow setShadowColor:[NSColor colorWithWhite:1 alpha:.5]];
 	}
-	return shadowColor;
+	return shadow;
+}
++ (NSShadow *)lineShadow
+{
+	static NSShadow *shadow = nil;
+	if (!shadow) {
+		shadow = [NSShadow new];
+	}
+	return shadow;
 }
 
 - (void) drawLineFromColumn: (int) from toColumn: (int) to inRect: (NSRect) r offset: (int) offset color: (int) c
@@ -81,14 +93,9 @@ const BOOL SHUFFLE_COLORS = NO;
 	NSPoint source = NSMakePoint(origin.x + COLUMN_WIDTH * from, origin.y + offset);
 	NSPoint center = NSMakePoint( origin.x + COLUMN_WIDTH * to, origin.y + r.size.height * 0.5 + 0.5);
 
-	if (ENABLE_SHADOW)
-	{
+	if (ENABLE_SHADOW) {
 		[NSGraphicsContext saveGraphicsState];
-
-		NSShadow *shadow = [NSShadow new];
-		[shadow setShadowColor:[[self class] lineShadowColor]];
-		[shadow setShadowOffset:NSMakeSize(0.5f, -0.5f)];
-		[shadow set];
+		[[[self class] lineShadow] set];
 	}
 	NSArray* colors = [PBGitRevisionCell laneColors];
 	[(NSColor*)[colors objectAtIndex: (c % [colors count])] set];
@@ -126,11 +133,8 @@ const BOOL SHUFFLE_COLORS = NO;
 	NSBezierPath * path = [NSBezierPath bezierPathWithOvalInRect:oval];
 	if (ENABLE_SHADOW && false) {
 		[NSGraphicsContext saveGraphicsState];
-		NSShadow *shadow = [NSShadow new];
-		[shadow setShadowColor:[[self class] shadowColor]];
-		[shadow setShadowOffset:NSMakeSize(0.5f, -0.5f)];
-		[shadow setShadowBlurRadius:2.0f];
-		[shadow set];
+		[[[self class] shadow] set];
+		[[NSColor blackColor] set];
 	}
 	[[NSColor blackColor] set];
 	[path fill];
@@ -192,19 +196,12 @@ const BOOL SHUFFLE_COLORS = NO;
 	[attributes setObject:style forKey:NSParagraphStyleAttributeName];
 	[attributes setObject:[NSFont fontWithName:@"LucidaGrande" size:10] forKey:NSFontAttributeName];
 
-	NSShadow *shadow = nil;
-
 	if (selected && false) { // white text is a bit too hard to read (even with shadow) on refs
 		[attributes setObject:[NSColor alternateSelectedControlTextColor] forKey:NSForegroundColorAttributeName];
-		if (ENABLE_SHADOW) {
-			shadow = [NSShadow new];
-			[shadow setShadowColor:[NSColor blackColor]];
-			[shadow setShadowBlurRadius:2.0f];
-		}
 	}
 
-	if (shadow) {
-		attributes[NSShadowAttributeName] = shadow;
+	if (ENABLE_SHADOW) {
+		attributes[NSShadowAttributeName] = [[self class] textInsetShadow];
 	}
 
 	return attributes;
@@ -272,12 +269,7 @@ const BOOL SHUFFLE_COLORS = NO;
 
 	if (ENABLE_SHADOW) {
 		[NSGraphicsContext saveGraphicsState];
-
-		NSShadow *shadow = [NSShadow new];
-		[shadow setShadowColor:[NSColor grayColor]];//[[self class] shadowColor]];
-		[shadow setShadowOffset:NSMakeSize(0.5f, -0.5f)];
-		[shadow setShadowBlurRadius:2.0f];
-		[shadow set];
+		[[[self class] shadow] set];
 	}
 	[border fill];
 	if (ENABLE_SHADOW) {
