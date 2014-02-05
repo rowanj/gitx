@@ -8,6 +8,7 @@
 
 #import "PBGitXProtocol.h"
 
+#import "NSFileManager+DirectoryLocations.h"
 
 @implementation PBGitXProtocol
 
@@ -24,15 +25,45 @@
 -(void)startLoading
 {
     NSURL *url = [[self request] URL];
-	PBGitRepository *repo = [[self request] repository];
-
-	if(!repo) {
-		[[self client] URLProtocol:self didFailWithError:[NSError errorWithDomain:NSURLErrorDomain code:0 userInfo:nil]];
-		return;
+    
+    if ([[url host] isEqualToString:@"custom.css"]) {
+        [self startLoadingCustomCSS];
+        return;
     }
+    
+	PBGitRepository *repo = [[self request] repository];
+    NSString * commit = [url host];
+    NSString * filepath = [url path];
+	if (repo) {
+        [self startLoadingGitFile:filepath atCommit:commit withRepository:repo];
+        return;
+    }
+    
+    [[self client] URLProtocol:self didFailWithError:[NSError errorWithDomain:NSURLErrorDomain code:0 userInfo:nil]];
+}
 
-	NSString *specifier = [NSString stringWithFormat:@"%@:%@", [url host], [[url path] substringFromIndex:1]];
-	handle = [repo handleInWorkDirForArguments:[NSArray arrayWithObjects:@"cat-file", @"blob", specifier, nil]];
+- (void)startLoadingCustomCSS
+{
+    NSString * filepath = [[[NSFileManager defaultManager] applicationSupportDirectory] stringByAppendingPathComponent:@"Custom.css"];
+    NSFileHandle * filehandle = [NSFileHandle fileHandleForReadingAtPath:[filepath stringByExpandingTildeInPath]];
+    [self startLoadingToEndOfFileHandle:filehandle];
+}
+
+- (void)startLoadingGitFile:(NSString *)filepath atCommit:(NSString *)commit withRepository:(PBGitRepository *)repo
+{
+    NSString *specifier = [NSString stringWithFormat:@"%@:%@", commit, [filepath substringFromIndex:1]];
+	NSFileHandle * filehandle = [repo handleInWorkDirForArguments:[NSArray arrayWithObjects:@"cat-file", @"blob", specifier, nil]];
+    [self startLoadingToEndOfFileHandle:filehandle];
+}
+
+- (void)startLoadingToEndOfFileHandle:(NSFileHandle *)handle_
+{
+    if (handle_ == nil) {
+        [[self client] URLProtocol:self didFailWithError:[NSError errorWithDomain:NSURLErrorDomain code:0 userInfo:nil]];
+        return;
+    }
+    
+    handle = handle_;
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didFinishFileLoad:) name:NSFileHandleReadToEndOfFileCompletionNotification object:handle];
 	[handle readToEndOfFileInBackgroundAndNotify];
 
