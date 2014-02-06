@@ -1248,6 +1248,7 @@
 				F580E6BD0E73329C009E2D3F /* CopyFiles */,
 				F5CF04A20EAE696C00D75C81 /* Copy HTML files */,
 				D81E15ED121CE83D00269E61 /* Scripting Bridge Header Script  */,
+				975A16F518A3E04300F29547 /* Set Version from Git */,
 			);
 			buildRules = (
 			);
@@ -1519,6 +1520,21 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		975A16F518A3E04300F29547 /* Set Version from Git */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Set Version from Git";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "#!/bin/bash\nset -e\nset -u\n\nplist=\"${BUILT_PRODUCTS_DIR}/${WRAPPER_NAME}/Contents/Info\"\nfull_version=$(git --git-dir=\"${PROJECT_DIR}/.git\" describe --dirty)\nshort_version=$(git --git-dir=\"${PROJECT_DIR}/.git\" describe --abbrev=0)\nversion=$(git --git-dir=\"${PROJECT_DIR}/.git\" rev-list --count HEAD)\n\n# remove build/ and v prefixes and replace / with .\nshort_version=${short_version#builds/}\nshort_version=${short_version#v}\nshort_version=${short_version//\\//.}\n\ndefaults write $plist CFBundleShortVersionString $short_version\ndefaults write $plist CFBundleVersion $version\ndefaults write $plist FullVersion $full_version\n\necho \"Version: $version, short: $short_version, full: $full_version\"\n";
+			showEnvVarsInLog = 0;
+		};
 		D81E15ED121CE83D00269E61 /* Scripting Bridge Header Script  */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
