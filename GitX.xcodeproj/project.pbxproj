@@ -6,6 +6,20 @@
 	objectVersion = 46;
 	objects = {
 
+/* Begin PBXAggregateTarget section */
+		4D3F252B18C37D2E000922D9 /* Generate Scripting Header */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = 4D3F252C18C37D2E000922D9 /* Build configuration list for PBXAggregateTarget "Generate Scripting Header" */;
+			buildPhases = (
+				4D3F252F18C37D5A000922D9 /* Generate Scripting Header */,
+			);
+			dependencies = (
+			);
+			name = "Generate Scripting Header";
+			productName = "Generate Scripting Header";
+		};
+/* End PBXAggregateTarget section */
+
 /* Begin PBXBuildFile section */
 		0A6858C711F7EA8A00AC2BE4 /* CoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A6858C611F7EA8A00AC2BE4 /* CoreServices.framework */; };
 		2682AABB1929140E00271A4D /* GTOID+JavaScript.m in Sources */ = {isa = PBXBuildFile; fileRef = 2682AABA1929140E00271A4D /* GTOID+JavaScript.m */; };
@@ -278,6 +292,20 @@
 			proxyType = 2;
 			remoteGlobalIDString = 88F05A6B16011E5400B7AD1D;
 			remoteInfo = ObjectiveGitTests;
+		};
+		4D3F253018C37D9A000922D9 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 4D3F252B18C37D2E000922D9;
+			remoteInfo = "Generate Scripting Header";
+		};
+		4D3F253218C37D9F000922D9 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 4D3F252B18C37D2E000922D9;
+			remoteInfo = "Generate Scripting Header";
 		};
 		551BF174112F3F3500265053 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -1051,11 +1079,11 @@
 				8D11072E0486CEB800E47090 /* Frameworks */,
 				F580E6BD0E73329C009E2D3F /* CopyFiles */,
 				F5CF04A20EAE696C00D75C81 /* Copy HTML files */,
-				D81E15ED121CE83D00269E61 /* Scripting Bridge Header Script  */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				4D3F253118C37D9A000922D9 /* PBXTargetDependency */,
 				4A8F6B4A14A9B6B80002F4D7 /* PBXTargetDependency */,
 				4A68AD7114A00534006DE321 /* PBXTargetDependency */,
 				4A68AD7314A00534006DE321 /* PBXTargetDependency */,
@@ -1078,6 +1106,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				4D3F253318C37D9F000922D9 /* PBXTargetDependency */,
 				4A467EF01546D1F300F8902B /* PBXTargetDependency */,
 			);
 			name = "cli tool";
@@ -1124,6 +1153,7 @@
 				8D1107260486CEB800E47090 /* GitX */,
 				913D5E480E55644600CECEA2 /* cli tool */,
 				551BF110112F371800265053 /* gitx_askpasswd */,
+				4D3F252B18C37D2E000922D9 /* Generate Scripting Header */,
 			);
 		};
 /* End PBXProject section */
@@ -1260,7 +1290,7 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		D81E15ED121CE83D00269E61 /* Scripting Bridge Header Script  */ = {
+		4D3F252F18C37D5A000922D9 /* Generate Scripting Header */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -1268,14 +1298,13 @@
 			inputPaths = (
 				"$(SRCROOT)/GitX.sdef",
 			);
-			name = "Scripting Bridge Header Script ";
+			name = "Generate Scripting Header";
 			outputPaths = (
 				"$(SRCROOT)/GitX.h",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# Build the scripting bridge header GitX.h if the GitX.sdef file changes\necho \"Trying to build scripting definitions from $CONFIGURATION_BUILD_DIR/GitX.app\"\nif [ -e \"$CONFIGURATION_BUILD_DIR/GitX.app\" ]; then\n\techo -n \"generating...\"\n\tsdef \"$CONFIGURATION_BUILD_DIR/GitX.app\" | sdp -fh --basename GitX\n\techo \" done.\"\nelse\n\techo \"warning: Scripting definitions weren't generated.\"\nfi";
-			showEnvVarsInLog = 0;
+			shellScript = "# Build the scripting bridge header GitX.h if the GitX.sdef file changes\nsdp -fh --basename GitX $SRCROOT/GitX.sdef\n";
 		};
 		F5CF04A20EAE696C00D75C81 /* Copy HTML files */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1438,6 +1467,16 @@
 			isa = PBXTargetDependency;
 			name = MGScopeBar.framework;
 			targetProxy = 4A8F6B4914A9B6B80002F4D7 /* PBXContainerItemProxy */;
+		};
+		4D3F253118C37D9A000922D9 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 4D3F252B18C37D2E000922D9 /* Generate Scripting Header */;
+			targetProxy = 4D3F253018C37D9A000922D9 /* PBXContainerItemProxy */;
+		};
+		4D3F253318C37D9F000922D9 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 4D3F252B18C37D2E000922D9 /* Generate Scripting Header */;
+			targetProxy = 4D3F253218C37D9F000922D9 /* PBXContainerItemProxy */;
 		};
 		551BF175112F3F3500265053 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -1607,6 +1646,20 @@
 			};
 			name = Release;
 		};
+		4D3F252D18C37D2E000922D9 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		4D3F252E18C37D2E000922D9 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 		551BF113112F371800265053 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1676,6 +1729,15 @@
 			buildConfigurations = (
 				26FC0A890875C7B200E6366F /* Debug */,
 				26FC0A8A0875C7B200E6366F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		4D3F252C18C37D2E000922D9 /* Build configuration list for PBXAggregateTarget "Generate Scripting Header" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4D3F252D18C37D2E000922D9 /* Debug */,
+				4D3F252E18C37D2E000922D9 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
