@@ -11,7 +11,6 @@
 #import "GitXScriptingConstants.h"
 #import "GitX.h"
 #import "PBHistorySearchController.h"
-#import "GitRepoFinder.h"
 
 
 #pragma mark Commands handled locally
@@ -283,46 +282,95 @@ void handleGitXSearch(NSURL *repositoryURL, NSMutableArray *arguments)
 #pragma mark -
 #pragma mark main
 
-
-#define kGitDirPrefix @"--git-dir="
+#define kGitDirPrefix @"--git-dir"
 
 NSURL *workingDirectoryURL(NSMutableArray *arguments)
 {
-    // path to git repository has been explicitly passed?
-	if ([arguments count] && [[arguments objectAtIndex:0] hasPrefix:kGitDirPrefix]) {
-		NSString *path = [[[arguments objectAtIndex:0] substringFromIndex:[kGitDirPrefix length]] stringByStandardizingPath];
+	NSString *workingDirectory = [[[NSProcessInfo processInfo] environment] objectForKey:@"PWD"];
 
-		// the path must exist and point to a directory
-		BOOL isDirectory = YES;
-		if (![[NSFileManager defaultManager] fileExistsAtPath:path isDirectory:&isDirectory] || !isDirectory) {
-			if (!isDirectory)
-				printf("Fatal: --git-dir path does not point to a directory.\n");
-			else
-				printf("Fatal: --git-dir path does not exist.\n");
-			printf("Cannot open git repository at path: '%s'\n", [path UTF8String]);
-			exit(2);
+	// First check our arguments for a --git-dir option
+	for (NSUInteger i = 0; i < [arguments count]; i++) {
+		NSString *argument = [arguments objectAtIndex:i];
+		NSString *path = nil;
+
+		if (![argument hasPrefix:kGitDirPrefix]) {
+			// That's not a --git-dir argument, don't bother
+			continue;
 		}
 
-		// remove the git-dir argument
-		[arguments removeObjectAtIndex:0];
+		BOOL isInlinePath = NO;
+		if ([argument hasPrefix:kGitDirPrefix @"="]) {
+			// We're looking at a --git-dir=, extract the argument
+			path = [argument substringFromIndex:[kGitDirPrefix length] + 1];
+			isInlinePath = YES;
+		} else {
+			// We're looking at a --git-dir [arg], next argument is our path
+			path = [arguments objectAtIndex:i + 1];
+		}
 
-        // create and return corresponding NSURL
-        NSURL *url = [NSURL fileURLWithPath:path isDirectory:YES];
-        if (!url) {
-            printf("Unable to create url to path: %s\n", [path UTF8String]);
-            exit(2);
-        }
+		// We might be looking at a filesystem path, try to standardize it
+		if (!([path hasPrefix:@"/"] || [path hasPrefix:@"~"])) {
+			path = [workingDirectory stringByAppendingPathComponent:path];
+		}
+		path = [path stringByStandardizingPath];
 
-        return url;
+		// The path must exist and point to a directory
+		BOOL isDirectory = YES;
+		BOOL exists = [[NSFileManager defaultManager] fileExistsAtPath:path isDirectory:&isDirectory];
+		if (!exists) {
+			printf("Fatal: --git-dir path does not exist.\n");
+			exit(2);
+		} else if (!isDirectory) {
+			printf("Fatal: --git-dir path does not point to a directory.\n");
+			exit(2);
+		} else {
+			[arguments removeObjectAtIndex:i];
+			if (!isInlinePath) {
+				[arguments removeObjectAtIndex:i];
+			}
+
+			// Create and return corresponding NSURL
+			NSURL *url = [NSURL fileURLWithPath:path isDirectory:YES];
+			if (!url) {
+				printf("Unable to create url to path: %s\n", [path UTF8String]);
+				exit(2);
+			}
+
+			return url;
+		}
 	}
 
-    // otherwise, determine current working directory
-    NSString *pwd = [[[NSProcessInfo processInfo] environment] objectForKey:@"PWD"];
+	// No --git-dir option, let's use the first thing that looks like a path
+	for (NSUInteger i = 0; i < [arguments count]; i++) {
+		NSString *path = [arguments objectAtIndex:i];
 
-	NSURL* pwdURL = [NSURL fileURLWithPath:pwd];
-	NSURL* repoURL = [GitRepoFinder workDirForURL:pwdURL];
-	return repoURL;
+		// We might be looking at a filesystem path, try to standardize it
+		if (!([path hasPrefix:@"/"] || [path hasPrefix:@"~"])) {
+			path = [workingDirectory stringByAppendingPathComponent:path];
+		}
+		path = [path stringByStandardizingPath];
 
+		// The path must exist and point to a directory
+		BOOL isDirectory = YES;
+		BOOL exists = [[NSFileManager defaultManager] fileExistsAtPath:path isDirectory:&isDirectory];
+		if (exists && isDirectory) {
+			[arguments removeObjectAtIndex:i];
+
+			// Create and return corresponding NSURL
+			NSURL *url = [NSURL fileURLWithPath:path isDirectory:YES];
+			if (!url) {
+				printf("Unable to create url to path: %s\n", [path UTF8String]);
+				exit(2);
+			}
+
+			return url;
+		}
+
+		// Let's try our luck with the next argument
+	}
+
+	// Still no path found, let's default to our current working directory
+	return [NSURL fileURLWithPath:workingDirectory];
 }
 
 int main(int argc, const char** argv)
