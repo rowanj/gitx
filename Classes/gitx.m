@@ -325,14 +325,6 @@ NSURL *workingDirectoryURL(NSMutableArray *arguments)
 
 }
 
-NSMutableArray *argumentsArray()
-{
-	NSMutableArray *arguments = [[[NSProcessInfo processInfo] arguments] mutableCopy];
-	[arguments removeObjectAtIndex:0]; // url to executable path is not needed
-
-	return arguments;
-}
-
 int main(int argc, const char** argv)
 {
 	@autoreleasepool {
@@ -352,9 +344,12 @@ int main(int argc, const char** argv)
 		// gitx can be used to pipe diff output to be displayed in GitX
 		if (!isatty(STDIN_FILENO) && fdopen(STDIN_FILENO, "r"))
 			handleSTDINDiff();
-		
+
+
+		NSMutableArray *arguments = [[[NSProcessInfo processInfo] arguments] mutableCopy];
+		[arguments removeObjectAtIndex:0]; // url to executable path is not needed
+
 		// From this point, we require a working directory and the arguments
-		NSMutableArray *arguments = argumentsArray();
 		NSURL *wdURL = workingDirectoryURL(arguments);
 		if (!wdURL)
 		{
