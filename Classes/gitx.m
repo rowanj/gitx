@@ -87,13 +87,8 @@ void usage(char const *programName)
 
 void version_info()
 {
-	NSString *version = [[[NSBundle bundleForClass:[PBGitBinary class]] infoDictionary] valueForKey:@"CFBundleVersion"];
-	NSString *gitVersion = [[[NSBundle bundleForClass:[PBGitBinary class]] infoDictionary] valueForKey:@"CFBundleGitVersion"];
-	printf("GitX version %s (%s)\n", [version UTF8String], [gitVersion UTF8String]);
-	if ([PBGitBinary path])
-		printf("Using git found at %s, version %s\n", [[PBGitBinary path] UTF8String], [[PBGitBinary version] UTF8String]);
-	else
-		printf("GitX cannot find a git binary\n");
+    NSString *version = [[NSBundle mainBundle] objectForInfoDictionaryKey:(NSString *)kCFBundleVersionKey];
+	printf("GitX version %s\n", [version UTF8String]);
 	exit(1);
 }
 
