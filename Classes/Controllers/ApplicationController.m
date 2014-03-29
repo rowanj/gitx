@@ -7,6 +7,7 @@
 //
 
 #import "ApplicationController.h"
+#import "PBRepositoryDocumentController.h"
 #import "PBGitRevisionCell.h"
 #import "PBGitWindowController.h"
 #import "PBServicesController.h"
@@ -65,6 +66,20 @@ static OpenRecentController* recentsDialog = nil;
 		NSUpdateDynamicServices();
 		[[NSUserDefaults standardUserDefaults] setInteger:2 forKey:@"Services Version"];
 	}
+}
+
+- (BOOL)application:(NSApplication *)sender openFile:(NSString *)filename {
+    NSURL *repository = [NSURL fileURLWithPath:filename];
+    NSError *error = nil;
+    NSDocument *doc = [[PBRepositoryDocumentController sharedDocumentController] openDocumentWithContentsOfURL:repository
+                                                                                                       display:YES
+                                                                                                         error:&error];
+    if (!doc) {
+        NSLog(@"Error opening repository \"%@\": %@", repository.path, error);
+        return NO;
+    }
+
+    return YES;
 }
 
 - (BOOL)applicationShouldOpenUntitledFile:(NSApplication *)sender

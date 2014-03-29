@@ -116,35 +116,9 @@ void handleDiffWithArguments(NSURL *repositoryURL, NSArray *arguments)
 
 void handleOpenRepository(NSURL *repositoryURL, NSMutableArray *arguments)
 {
-	// if there are command line arguments send them to GitX through an Apple Event
-	// the recordDescriptor will be stored in keyAEPropData inside the openDocument or openApplication event
-	NSAppleEventDescriptor *recordDescriptor = nil;
-	if ([arguments count]) {
-		recordDescriptor = [NSAppleEventDescriptor recordDescriptor];
-
-		NSAppleEventDescriptor *listDescriptor = [NSAppleEventDescriptor listDescriptor];
-		uint listIndex = 1; // AppleEvent list descriptor's are one based
-		for (NSString *argument in arguments)
-			[listDescriptor insertDescriptor:[NSAppleEventDescriptor descriptorWithString:argument] atIndex:listIndex++];
-
-		[recordDescriptor setParamDescriptor:listDescriptor forKeyword:kGitXAEKeyArgumentsList];
-
-		// this is used as a double check in GitX
-		NSAppleEventDescriptor *url = [NSAppleEventDescriptor descriptorWithString:[repositoryURL absoluteString]];
-		[recordDescriptor setParamDescriptor:url forKeyword:typeFileURL];
-	}
-
-	// use NSWorkspace to open GitX and send the arguments
-	// this allows the repository document to modify itself before it shows it's GUI
-	BOOL didOpenURLs = [[NSWorkspace sharedWorkspace] openURLs:[NSArray arrayWithObject:repositoryURL]
-									   withAppBundleIdentifier:kGitXBundleIdentifier
-													   options:0
-								additionalEventParamDescriptor:recordDescriptor
-											 launchIdentifiers:NULL];
-	if (!didOpenURLs) {
-		printf("Unable to open GitX.app\n");
-		exit(2);
-	}
+    GitXApplication *gitXApp = [SBApplication applicationWithBundleIdentifier:kGitXBundleIdentifier];
+    [gitXApp open:repositoryURL];
+    return;
 }
 
 void handleInit(NSURL *repositoryURL)
