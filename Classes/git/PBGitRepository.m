@@ -21,7 +21,8 @@
 #import "GitXScriptingConstants.h"
 #import "PBHistorySearchController.h"
 #import "PBGitRepositoryWatcher.h"
-#import "GitRepoFinder.h"
+#import "PBRepositoryFinder.h"
+#import "PBGitSubmodule.h"
 #import "PBGitHistoryList.h"
 
 
@@ -157,7 +158,7 @@ NSString *PBGitRepositoryDocumentType = @"Git Repository";
 		NSString *path = [[eventRecord paramDescriptorForKeyword:typeFileURL] stringValue];
 		if (path) {
 			NSURL *workingDirectory = [NSURL URLWithString:path];
-			if ([[GitRepoFinder gitDirForURL:workingDirectory] isEqual:[self fileURL]]) {
+			if ([[PBRepositoryFinder gitDirForURL:workingDirectory] isEqual:[self fileURL]]) {
 				NSAppleEventDescriptor *argumentsList = [eventRecord paramDescriptorForKeyword:kGitXAEKeyArgumentsList];
 				[self handleGitXScriptingArguments:argumentsList inWorkingDirectory:workingDirectory];
 

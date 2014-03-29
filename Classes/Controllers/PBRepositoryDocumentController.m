@@ -11,7 +11,6 @@
 #import "PBGitRevList.h"
 #import "PBEasyPipe.h"
 #import "PBGitBinary.h"
-#import "GitRepoFinder.h"
 
 #import <ObjectiveGit/GTRepository.h>
 
