@@ -265,6 +265,22 @@
 	</suite>
 
 	<suite name="GitX Suite" code="GitX" description="Classes for GitX.">
+        <!-- Override for the core open command: we handle options -->
+		<command name="open" code="aevtodoc" description="Open a document.">
+			<direct-parameter description="The file(s) to be opened.">
+				<type type="file"/>
+				<type type="file" list="yes"/>
+			</direct-parameter>
+            <parameter name="with options" code="PDOp" optional="yes" description="The options for the open operation.">
+                <type type="text" list="yes"/>
+                <cocoa key="openOptions"/>
+            </parameter>
+			<result description="The opened document(s).">
+				<type type="document"/>
+				<type type="document" list="yes"/>
+			</result>
+		</command>
+
 
 		<command name="show diff" code="GitXShDf" description="Show the supplied diff output in a GitX window.">
 			<direct-parameter type="text" description="The textual output from a diff tool."/>
