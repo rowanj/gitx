@@ -8,6 +8,7 @@
 
 #import "PBGitBinary.h"
 #import "PBEasyPipe.h"
+#import "PBRepositoryFinder.h"
 #import "GitXScriptingConstants.h"
 #import "GitX.h"
 #import "PBHistorySearchController.h"
@@ -284,6 +285,26 @@ void handleGitXSearch(NSURL *repositoryURL, NSMutableArray *arguments)
 
 #define kGitDirPrefix @"--git-dir"
 
+NSURL *checkWorkingDirectoryPath(NSString *path)
+{
+	NSString *workingDirectory = [[[NSProcessInfo processInfo] environment] objectForKey:@"PWD"];
+
+	// We might be looking at a filesystem path, try to standardize it
+	if (!([path hasPrefix:@"/"] || [path hasPrefix:@"~"])) {
+		path = [workingDirectory stringByAppendingPathComponent:path];
+	}
+	path = [path stringByStandardizingPath];
+
+	// The path must exist and point to a directory
+	BOOL isDirectory = YES;
+	BOOL exists = [[NSFileManager defaultManager] fileExistsAtPath:path isDirectory:&isDirectory];
+	if (!exists || !isDirectory) {
+		return nil;
+	}
+
+	return [NSURL fileURLWithPath:path];
+}
+
 NSURL *workingDirectoryURL(NSMutableArray *arguments)
 {
 	NSString *workingDirectory = [[[NSProcessInfo processInfo] environment] objectForKey:@"PWD"];
@@ -308,69 +329,45 @@ NSURL *workingDirectoryURL(NSMutableArray *arguments)
 			path = [arguments objectAtIndex:i + 1];
 		}
 
-		// We might be looking at a filesystem path, try to standardize it
-		if (!([path hasPrefix:@"/"] || [path hasPrefix:@"~"])) {
-			path = [workingDirectory stringByAppendingPathComponent:path];
-		}
-		path = [path stringByStandardizingPath];
+		NSURL *url = checkWorkingDirectoryPath(path);
 
-		// The path must exist and point to a directory
-		BOOL isDirectory = YES;
-		BOOL exists = [[NSFileManager defaultManager] fileExistsAtPath:path isDirectory:&isDirectory];
-		if (!exists) {
-			printf("Fatal: --git-dir path does not exist.\n");
+		// Let's check that this points to a repository
+		url = [PBRepositoryFinder workDirForURL:url];
+		if (!url) {
+			NSLog(@"Fatal: --git-dir \"%@\" does not look like a valid repository.", argument);
 			exit(2);
-		} else if (!isDirectory) {
-			printf("Fatal: --git-dir path does not point to a directory.\n");
-			exit(2);
-		} else {
+		}
+
+		// Valid --git-dir found, let's drop parsed arguments
+		[arguments removeObjectAtIndex:i];
+		if (!isInlinePath) {
 			[arguments removeObjectAtIndex:i];
-			if (!isInlinePath) {
-				[arguments removeObjectAtIndex:i];
-			}
-
-			// Create and return corresponding NSURL
-			NSURL *url = [NSURL fileURLWithPath:path isDirectory:YES];
-			if (!url) {
-				printf("Unable to create url to path: %s\n", [path UTF8String]);
-				exit(2);
-			}
-
-			return url;
 		}
+
+		return url;
 	}
 
 	// No --git-dir option, let's use the first thing that looks like a path
 	for (NSUInteger i = 0; i < [arguments count]; i++) {
 		NSString *path = [arguments objectAtIndex:i];
 
-		// We might be looking at a filesystem path, try to standardize it
-		if (!([path hasPrefix:@"/"] || [path hasPrefix:@"~"])) {
-			path = [workingDirectory stringByAppendingPathComponent:path];
-		}
-		path = [path stringByStandardizingPath];
+		// Stop processing arguments willy-nilly, we'll just give the CWD a spin.
+		// The user might be trying todo a `gitx log -- path` or something.
+		if ([path isEqualToString:@"--"]) break;
 
-		// The path must exist and point to a directory
-		BOOL isDirectory = YES;
-		BOOL exists = [[NSFileManager defaultManager] fileExistsAtPath:path isDirectory:&isDirectory];
-		if (exists && isDirectory) {
-			[arguments removeObjectAtIndex:i];
+		// Let's check that path and find the closest repository
+		NSURL *url = checkWorkingDirectoryPath(path);
+		url = [PBRepositoryFinder fileURLForURL:url];
+		if (!url) continue; // Invalid path, let's ignore it
 
-			// Create and return corresponding NSURL
-			NSURL *url = [NSURL fileURLWithPath:path isDirectory:YES];
-			if (!url) {
-				printf("Unable to create url to path: %s\n", [path UTF8String]);
-				exit(2);
-			}
+		// Valid repository found, lets' drop parsed argument
+		[arguments removeObjectAtIndex:i];
 
-			return url;
-		}
-
-		// Let's try our luck with the next argument
+		return url;
 	}
 
 	// Still no path found, let's default to our current working directory
-	return [NSURL fileURLWithPath:workingDirectory];
+	return [PBRepositoryFinder fileURLForURL:[NSURL fileURLWithPath:workingDirectory]];
 }
 
 int main(int argc, const char** argv)
