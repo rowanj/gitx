@@ -44,7 +44,7 @@ typedef enum GitXPrintingErrorHandling GitXPrintingErrorHandling;
 - (id) open:(id)x withOptions:(NSArray *)withOptions;  // Open a document.
 - (void) showDiff:(NSString *)x;  // Show the supplied diff output in a GitX window.
 - (void) performDiffIn:(NSURL *)x withOptions:(NSArray *)withOptions;  // Perform a diff operation in a repository.
-- (void) initRepository:(NSURL *)x NS_RETURNS_NOT_RETAINED;  // Create a git repository at the given filesystem URL.
+- (void) createRepository:(NSURL *)x;  // Create a git repository at the given filesystem URL.
 - (void) cloneRepository:(NSString *)x to:(NSURL *)to isBare:(BOOL)isBare;  // Clone a repository.
 
 @end

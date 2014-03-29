@@ -124,7 +124,7 @@ void handleOpenRepository(NSURL *repositoryURL, NSArray *arguments)
 void handleInit(NSURL *repositoryURL)
 {
 	GitXApplication *gitXApp = [SBApplication applicationWithBundleIdentifier:kGitXBundleIdentifier];
-	[gitXApp initRepository:repositoryURL];
+	[gitXApp createRepository:repositoryURL];
 
 	exit(0);
 }

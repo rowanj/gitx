@@ -294,8 +294,10 @@
             </parameter>
         </command>
 
-		<command name="init repository" code="GitXInit" description="Create a git repository at the given filesystem URL.">
-			<direct-parameter type="file" description="The URL of the repository to clone."/>
+        <!-- FIXME using "init" here causes sdf to put NS_RETURNS_NOT_RETAINED on the corresponding method (and triggers a warning) -->
+		<command name="create repository" code="GitXInit" description="Create a git repository at the given filesystem URL.">
+            <synonym name="init repository" code="GitXCrea" hidden="yes"/>
+			<direct-parameter type="file" description="The path where the repository should be created."/>
 		</command>
 
 		<command name="clone repository" code="GitXClon" description="Clone a repository.">
