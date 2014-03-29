@@ -93,8 +93,14 @@
 		[inHandle writeData:[input dataUsingEncoding:NSUTF8StringEncoding]];
 		[inHandle closeFile];
 	}
-	
-	[task launch];
+
+    @try {
+        [task launch];
+    }
+    @catch (NSException *exception) {
+        if (ret) *ret = -1;
+        return nil;
+    }
 	
 	NSData* data = [handle readDataToEndOfFile];
 	NSString *string = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
