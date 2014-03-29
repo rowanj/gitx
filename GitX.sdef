@@ -269,9 +269,19 @@
 		<command name="show diff" code="GitXShDf" description="Show the supplied diff output in a GitX window.">
 			<direct-parameter type="text" description="The textual output from a diff tool."/>
 		</command>
+
+		<command name="perform diff in" code="GitXPfDf" description="Perform a diff operation in a repository.">
+			<direct-parameter type="file" description="The repository to perform the diff in."/>
+            <parameter name="with options" code="PDOp" optional="yes" description="The options for the diff operation.">
+                <type type="text" list="yes"/>
+                <cocoa key="diffOptions"/>
+            </parameter>
+        </command>
+
 		<command name="init repository" code="GitXInit" description="Create a git repository at the given filesystem URL.">
 			<direct-parameter type="file" description="The URL of the repository to clone."/>
 		</command>
+
 		<command name="clone repository" code="GitXClon" description="Clone a repository.">
 			<direct-parameter type="text" description="The URL of the repository to clone."/>
 			<parameter name="to" code="URL " type="file" description="The location for the new repository.">
@@ -295,6 +305,9 @@
 		<class-extension extends="application" description="The GitX application.">
 			<responds-to name="show diff">
 				<cocoa method="showDiffScriptCommand:"/>
+			</responds-to>
+            <responds-to name="perform diff in">
+				<cocoa method="performDiffScriptCommand:"/>
 			</responds-to>
 			<responds-to name="init repository">
 				<cocoa method="initRepositoryScriptCommand:"/>

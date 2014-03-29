@@ -6,8 +6,6 @@
 //  Copyright 2008 __MyCompanyName__. All rights reserved.
 //
 
-#import "PBGitBinary.h"
-#import "PBEasyPipe.h"
 #import "PBRepositoryFinder.h"
 #import "GitXScriptingConstants.h"
 #import "GitX.h"
@@ -92,17 +90,6 @@ void version_info()
 	exit(1);
 }
 
-void git_path()
-{
-	if (![PBGitBinary path])
-		exit(101);
-
-	NSString *path = [[PBGitBinary path] stringByDeletingLastPathComponent];
-	printf("%s\n", [path UTF8String]);
-	exit(0);
-}
-
-
 #pragma mark -
 #pragma mark Commands sent to GitX
 
@@ -121,21 +108,8 @@ void handleSTDINDiff()
 
 void handleDiffWithArguments(NSURL *repositoryURL, NSArray *arguments)
 {
-	arguments = [[NSArray arrayWithObjects:@"diff", @"--no-ext-diff", nil] arrayByAddingObjectsFromArray:arguments];
-
-	int retValue = 1;
-	NSString *diffOutput = [PBEasyPipe outputForCommand:[PBGitBinary path] withArgs:arguments inDir:[repositoryURL path] retValue:&retValue];
-	if (retValue) {
-		// if there is an error diffOutput should have the error output from git
-		if (diffOutput)
-			printf("%s\n", [diffOutput UTF8String]);
-		else
-			printf("Invalid diff command [%d]\n", retValue);
-		exit(3);
-	}
-
 	GitXApplication *gitXApp = [SBApplication applicationWithBundleIdentifier:kGitXBundleIdentifier];
-	[gitXApp showDiff:diffOutput];
+	[gitXApp performDiffIn:repositoryURL withOptions:arguments];
 
 	exit(0);
 }
@@ -372,15 +346,11 @@ int main(int argc, const char** argv)
 			usage(argv[0]);
 		if (argc >= 2 && (!strcmp(argv[1], "--version") || !strcmp(argv[1], "-v")))
 			version_info();
-		if (argc >= 2 && !strcmp(argv[1], "--git-path"))
-			git_path();
-		
-		// From here on everything needs to access git, so make sure it's installed
-		if (![PBGitBinary path]) {
-			printf("%s\n", [[PBGitBinary notFoundError] cStringUsingEncoding:NSUTF8StringEncoding]);
-			exit(2);
-		}
-		
+		if (argc >= 2 && !strcmp(argv[1], "--git-path")) {
+            printf("gitx now uses libgit2 to work.");
+            exit(1);
+        }
+
 		// gitx can be used to pipe diff output to be displayed in GitX
 		if (!isatty(STDIN_FILENO) && fdopen(STDIN_FILENO, "r"))
 			handleSTDINDiff();
