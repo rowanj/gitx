@@ -122,11 +122,11 @@ const BOOL SHUFFLE_COLORS = NO;
 	return [currentSha isEqual:thisSha];
 }
 
-- (void) drawCircleInRect: (NSRect) r
+- (void) drawCircleInRect: (NSRect) r color: (int) c
 {
-	int c = cellInfo.position;
+	int p = cellInfo.position;
 	NSPoint origin = r.origin;
-	NSPoint columnOrigin = { origin.x + COLUMN_WIDTH * c, origin.y};
+	NSPoint columnOrigin = { origin.x + COLUMN_WIDTH * p, origin.y};
 
 	NSRect oval = { columnOrigin.x - 5, columnOrigin.y + r.size.height * 0.5 - 5, 10, 10};
 
@@ -134,9 +134,9 @@ const BOOL SHUFFLE_COLORS = NO;
 	if (ENABLE_SHADOW && false) {
 		[NSGraphicsContext saveGraphicsState];
 		[[[self class] shadow] set];
-		[[NSColor blackColor] set];
 	}
-	[[NSColor blackColor] set];
+	NSArray* colors = [PBGitRevisionCell laneColors];
+	[(NSColor*)[colors objectAtIndex: (c % [colors count])] set];
 	[path fill];
 	if (ENABLE_SHADOW && false) {
 		[NSGraphicsContext restoreGraphicsState];
@@ -155,17 +155,17 @@ const BOOL SHUFFLE_COLORS = NO;
 
 }
 
-- (void) drawTriangleInRect: (NSRect) r sign: (char) sign
+- (void) drawTriangleInRect: (NSRect) r sign: (char) sign color: (int) c
 {
-	int c = cellInfo.position;
+	int p = cellInfo.position;
 	int columnHeight = 10;
 	int columnWidth = 8;
 
 	NSPoint top;
 	if (sign == '<')
-		top.x = round(r.origin.x) + 10 * c + 4;
+		top.x = round(r.origin.x) + 10 * p + 4;
 	else {
-		top.x = round(r.origin.x) + 10 * c - 4;
+		top.x = round(r.origin.x) + 10 * p - 4;
 		columnWidth *= -1;
 	}
 	top.y = r.origin.y + (r.size.height - columnHeight) / 2;
@@ -182,7 +182,8 @@ const BOOL SHUFFLE_COLORS = NO;
 
 	[[NSColor whiteColor] set];
 	[path fill];
-	[[NSColor blackColor] set];
+	NSArray* colors = [PBGitRevisionCell laneColors];
+	[(NSColor*)[colors objectAtIndex: (c % [colors count])] set];
 	[path setLineWidth: 2];
 	[path stroke];
 }
@@ -310,19 +311,22 @@ const BOOL SHUFFLE_COLORS = NO;
 		NSRect ownRect;
 		NSDivideRect(rect, &ownRect, &rect, pathWidth, NSMinXEdge);
 
-		int i;
+		int i, cellColorIndex = 0;
 		struct PBGitGraphLine *lines = cellInfo.lines;
 		for (i = 0; i < cellInfo.nLines; i++) {
+			int colorIndex = lines[i].colorIndex;
+			if (lines[i].from == cellInfo.position && lines[i].to == cellInfo.position)
+				cellColorIndex = colorIndex;
 			if (lines[i].upper == 0)
-				[self drawLineFromColumn: lines[i].from toColumn: lines[i].to inRect:ownRect offset: ownRect.size.height color: lines[i].colorIndex];
+				[self drawLineFromColumn: lines[i].from toColumn: lines[i].to inRect:ownRect offset: ownRect.size.height color: colorIndex];
 			else
-				[self drawLineFromColumn: lines[i].from toColumn: lines[i].to inRect:ownRect offset: 0 color:lines[i].colorIndex];
+				[self drawLineFromColumn: lines[i].from toColumn: lines[i].to inRect:ownRect offset: 0 color: colorIndex];
 		}
 
 		if (cellInfo.sign == '<' || cellInfo.sign == '>')
-			[self drawTriangleInRect: ownRect sign: cellInfo.sign];
+			[self drawTriangleInRect: ownRect sign: cellInfo.sign color: cellColorIndex];
 		else
-			[self drawCircleInRect: ownRect];
+			[self drawCircleInRect: ownRect color: cellColorIndex];
 	}
 
 
