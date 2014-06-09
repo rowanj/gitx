@@ -29,15 +29,31 @@ const BOOL SHUFFLE_COLORS = NO;
 	return self;
 }
 
+#define HEX_COLOR(hex)                        \
+{                                             \
+	(CGFloat)((((hex) >> 16) & 0xFF) / 255.0f), \
+	(CGFloat)((((hex) >> 8)  & 0xFF) / 255.0f), \
+	(CGFloat)((((hex) >> 0)  & 0xFF) / 255.0f)  \
+}
+
 + (NSArray *)laneColors
 {
-	static const size_t colorCount = 8;
+	static const CGFloat colorPalette[][3] = {
+		HEX_COLOR(0xF00000), // red
+		HEX_COLOR(0xFF8000), // tangerine (orange)
+		HEX_COLOR(0xE0D030), // yellow
+		HEX_COLOR(0x008000), // clover (green)
+		HEX_COLOR(0x00D0D0), // cyan
+		HEX_COLOR(0x0000FF), // blueberry (navy)
+		HEX_COLOR(0x0080FF), // aqua (sky blue)
+		HEX_COLOR(0x8000FF), // grape (violet)
+		HEX_COLOR(0xFF00FF), // magenta
+	};
 	static NSArray *laneColors = nil;
 	if (!laneColors) {
-		float segment = 1.0f / colorCount;
 		NSMutableArray *colors = [NSMutableArray new];
-		for (size_t i = 0; i < colorCount; ++i) {
-			NSColor *newColor = [NSColor colorWithCalibratedHue:(segment * i) saturation:0.9f brightness:0.9f alpha:1.0f];
+		for (size_t i = 0; i < sizeof(colorPalette)/sizeof(*colorPalette); ++i) {
+			NSColor *newColor = [NSColor colorWithCalibratedRed:colorPalette[i][0] green:colorPalette[i][1] blue:colorPalette[i][2] alpha:1.0f];
 			[colors addObject:newColor];
 		}
 		if (SHUFFLE_COLORS) {
