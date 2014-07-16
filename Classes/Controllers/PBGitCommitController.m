@@ -213,9 +213,8 @@
 
 - (void)amendCommit:(NSNotification *)notification
 {
-	// Replace commit message with the old one if it's less than 3 characters long.
-	// This is just a random number.
-	if ([[commitMessageView string] length] > 3)
+	// Replace commit message with the old one if it's empty.
+	if ([[commitMessageView string] length] > 0)
 		return;
 	
 	NSString *message = [[notification userInfo] objectForKey:@"message"];
