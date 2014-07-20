@@ -38,15 +38,19 @@
 	{
 		return nil;
 	}
-	NSMutableData* repoPathBuffer = [NSMutableData dataWithLength:GIT_PATH_MAX];
-	
-	int gitResult = git_repository_discover(repoPathBuffer.mutableBytes,
-											repoPathBuffer.length,
+	git_buf path_buffer = {NULL, 0, 0};
+	int gitResult = git_repository_discover(&path_buffer,
 											[fileURL.path UTF8String],
 											GIT_REPOSITORY_OPEN_CROSS_FS,
 											nil);
 	
-	if (gitResult == GIT_OK)
+	NSData *repoPathBuffer = nil;
+	if (path_buffer.ptr) {
+		repoPathBuffer = [NSData dataWithBytes:path_buffer.ptr length:path_buffer.asize];
+		git_buf_free(&path_buffer);
+	}
+	
+	if (gitResult == GIT_OK && repoPathBuffer.length)
 	{
 		NSString* repoPath = [NSString stringWithUTF8String:repoPathBuffer.bytes];
 		BOOL isDirectory;
@@ -59,21 +63,6 @@
 		}
 	}
 	return nil;
-}
-
-+ (NSURL*) fileURLForURL:(NSURL *)inputURL
-{
-	NSURL* gitDir = [GitRepoFinder gitDirForURL:inputURL];
-	if (!gitDir)
-	{
-		return nil; // not a Git directory at all
-	}
-	NSURL* workDir = [GitRepoFinder workDirForURL:inputURL];
-	if (workDir)
-	{
-		return workDir; // root of this working copy or deepest submodule
-	}
-	return gitDir; // bare repo
 }
 
 @end

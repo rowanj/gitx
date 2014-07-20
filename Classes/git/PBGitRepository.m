@@ -22,11 +22,9 @@
 #import "PBHistorySearchController.h"
 #import "PBGitRepositoryWatcher.h"
 #import "GitRepoFinder.h"
-#import "PBGitSubmodule.h"
+#import "PBGitHistoryList.h"
+#import "PBGitSHA.h"
 
-#import <ObjectiveGit/GTRepository.h>
-#import <ObjectiveGit/GTIndex.h>
-#import <ObjectiveGit/GTConfiguration.h>
 
 NSString *PBGitRepositoryDocumentType = @"Git Repository";
 
@@ -38,34 +36,32 @@ NSString *PBGitRepositoryDocumentType = @"Git Repository";
 
 @implementation PBGitRepository
 
-@synthesize revisionList, branchesSet, currentBranch, refs, hasChanged, submodules;
+@synthesize revisionList, branchesSet, currentBranch, refs, hasChanged;
 @synthesize currentBranchFilter;
 
-- (BOOL) isBareRepository
+#pragma mark -
+#pragma mark Memory management
+
+- (id)init
 {
-    return self.gtRepo.isBare;
+    self = [super init];
+    if (!self) return nil;
+
+	self.branchesSet = [NSMutableOrderedSet orderedSet];
+    self.submodules = [NSMutableArray array];
+	currentBranchFilter = [PBGitDefaults branchFilter];
+    return self;
 }
 
-- (BOOL) readHasSVNRemoteFromConfig
+- (void) dealloc
 {
-	NSError *error = nil;
-	GTConfiguration *config = [self.gtRepo configurationWithError:&error];
-	NSArray *allKeys = config.configurationKeys;
-	for (NSString *key in allKeys) {
-		if ([key hasPrefix:@"svn-remote."]) {
-			return TRUE;
-		}
-	}
-	return false;
+	// NSLog(@"Dealloc of repository");
+	[watcher stop];
 }
 
-- (BOOL) hasSVNRemote
-{
-	if (!self.hasSVNRepoConfig) {
-		self.hasSVNRepoConfig = @([self readHasSVNRemoteFromConfig]);
-	}
-	return [self.hasSVNRepoConfig boolValue];
-}
+
+#pragma mark -
+#pragma mark NSDocument API
 
 // NSFileWrapper is broken and doesn't work when called on a directory containing a large number of directories and files.
 //because of this it is safer to implement readFromURL than readFromFileWrapper.
@@ -95,7 +91,8 @@ NSString *PBGitRepositoryDocumentType = @"Git Repository";
 	}
 
     NSError *error = nil;
-    _gtRepo = [GTRepository repositoryWithURL:absoluteURL error:&error];
+	NSURL *repoURL = [GitRepoFinder gitDirForURL:absoluteURL];
+    _gtRepo = [GTRepository repositoryWithURL:repoURL error:&error];
 	if (!_gtRepo) {
 		if (outError) {
 			NSDictionary* userInfo = [NSDictionary dictionaryWithObjectsAndKeys:
@@ -117,22 +114,6 @@ NSString *PBGitRepositoryDocumentType = @"Git Repository";
 	return YES;
 }
 
-- (NSURL *) gitURL {
-    return self.gtRepo.gitDirectoryURL;
-}
-
-- (id) init
-{
-    self = [super init];
-    if (!self)
-        return nil;
-
-	self.branchesSet = [NSMutableOrderedSet orderedSet];
-    self.submodules = [NSMutableArray array];
-	currentBranchFilter = [PBGitDefaults branchFilter];
-    return self;
-}
-
 - (void)close
 {
 	[revisionList cleanup];
@@ -140,43 +121,116 @@ NSString *PBGitRepositoryDocumentType = @"Git Repository";
 	[super close];
 }
 
-- (void) forceUpdateRevisions
-{
-	[revisionList forceUpdate];
-}
-
 - (BOOL)isDocumentEdited
 {
 	return NO;
 }
 
-// The fileURL the document keeps is to the working dir
-- (NSString *) displayName
+- (NSString *)displayName
 {
+    // Build our display name depending on the current HEAD and whether it's detached or not
     if (self.gtRepo.isHEADDetached)
-		return [NSString stringWithFormat:@"%@ (detached HEAD)", [self projectName]];
+		return [NSString localizedStringWithFormat:@"%@ (detached HEAD)", self.projectName];
 
-	return [NSString stringWithFormat:@"%@ (branch: %@)", [self projectName], [[self headRef] description]];
+	return [NSString localizedStringWithFormat:@"%@ (branch: %@)", self.projectName, [[self headRef] description]];
 }
 
-- (NSString *) projectName
+- (void)makeWindowControllers
+{
+    // Create our custom window controller
+#ifndef CLI
+	[self addWindowController: [[PBGitWindowController alloc] initWithRepository:self displayDefault:YES]];
+#endif
+}
+
+// see if the current appleEvent has the command line arguments from the gitx cli
+// this could be from an openApplication or an openDocument apple event
+// when opening a repository this is called before the sidebar controller gets it's awakeFromNib: message
+// if the repository is already open then this is also a good place to catch the event as the window is about to be brought forward
+- (void)showWindows
+{
+	NSAppleEventDescriptor *currentAppleEvent = [[NSAppleEventManager sharedAppleEventManager] currentAppleEvent];
+
+	if (currentAppleEvent) {
+		NSAppleEventDescriptor *eventRecord = [currentAppleEvent paramDescriptorForKeyword:keyAEPropData];
+
+		// on app launch there may be many repositories opening, so double check that this is the right repo
+		NSString *path = [[eventRecord paramDescriptorForKeyword:typeFileURL] stringValue];
+		if (path) {
+			NSURL *workingDirectory = [NSURL URLWithString:path];
+			if ([[GitRepoFinder gitDirForURL:workingDirectory] isEqual:[self fileURL]]) {
+				NSAppleEventDescriptor *argumentsList = [eventRecord paramDescriptorForKeyword:kGitXAEKeyArgumentsList];
+				[self handleGitXScriptingArguments:argumentsList inWorkingDirectory:workingDirectory];
+
+				// showWindows may be called more than once during app launch so remove the CLI data after we handle the event
+				[currentAppleEvent removeDescriptorWithKeyword:keyAEPropData];
+			}
+		}
+	}
+
+	[super showWindows];
+}
+
+#pragma mark -
+#pragma mark Properties/General methods
+
+- (NSURL *)getIndexURL
+{
+	NSError *error = nil;
+	GTIndex *index = [self.gtRepo indexWithError:&error];
+    if (index == nil) {
+        NSLog(@"getIndexURL failed with error %@", error);
+        return nil;
+    }
+	NSURL* result = index.fileURL;
+	return result;
+}
+
+- (BOOL)isBareRepository
+{
+    return self.gtRepo.isBare;
+}
+
+- (BOOL)readHasSVNRemoteFromConfig
+{
+	NSError *error = nil;
+	GTConfiguration *config = [self.gtRepo configurationWithError:&error];
+	NSArray *allKeys = config.configurationKeys;
+	for (NSString *key in allKeys) {
+		if ([key hasPrefix:@"svn-remote."]) {
+			return TRUE;
+		}
+	}
+	return false;
+}
+
+- (BOOL)hasSVNRemote
+{
+	if (!self.hasSVNRepoConfig) {
+		self.hasSVNRepoConfig = @([self readHasSVNRemoteFromConfig]);
+	}
+	return [self.hasSVNRepoConfig boolValue];
+}
+
+- (NSURL *)gitURL {
+    return self.gtRepo.gitDirectoryURL;
+}
+
+- (void)forceUpdateRevisions
+{
+	[revisionList forceUpdate];
+}
+
+- (NSString *)projectName
 {
 	NSString* result = [self.workingDirectory lastPathComponent];
 	return result;
 }
 
 // Get the .gitignore file at the root of the repository
-- (NSString*)gitIgnoreFilename
+- (NSString *)gitIgnoreFilename
 {
 	return [[self workingDirectory] stringByAppendingPathComponent:@".gitignore"];
-}
-
-// Overridden to create our custom window controller
-- (void)makeWindowControllers
-{
-#ifndef CLI
-	[self addWindowController: [[PBGitWindowController alloc] initWithRepository:self displayDefault:YES]];
-#endif
 }
 
 - (PBGitWindowController *)windowController
@@ -187,70 +241,41 @@ NSString *PBGitRepositoryDocumentType = @"Git Repository";
 	return [[self windowControllers] objectAtIndex:0];
 }
 
-- (void) addRef:(GTReference*)gtRef
+- (void)addRef:(GTReference *)gtRef
 {
-	while (gtRef && gtRef.referenceType == GTReferenceTypeSymbolic) {
-//		GTReference *oldRef = gtRef;
-		gtRef = gtRef.resolvedReference;
-//		NSLog(@"Resolved reference %@ to %@", oldRef, gtRef);
-	}
-	if (gtRef == nil)
-	{
-		NSLog(@"Sneaky attempt to add nil GTReference");
-		return;
-	}
-	if (gtRef.referenceType != GTReferenceTypeOid) {
-		NSLog(@"Can't addRef for %@ ref of unsupported type \"%u\"", gtRef.name, gtRef.referenceType);
+	GTObject *refTarget = gtRef.resolvedTarget;
+	if (![refTarget isKindOfClass:[GTObject class]]) {
+		NSLog(@"Tried to add invalid ref %@ -> %@", gtRef, refTarget);
 		return;
 	}
 
-	git_oid refOid = *gtRef.OID.git_oid;
-	git_object* gitTarget = NULL;
-	git_tag* gitTag = NULL;
-
-	PBGitSHA *sha = [PBGitSHA shaWithOID:refOid];
-	if (git_tag_lookup(&gitTag, self.gtRepo.git_repository, gtRef.git_oid) == GIT_OK)
-	{
-		if (git_tag_peel(&gitTarget, gitTag) == GIT_OK)
-		{
-			GTObject* peeledObject = [GTObject objectWithObj:gitTarget inRepository:self.gtRepo];
-//			NSLog(@"peeled sha:%@", peeledObject.sha);
-			sha = [PBGitSHA shaWithString:peeledObject.SHA];
-		}
-        git_tag_free(gitTag);
+	PBGitSHA *sha = [PBGitSHA shaWithOID:refTarget.OID.git_oid];
+	if (!sha) {
+		NSLog(@"Couldn't determine sha for ref %@ -> %@", gtRef, refTarget);
+		return;
 	}
-	
+
 	PBGitRef* ref = [[PBGitRef alloc] initWithString:gtRef.name];
 //	NSLog(@"addRef %@ %@ at %@", ref.type, gtRef.name, [sha string]);
-	NSMutableArray* curRefs;
-	if ( (curRefs = [refs objectForKey:sha]) != nil )
+	NSMutableArray* curRefs = refs[sha];
+	if ( curRefs != nil ) {
+		if ([curRefs containsObject:ref]) {
+			NSLog(@"Duplicate ref shouldn't be added: %@", ref);
+			return;
+		}
 		[curRefs addObject:ref];
-	else
-		[refs setObject:[NSMutableArray arrayWithObject:ref] forKey:sha];
+	} else {
+		refs[sha] = [NSMutableArray arrayWithObject:ref];
+	}
 }
 
-int addSubmoduleName(git_submodule *module, const char* name, void * context)
-{
-    PBGitRepository *me = (__bridge PBGitRepository *)context;
-    PBGitSubmodule *sub = [[PBGitSubmodule alloc] init];
-    [sub setWorkingDirectory:me.workingDirectory];
-    [sub setSubmodule:module];
-    
-
-    [me.submodules addObject:sub];
-    
-    return 0;
-}
-
-- (void) loadSubmodules
+- (void)loadSubmodules
 {
     self.submodules = [NSMutableArray array];
-	git_repository* theRepo = self.gtRepo.git_repository;
-	if (!theRepo)
-	{
-		return;
-	}
-    git_submodule_foreach(theRepo, addSubmoduleName, (__bridge void *)self);
+
+    [self.gtRepo enumerateSubmodulesRecursively:NO usingBlock:^(GTSubmodule *gtSubmodule, NSError *error, BOOL *stop) {
+		[self.submodules addObject:gtSubmodule];
+    }];
 }
 
 - (void) reloadRefs
@@ -279,6 +304,10 @@ int addSubmoduleName(git_submodule *module, const char* name, void * context)
 			{
 				NSLog(@"Error loading reference was: %@", error);
 			}
+			continue;
+		}
+		if (gtRef.remote && gtRef.referenceType == GTReferenceTypeSymbolic) {
+			// Hide remote symbolic references like origin/HEAD
 			continue;
 		}
 		PBGitRef* gitRef = [PBGitRef refFromString:referenceName];
@@ -344,9 +373,10 @@ int addSubmoduleName(git_submodule *module, const char* name, void * context)
 	if (!ref)
 		return nil;
 	
-	for (PBGitSHA *sha in refs)
+	for (PBGitSHA *sha in refs.allKeys)
 	{
-		for (PBGitRef *existingRef in [refs objectForKey:sha])
+		NSMutableSet *refsForSha = [refs objectForKey:sha];
+		for (PBGitRef *existingRef in refsForSha)
 		{
 			if ([existingRef isEqualToRef:ref])
 			{
@@ -454,20 +484,18 @@ int addSubmoduleName(git_submodule *module, const char* name, void * context)
 
 - (BOOL) checkRefFormat:(NSString *)refName
 {
-	int retValue = 1;
-	[self outputInWorkdirForArguments:[NSArray arrayWithObjects:@"check-ref-format", refName, nil] retValue:&retValue];
-	if (retValue)
-		return NO;
-	return YES;
+	BOOL result = [GTReference isValidReferenceName:refName];
+	return result;
 }
 
 - (BOOL) refExists:(PBGitRef *)ref
 {
-	int retValue = 1;
-    NSString *output = [self outputInWorkdirForArguments:[NSArray arrayWithObjects:@"for-each-ref", [ref ref], nil] retValue:&retValue];
-    if (retValue || [output isEqualToString:@""])
-        return NO;
-    return YES;
+	NSError *gtError = nil;
+	GTReference *gtRef = [GTReference referenceByLookingUpReferencedNamed:ref.ref inRepository:self.gtRepo error:&gtError];
+	if (gtRef) {
+		return YES;
+	}
+	return NO;
 }
 
 // useful for getting the full ref for a user entered name
@@ -572,19 +600,24 @@ int addSubmoduleName(git_submodule *module, const char* name, void * context)
 
 - (PBGitRef *) remoteRefForBranch:(PBGitRef *)branch error:(NSError **)error
 {
-	if ([branch isRemote])
+	if ([branch isRemote]) {
 		return [branch remoteRef];
+	}
 
-	NSString *branchName = [branch branchName];
-	if (branchName) {
-		NSError *error = nil;
-		GTConfiguration *config = [self.gtRepo configurationWithError:&error];
-		NSString *remoteName = [config stringForKey:[NSString stringWithFormat:@"branch.%@.remote", branchName]];
-		if (remoteName && ([remoteName isKindOfClass:[NSString class]] && ![remoteName isEqualToString:@""])) {
-			PBGitRef *remoteRef = [PBGitRef refFromString:[kGitXRemoteRefPrefix stringByAppendingString:remoteName]];
-			// check that the remote is a valid ref and exists
-			if ([self checkRefFormat:[remoteRef ref]] && [self refExists:remoteRef])
-				return remoteRef;
+	NSString *branchRef = branch.ref;
+	if (branchRef) {
+		NSError *branchError = nil;
+		BOOL lookupSuccess = NO;
+		GTBranch *gtBranch = [self.gtRepo lookUpBranchWithName:branch.branchName type:GTBranchTypeLocal success:&lookupSuccess error:&branchError];
+		if (gtBranch && lookupSuccess) {
+			NSError *trackingError = nil;
+			BOOL trackingSuccess = NO;
+			GTBranch *trackingBranch = [gtBranch trackingBranchWithError:&trackingError success:&trackingSuccess];
+			if (trackingBranch && trackingSuccess) {
+				NSString *trackingBranchRefName = trackingBranch.reference.name;
+				PBGitRef *trackingBranchRef = [PBGitRef refFromString:trackingBranchRefName];
+				return trackingBranchRef;
+			}
 		}
 	}
 
@@ -851,7 +884,7 @@ int addSubmoduleName(git_submodule *module, const char* name, void * context)
 
 	NSError *error = nil;
 
-	GTObject *object = [self.gtRepo lookupObjectByRefspec:[target refishName] error:&error];
+	GTObject *object = [self.gtRepo lookUpObjectByRevParse:[target refishName] error:&error];
 	GTTag *newTag = nil;
 	if (object && !error) {
 		newTag = [self.gtRepo createTagNamed:tagName target:object tagger:self.gtRepo.userSignatureForNow message:message error:&error];
@@ -1004,34 +1037,6 @@ int addSubmoduleName(git_submodule *module, const char* name, void * context)
 	[self handleRevListArguments:arguments inWorkingDirectory:workingDirectory];
 }
 
-// see if the current appleEvent has the command line arguments from the gitx cli
-// this could be from an openApplication or an openDocument apple event
-// when opening a repository this is called before the sidebar controller gets it's awakeFromNib: message
-// if the repository is already open then this is also a good place to catch the event as the window is about to be brought forward
-- (void)showWindows
-{
-	NSAppleEventDescriptor *currentAppleEvent = [[NSAppleEventManager sharedAppleEventManager] currentAppleEvent];
-
-	if (currentAppleEvent) {
-		NSAppleEventDescriptor *eventRecord = [currentAppleEvent paramDescriptorForKeyword:keyAEPropData];
-
-		// on app launch there may be many repositories opening, so double check that this is the right repo
-		NSString *path = [[eventRecord paramDescriptorForKeyword:typeFileURL] stringValue];
-		if (path) {
-			NSURL *workingDirectory = [NSURL URLWithString:path];
-			if ([[GitRepoFinder gitDirForURL:workingDirectory] isEqual:[self fileURL]]) {
-				NSAppleEventDescriptor *argumentsList = [eventRecord paramDescriptorForKeyword:kGitXAEKeyArgumentsList];
-				[self handleGitXScriptingArguments:argumentsList inWorkingDirectory:workingDirectory];
-
-				// showWindows may be called more than once during app launch so remove the CLI data after we handle the event
-				[currentAppleEvent removeDescriptorWithKeyword:keyAEPropData];
-			}
-		}
-	}
-
-	[super showWindows];
-}
-
 // for the scripting bridge
 - (void)findInModeScriptCommand:(NSScriptCommand *)command
 {
@@ -1173,18 +1178,4 @@ int addSubmoduleName(git_submodule *module, const char* name, void * context)
 	return nil;
 }
 
-- (NSURL*) getIndexURL
-{
-	NSError *error = nil;
-	GTIndex *index = [self.gtRepo indexWithError:&error];
-	NSURL* result = index.fileURL;
-	return result;
-}
-
-
-- (void) dealloc
-{
-	NSLog(@"Dealloc of repository");
-	[watcher stop];
-}
 @end

@@ -13,8 +13,7 @@
 #import "PBCreateTagSheet.h"
 #import "PBGitDefaults.h"
 #import "PBDiffWindowController.h"
-
-#import <ObjectiveGit/ObjectiveGit.h>
+#import "PBGitRevSpecifier.h"
 
 #define kDialogAcceptDroppedRef @"Accept Dropped Ref"
 #define kDialogConfirmPush @"Confirm Push"
@@ -251,7 +250,7 @@
 	NSError *error = nil;
 	NSString *tagName = [(PBGitRef *)[sender refish] tagName];
 	NSString *tagRef = [@"refs/tags/" stringByAppendingString:tagName];
-	GTObject *object = [historyController.repository.gtRepo lookupObjectByRefspec:tagRef error:&error];
+	GTObject *object = [historyController.repository.gtRepo lookUpObjectByRevParse:tagRef error:&error];
 	if (!object) {
 		NSLog(@"Couldn't look up ref %@:%@", tagRef, [error debugDescription]);
 		return;
@@ -443,7 +442,7 @@
 									 defaultButton:@"Move"
 								   alternateButton:@"Cancel"
 									   otherButton:nil
-						 informativeTextWithFormat:infoText];
+						 informativeTextWithFormat:@"%@", infoText];
     [alert setShowsSuppressionButton:YES];
 
 	[alert beginSheetModalForWindow:[historyController.repository.windowController window]

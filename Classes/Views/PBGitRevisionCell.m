@@ -8,11 +8,19 @@
 
 #import "PBGitRevisionCell.h"
 #import "PBGitRef.h"
+#import "PBGitSHA.h"
+#import "PBGitCommit.h"
+#import "PBGitRevSpecifier.h"
 #import "RoundedRectangle.h"
 #import "GitXTextFieldCell.h"
 
-@implementation PBGitRevisionCell
+#import "NSColor+RGB.h"
 
+const int COLUMN_WIDTH = 10;
+const BOOL ENABLE_SHADOW = YES;
+const BOOL SHUFFLE_COLORS = NO;
+
+@implementation PBGitRevisionCell
 
 - (id) initWithCoder: (id) coder
 {
@@ -23,39 +31,78 @@
 
 + (NSArray *)laneColors
 {
+	static const size_t colorCount = 8;
 	static NSArray *laneColors = nil;
-	if (!laneColors)
-		laneColors = [NSArray arrayWithObjects:
-					  [NSColor colorWithCalibratedRed: 0X4e/256.0 green:0X9A/256.0 blue: 0X06/256.0 alpha: 1.0],
-					  [NSColor colorWithCalibratedRed: 0X20/256.0 green:0X4A/256.0 blue: 0X87/256.0 alpha: 1.0],
-					  [NSColor colorWithCalibratedRed: 0XC4/256.0 green:0XA0/256.0 blue: 0 alpha: 1.0],
-					  [NSColor colorWithCalibratedRed: 0X5C/256.0 green:0X35/256.0 blue: 0X66/256.0 alpha: 1.0],
-					  [NSColor colorWithCalibratedRed: 0XA4/256.0 green:0X00/256.0 blue: 0X00/256.0 alpha: 1.0],
-					  [NSColor colorWithCalibratedRed: 0XCE/256.0 green:0X5C/256.0 blue: 0 alpha: 1.0],
-					  nil];
+	if (!laneColors) {
+		float segment = 1.0f / colorCount;
+		NSMutableArray *colors = [NSMutableArray new];
+		for (size_t i = 0; i < colorCount; ++i) {
+			NSColor *newColor = [NSColor colorWithCalibratedHue:(segment * i) saturation:0.9f brightness:0.9f alpha:1.0f];
+			[colors addObject:newColor];
+		}
+		if (SHUFFLE_COLORS) {
+			NSMutableArray *shuffledColors = [NSMutableArray new];
+			while (colors.count) {
+				uint32_t index = arc4random_uniform(colors.count);
+				[shuffledColors addObject:colors[index]];
+				[colors removeObjectAtIndex:index];
+			}
+			colors = shuffledColors;
+		}
+		laneColors = [NSArray arrayWithArray:colors];
+	}
 
 	return laneColors;
 }
 
++ (NSColor *)shadowColor
+{
+	static NSColor *shadowColor = nil;
+	if (!shadowColor) {
+		uint8_t l = 64;
+		shadowColor = [NSColor colorWithR:l G:l B:l];
+	}
+	return shadowColor;
+}
++ (NSColor *)lineShadowColor
+{
+	static NSColor *shadowColor = nil;
+	if (!shadowColor) {
+		uint8_t l = 200;
+		shadowColor = [NSColor colorWithR:l G:l B:l];
+	}
+	return shadowColor;
+}
+
 - (void) drawLineFromColumn: (int) from toColumn: (int) to inRect: (NSRect) r offset: (int) offset color: (int) c
 {
-
-	int columnWidth = 10;
 	NSPoint origin = r.origin;
 	
-	NSPoint source = NSMakePoint(origin.x + columnWidth* from, origin.y + offset);
-	NSPoint center = NSMakePoint( origin.x + columnWidth * to, origin.y + r.size.height * 0.5 + 0.5);
+	NSPoint source = NSMakePoint(origin.x + COLUMN_WIDTH * from, origin.y + offset);
+	NSPoint center = NSMakePoint( origin.x + COLUMN_WIDTH * to, origin.y + r.size.height * 0.5 + 0.5);
 
+	if (ENABLE_SHADOW)
+	{
+		[NSGraphicsContext saveGraphicsState];
+
+		NSShadow *shadow = [NSShadow new];
+		[shadow setShadowColor:[[self class] lineShadowColor]];
+		[shadow setShadowOffset:NSMakeSize(0.5f, -0.5f)];
+		[shadow set];
+	}
 	NSArray* colors = [PBGitRevisionCell laneColors];
 	[(NSColor*)[colors objectAtIndex: (c % [colors count])] set];
 	
 	NSBezierPath * path = [NSBezierPath bezierPath];
 	[path setLineWidth:2];
-	
+	[path setLineCapStyle:NSRoundLineCapStyle];
 	[path moveToPoint: source];
 	[path lineToPoint: center];
 	[path stroke];
-	
+
+	if (ENABLE_SHADOW) {
+		[NSGraphicsContext restoreGraphicsState];
+	}
 }
 
 - (BOOL) isCurrentCommit
@@ -70,21 +117,28 @@
 
 - (void) drawCircleInRect: (NSRect) r
 {
-
 	int c = cellInfo.position;
-	int columnWidth = 10;
 	NSPoint origin = r.origin;
-	NSPoint columnOrigin = { origin.x + columnWidth * c, origin.y};
+	NSPoint columnOrigin = { origin.x + COLUMN_WIDTH * c, origin.y};
 
 	NSRect oval = { columnOrigin.x - 5, columnOrigin.y + r.size.height * 0.5 - 5, 10, 10};
 
-	
 	NSBezierPath * path = [NSBezierPath bezierPathWithOvalInRect:oval];
-
+	if (ENABLE_SHADOW && false) {
+		[NSGraphicsContext saveGraphicsState];
+		NSShadow *shadow = [NSShadow new];
+		[shadow setShadowColor:[[self class] shadowColor]];
+		[shadow setShadowOffset:NSMakeSize(0.5f, -0.5f)];
+		[shadow setShadowBlurRadius:2.0f];
+		[shadow set];
+	}
 	[[NSColor blackColor] set];
 	[path fill];
+	if (ENABLE_SHADOW && false) {
+		[NSGraphicsContext restoreGraphicsState];
+	}
 	
-	NSRect smallOval = { columnOrigin.x - 3, columnOrigin.y + r.size.height * 0.5 - 3, 6, 6};
+	NSRect smallOval = { columnOrigin.x - 4, columnOrigin.y + r.size.height * 0.5 - 4, 8, 8};
 
 	if ( [self isCurrentCommit ] ) {
 		[[NSColor colorWithCalibratedRed: 0Xfc/256.0 green:0Xa6/256.0 blue: 0X4f/256.0 alpha: 1.0] set];
@@ -92,8 +146,9 @@
 		[[NSColor whiteColor] set];
 	}
 
-	path = [NSBezierPath bezierPathWithOvalInRect:smallOval];
-	[path fill];	
+	NSBezierPath *smallPath = [NSBezierPath bezierPathWithOvalInRect:smallOval];
+	[smallPath fill];
+
 }
 
 - (void) drawTriangleInRect: (NSRect) r sign: (char) sign
@@ -135,10 +190,22 @@
 	
 	[style setAlignment:NSCenterTextAlignment];
 	[attributes setObject:style forKey:NSParagraphStyleAttributeName];
-	[attributes setObject:[NSFont fontWithName:@"Helvetica" size:9] forKey:NSFontAttributeName];
+	[attributes setObject:[NSFont fontWithName:@"LucidaGrande" size:10] forKey:NSFontAttributeName];
 
-	//if (selected)
-	//	[attributes setObject:[NSColor alternateSelectedControlTextColor] forKey:NSForegroundColorAttributeName];
+	NSShadow *shadow = nil;
+
+	if (selected && false) { // white text is a bit too hard to read (even with shadow) on refs
+		[attributes setObject:[NSColor alternateSelectedControlTextColor] forKey:NSForegroundColorAttributeName];
+		if (ENABLE_SHADOW) {
+			shadow = [NSShadow new];
+			[shadow setShadowColor:[NSColor blackColor]];
+			[shadow setShadowBlurRadius:2.0f];
+		}
+	}
+
+	if (shadow) {
+		attributes[NSShadowAttributeName] = shadow;
+	}
 
 	return attributes;
 }
@@ -147,16 +214,18 @@
 {
 	BOOL isHEAD = [ref.ref isEqualToString:[[[controller repository] headRef] simpleRef]];
 
-	if (isHEAD)
+	if (isHEAD) {
 		return [NSColor colorWithCalibratedRed: 0Xfc/256.0 green:0Xa6/256.0 blue: 0X4f/256.0 alpha: 1.0];
+	}
 
 	NSString* type = [ref type];
-	if ([type isEqualToString:@"head"])
-		return [NSColor colorWithCalibratedRed: 0Xaa/256.0 green:0Xf2/256.0 blue: 0X54/256.0 alpha: 1.0];
-	else if ([type isEqualToString:@"remote"])
-		return [NSColor colorWithCalibratedRed: 0xb2/256.0 green:0Xdf/256.0 blue: 0Xff/256.0 alpha: 1.0];
-	else if ([type isEqualToString:@"tag"])
-		return [NSColor colorWithCalibratedRed: 0Xfc/256.0 green:0Xed/256.0 blue: 0X4f/256.0 alpha: 1.0];
+	if ([type isEqualToString:@"head"]) {
+		return [NSColor colorWithCalibratedRed: 0X9a/256.0 green:0Xe2/256.0 blue: 0X84/256.0 alpha: 1.0];
+	} else if ([type isEqualToString:@"remote"]) {
+		return [NSColor colorWithCalibratedRed: 0xa2/256.0 green:0Xcf/256.0 blue: 0Xef/256.0 alpha: 1.0];
+	} else if ([type isEqualToString:@"tag"]) {
+		return [NSColor colorWithCalibratedRed: 0Xfc/256.0 green:0Xed/256.0 blue: 0X6f/256.0 alpha: 1.0];
+	}
 	
 	return [NSColor yellowColor];
 }
@@ -166,11 +235,11 @@
 	NSMutableArray *array = [NSMutableArray array];
 	
 	static const int ref_padding = 10;
-	static const int ref_spacing = 2;
+	static const int ref_spacing = 4;
 	
 	NSRect lastRect = rect;
-	lastRect.origin.x = round(lastRect.origin.x) + 0.5;
-	lastRect.origin.y = round(lastRect.origin.y) + 0.5;
+	lastRect.origin.x = round(lastRect.origin.x);
+	lastRect.origin.y = round(lastRect.origin.y);
 	
 	for (PBGitRef *ref in self.objectValue.refs) {
 		NSMutableDictionary* attributes = [self attributesForRefLabelSelected:NO];
@@ -197,12 +266,26 @@
 	PBGitRef *ref = [refs objectAtIndex:index];
 	
 	NSMutableDictionary* attributes = [self attributesForRefLabelSelected:[self isHighlighted]];
-	NSBezierPath *border = [NSBezierPath bezierPathWithRoundedRect:rect cornerRadius: 2.0];
+	NSBezierPath *border = [NSBezierPath bezierPathWithRoundedRect:rect cornerRadius: 3.0];
 	[[self colorForRef:ref] set];
-	[border fill];
 	
+
+	if (ENABLE_SHADOW) {
+		[NSGraphicsContext saveGraphicsState];
+
+		NSShadow *shadow = [NSShadow new];
+		[shadow setShadowColor:[NSColor grayColor]];//[[self class] shadowColor]];
+		[shadow setShadowOffset:NSMakeSize(0.5f, -0.5f)];
+		[shadow setShadowBlurRadius:2.0f];
+		[shadow set];
+	}
+	[border fill];
+	if (ENABLE_SHADOW) {
+		[NSGraphicsContext restoreGraphicsState];
+	}
+//	[[NSColor blackColor] set];
+//	[border stroke];
 	[[ref shortName] drawInRect:rect withAttributes:attributes];
-	[border stroke];	
 }
 
 - (void) drawRefsInRect: (NSRect *)refRect
@@ -222,8 +305,9 @@
     // Only update rect to account for drawn refs if necessary to push
     // subsequent content to the right.
     if (index > 0) {
-        refRect->size.width -= lastRect.origin.x - refRect->origin.x + lastRect.size.width;
-        refRect->origin.x    = lastRect.origin.x + lastRect.size.width;
+		const CGFloat PADDING = 4;
+        refRect->size.width -= lastRect.origin.x - refRect->origin.x + lastRect.size.width - PADDING;
+        refRect->origin.x    = lastRect.origin.x + lastRect.size.width + PADDING;
     }
 }
 
@@ -232,7 +316,7 @@
 	cellInfo = [self.objectValue lineInfo];
 	
 	if (cellInfo && ![controller hasNonlinearPath]) {
-		float pathWidth = 10 + 10 * cellInfo.numColumns;
+		float pathWidth = 10 + COLUMN_WIDTH * cellInfo.numColumns;
 
 		NSRect ownRect;
 		NSDivideRect(rect, &ownRect, &rect, pathWidth, NSMinXEdge);

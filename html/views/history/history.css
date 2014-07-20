@@ -114,6 +114,16 @@ a.servicebutton:hover {
 	margin-bottom: 0.25em;
 }
 
+#files a .renamed .meta,
+#files a .renamed .old {
+	color: #888888;
+	border-bottom: 1px solid #ffffff;
+}
+
+#files a .renamed .meta {
+	font-weight: bold;
+}
+
 .clear_both {
 	clear:both;
 	display:block;
@@ -149,18 +159,18 @@ a.showdiff {
 .refs {
 	font-size: 9px;
 	font-family: Helvetica;
-	border: 1px solid black;
 	margin-right: 2px;
 	padding: 1px 3px 1px 3px;
-	-webkit-border-radius: 2px;
+	-webkit-border-radius: 3px;
+	-webkit-box-shadow: 1px 1px 2px #444;
 }
 
 .refs.head {
-	background-color: #aaf254;
+	background-color: #7ad254;
 }
 
 .refs.remote {
-	background-color: #b2dfff;
+	background-color: #82afef;
 }
 
 .refs.tag {

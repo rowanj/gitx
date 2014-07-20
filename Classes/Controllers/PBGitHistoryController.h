@@ -7,10 +7,11 @@
 //
 
 #import <Cocoa/Cocoa.h>
-#import "PBGitCommit.h"
-#import "PBGitTree.h"
 #import "PBViewController.h"
-#import "PBCollapsibleSplitView.h"
+
+@class PBGitCommit;
+@class PBGitTree;
+@class PBCollapsibleSplitView;
 
 @class PBGitSidebarController;
 @class PBWebHistoryController;

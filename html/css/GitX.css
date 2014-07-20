@@ -16,3 +16,7 @@ body {
   content: "\25b8\0020";
 }
 
+.SHA {
+	font-family: 'Monaco', monospace;
+	text-decoration: none;
+}

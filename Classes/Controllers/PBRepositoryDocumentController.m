@@ -37,7 +37,7 @@
 	if ([op runModal] != NSFileHandlingPanelOKButton)
         return nil;
 
-    BOOL success = [GTRepository initializeEmptyRepositoryAtURL:[op URL] error:outError];
+    BOOL success = [GTRepository initializeEmptyRepositoryAtFileURL:[op URL] error:outError];
     if (!success)
         return nil; // Repo creation failed
 

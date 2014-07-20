@@ -320,7 +320,7 @@ NSURL *workingDirectoryURL(NSMutableArray *arguments)
     NSString *pwd = [[[NSProcessInfo processInfo] environment] objectForKey:@"PWD"];
 
 	NSURL* pwdURL = [NSURL fileURLWithPath:pwd];
-	NSURL* repoURL = [GitRepoFinder fileURLForURL:pwdURL];
+	NSURL* repoURL = [GitRepoFinder workDirForURL:pwdURL];
 	return repoURL;
 
 }

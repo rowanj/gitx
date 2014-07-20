@@ -7,7 +7,9 @@
 //
 
 #import "PBRefMenuItem.h"
-
+#import "PBGitRepository.h"
+#import "PBGitRevSpecifier.h"
+#import "PBGitSHA.h"
 
 @implementation PBRefMenuItem
 @synthesize refish;
@@ -47,8 +49,9 @@
 	BOOL isDetachedHead = (isHead && [headRefName isEqualToString:@"HEAD"]);
 
 	NSString *remoteName = [ref remoteName];
-	if (!remoteName && [ref isBranch])
+	if (!remoteName && [ref isBranch]) {
 		remoteName = [[repo remoteRefForBranch:ref error:NULL] remoteName];
+	}
 	BOOL hasRemote = (remoteName ? YES : NO);
 	BOOL isRemote = ([ref isRemote] && ![ref isRemoteBranch]);
 
@@ -131,8 +134,15 @@
 
 	// delete ref
 	[items addObject:[PBRefMenuItem separatorItem]];
-	NSString *deleteTitle = [NSString stringWithFormat:@"Delete %@…", targetRefName];
-	[items addObject:[PBRefMenuItem itemWithTitle:deleteTitle action:@selector(showDeleteRefSheet:) enabled:!isDetachedHead]];
+	{
+		NSString *deleteTitle = [NSString stringWithFormat:@"Delete %@…", targetRefName];
+		if ([ref isRemote]) {
+			deleteTitle = [NSString stringWithFormat:@"Remove %@…", targetRefName];
+		}
+		BOOL deleteEnabled = !(isDetachedHead || isHead);
+		PBRefMenuItem *deleteItem = [PBRefMenuItem itemWithTitle:deleteTitle action:@selector(showDeleteRefSheet:) enabled:deleteEnabled];
+		[items addObject:deleteItem];
+	}
 
 	for (PBRefMenuItem *item in items) {
 		[item setTarget:target];

@@ -7,17 +7,16 @@
 //
 
 #import <Cocoa/Cocoa.h>
-#import "PBGitRepository.h"
-#import "PBGitTree.h"
-#import "PBGitRefish.h"
-#import "PBGitSHA.h"
+#import "PBGitRefish.h" // for @protocol PBGitRefish
 
-#import <ObjectiveGit/git2/oid.h>
+@class PBGitRepository;
+@class PBGitTree;
+@class PBGitRef;
+@class PBGitSHA;
+@class PBGraphCellInfo;
 
 extern NSString * const kGitXCommitType;
 
-@class PBGraphCellInfo;
-@class GTCommit;
 
 @interface PBGitCommit : NSObject <PBGitRefish>
 

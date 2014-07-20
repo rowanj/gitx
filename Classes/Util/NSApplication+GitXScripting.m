@@ -34,7 +34,7 @@
 	if (!repositoryURL)
         return;
 
-    BOOL success = [GTRepository initializeEmptyRepositoryAtURL:repositoryURL error:&error];
+    BOOL success = [GTRepository initializeEmptyRepositoryAtFileURL:repositoryURL error:&error];
     if (!success) {
         NSLog(@"Failed to create repository at %@: %@", repositoryURL, error);
         return;

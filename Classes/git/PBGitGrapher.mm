@@ -6,20 +6,22 @@
 //  Copyright 2008 __MyCompanyName__. All rights reserved.
 //
 
+#include <vector>
+#include <algorithm>
+
 #import "PBGraphCellInfo.h"
 #import "PBGitGrapher.h"
 #import "PBGitCommit.h"
+#import "PBGitSHA.h"
 #import "PBGitLane.h"
 #import "PBGitGraphLine.h"
-
-#import <vector>
-#import <git2/oid.h>
-#include <algorithm>
 
 using namespace std;
 typedef std::vector<PBGitLane *> LaneCollection;
 
-@interface PBGitGrapher ()
+@interface PBGitGrapher () {
+	int _laneIndex;
+}
 
 @property (nonatomic, strong) PBGraphCellInfo *previous;
 @property (nonatomic, assign) LaneCollection *pl;
@@ -37,8 +39,8 @@ typedef std::vector<PBGitLane *> LaneCollection;
 	}
 	
 	self.pl = new LaneCollection;
-
-	PBGitLane::resetColors();
+	_laneIndex = 0;
+	
 	return self;
 }
 
@@ -107,7 +109,7 @@ void add_line(struct PBGitGraphLine *lines, int *nLines, int upper, int from, in
 	// If we already did the first parent, don't do so again
 	if (!didFirst && nParents) {
 		git_oid parentOID = [(PBGitSHA*)[parents objectAtIndex:0] oid];
-		PBGitLane *newLane = new PBGitLane(&parentOID);
+		PBGitLane *newLane = new PBGitLane(_laneIndex++, &parentOID);
 		currentLanes->push_back(newLane);
 		newPos = currentLanes->size();
 		add_line(lines, &currentLine, 0, newPos, newPos, newLane->index());
@@ -138,7 +140,7 @@ void add_line(struct PBGitGraphLine *lines, int *nLines, int upper, int from, in
 		
 		// Really add this parent
 		addedParent = YES;
-		PBGitLane *newLane = new PBGitLane(&parentOID);
+		PBGitLane *newLane = new PBGitLane(_laneIndex++, &parentOID);
 		currentLanes->push_back(newLane);
 		add_line(lines, &currentLine, 0, currentLanes->size(), newPos, newLane->index());
 	}

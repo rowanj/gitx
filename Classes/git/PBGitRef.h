@@ -9,7 +9,6 @@
 #import <Cocoa/Cocoa.h>
 #import "PBGitRefish.h"
 
-
 extern NSString * const kGitXTagType;
 extern NSString * const kGitXBranchType;
 extern NSString * const kGitXRemoteType;
@@ -20,9 +19,7 @@ extern NSString * const kGitXBranchRefPrefix;
 extern NSString * const kGitXRemoteRefPrefix;
 
 
-@interface PBGitRef : NSObject <PBGitRefish> {
-	NSString* ref;
-}
+@interface PBGitRef : NSObject <PBGitRefish>
 
 // <PBGitRefish>
 - (NSString *) refishName;
@@ -46,6 +43,7 @@ extern NSString * const kGitXRemoteRefPrefix;
 
 + (PBGitRef*) refFromString: (NSString*) s;
 - (PBGitRef*) initWithString: (NSString*) s;
-@property(readonly) NSString* ref;
+
+@property(nonatomic, strong, readonly) NSString* ref;
 
 @end

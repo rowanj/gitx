@@ -5,32 +5,23 @@
 //  Created by Pieter de Bie on 27-08-08.
 //  Copyright 2008 __MyCompanyName__. All rights reserved.
 //
+
 #import <Cocoa/Cocoa.h>
-#include <git2/oid.h>
 
 class PBGitLane {
-	static int s_colorIndex;
-
 	git_oid d_sha;
 	int d_index;
 
 public:
 
-	PBGitLane(git_oid *sha)
+	PBGitLane(int index, git_oid *sha) : d_index(index)
 	{
-		d_index = s_colorIndex++;
 		d_sha = *sha;
 	}
 
-	PBGitLane(NSString *sha)
+	PBGitLane(int index, NSString *sha) : d_index(index)
 	{
 		git_oid_fromstr(&d_sha, [sha UTF8String]);
-		d_index = s_colorIndex++;
-	}
-	
-	PBGitLane()
-	{
-		d_index = s_colorIndex++;
 	}
 	
 	bool isCommit(git_oid sha) const
@@ -46,6 +37,4 @@ public:
 	}
 	
 	int index() const;
-
-	static void resetColors();
 };

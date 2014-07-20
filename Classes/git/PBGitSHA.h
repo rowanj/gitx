@@ -7,22 +7,16 @@
 //
 
 #import <Cocoa/Cocoa.h>
-#include <git2/oid.h>
 
+@interface PBGitSHA : NSObject <NSCopying>
 
-@interface PBGitSHA : NSObject <NSCopying> {
-	git_oid oid;
-	NSString *string;
-}
-
-
-+ (PBGitSHA *)shaWithOID:(git_oid)oid;
++ (PBGitSHA *)shaWithOID:(git_oid const *)oid;
 + (PBGitSHA *)shaWithString:(NSString *)shaString;
 + (PBGitSHA *)shaWithCString:(const char *)shaCString;
 
-- (BOOL)isEqualToOID:(git_oid)other_oid;
+- (BOOL)isEqualToOID:(git_oid const *)other_oid;
 
-@property (readonly) git_oid oid;
-@property (readonly) NSString *string;
+@property (nonatomic, assign, readonly) git_oid oid;
+@property (nonatomic, strong, readonly) NSString *string;
 
 @end

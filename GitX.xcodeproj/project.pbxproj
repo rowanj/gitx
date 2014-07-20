@@ -11,6 +11,7 @@
 		4A0B5BD315FE2DA600ACCB61 /* libssl.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 4A0B5BD215FE2DA600ACCB61 /* libssl.dylib */; };
 		4A0B5BD515FE2DC900ACCB61 /* libcrypto.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 4A0B5BD415FE2DC900ACCB61 /* libcrypto.dylib */; };
 		4A1F4E6917AFE969004D51E9 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 29B97325FDCFA39411CA2CEA /* Foundation.framework */; };
+		4A2125A417C0C78A00B5B582 /* NSColor+RGB.m in Sources */ = {isa = PBXBuildFile; fileRef = 4A2125A317C0C78A00B5B582 /* NSColor+RGB.m */; };
 		4A40159714067B6300DB9C07 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4A40159614067B6300DB9C07 /* CoreFoundation.framework */; };
 		4A40159914067B7A00DB9C07 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4A40159814067B7A00DB9C07 /* AppKit.framework */; };
 		4A467EEE1546D1CD00F8902B /* ObjectiveGit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4A4EF0AF142CBAD5001B8CDF /* ObjectiveGit.framework */; };
@@ -22,7 +23,6 @@
 		4A5D75C814A9A90500DF6C68 /* AddLabelTemplate.png in Resources */ = {isa = PBXBuildFile; fileRef = 4A5D758514A9A90500DF6C68 /* AddLabelTemplate.png */; };
 		4A5D75CC14A9A90500DF6C68 /* AddRemoteBranchFireworksTemplate.png in Resources */ = {isa = PBXBuildFile; fileRef = 4A5D758914A9A90500DF6C68 /* AddRemoteBranchFireworksTemplate.png */; };
 		4A5D75CD14A9A90500DF6C68 /* AddRemoteBranchTemplate.png in Resources */ = {isa = PBXBuildFile; fileRef = 4A5D758A14A9A90500DF6C68 /* AddRemoteBranchTemplate.png */; };
-		4A5D75CE14A9A90500DF6C68 /* Branch.png in Resources */ = {isa = PBXBuildFile; fileRef = 4A5D758B14A9A90500DF6C68 /* Branch.png */; };
 		4A5D75CF14A9A90500DF6C68 /* branch.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 4A5D758C14A9A90500DF6C68 /* branch.tiff */; };
 		4A5D75D014A9A90500DF6C68 /* CherryPickTemplate.png in Resources */ = {isa = PBXBuildFile; fileRef = 4A5D758D14A9A90500DF6C68 /* CherryPickTemplate.png */; };
 		4A5D75D114A9A90500DF6C68 /* CloneRepositoryFireworksTemplate.png in Resources */ = {isa = PBXBuildFile; fileRef = 4A5D758E14A9A90500DF6C68 /* CloneRepositoryFireworksTemplate.png */; };
@@ -166,6 +166,8 @@
 		4A5D777414A9AEB000DF6C68 /* PBSourceViewBadge.m in Sources */ = {isa = PBXBuildFile; fileRef = 4A5D776F14A9AEB000DF6C68 /* PBSourceViewBadge.m */; };
 		4A5D777514A9AEB000DF6C68 /* PBSourceViewRemote.m in Sources */ = {isa = PBXBuildFile; fileRef = 4A5D777214A9AEB000DF6C68 /* PBSourceViewRemote.m */; };
 		4A68AD7414A00541006DE321 /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4A68AD6714A0050F006DE321 /* Sparkle.framework */; };
+		4A74FA75183E3B6A003F7184 /* Branch.png in Resources */ = {isa = PBXBuildFile; fileRef = 4A5D758B14A9A90500DF6C68 /* Branch.png */; };
+		4A74FA76183E3B6E003F7184 /* Branch@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = BC0AAF6B17590F5B00F4EE9A /* Branch@2x.png */; };
 		4A774CC9142F482900E158CC /* ObjectiveGit.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 4A4EF0AF142CBAD5001B8CDF /* ObjectiveGit.framework */; };
 		4A8F6B4B14A9B6C20002F4D7 /* MGScopeBar.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4A8F6B4714A9B6110002F4D7 /* MGScopeBar.framework */; };
 		4A8F6B4C14A9B6C90002F4D7 /* MGScopeBar.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 4A8F6B4714A9B6110002F4D7 /* MGScopeBar.framework */; };
@@ -176,7 +178,6 @@
 		4AB71FF814B7EDD400F1DFFC /* RJModalRepoSheet.m in Sources */ = {isa = PBXBuildFile; fileRef = 4AB71FF714B7EDD400F1DFFC /* RJModalRepoSheet.m */; };
 		4AC42F7D16BFBADA007CCA3A /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4A40159814067B7A00DB9C07 /* AppKit.framework */; };
 		551BF176112F3F4B00265053 /* gitx_askpasswd in Resources */ = {isa = PBXBuildFile; fileRef = 551BF111112F371800265053 /* gitx_askpasswd */; };
-		643952741603E9BC00BB7AFF /* PBGitSubmodule.m in Sources */ = {isa = PBXBuildFile; fileRef = 643952731603E9BC00BB7AFF /* PBGitSubmodule.m */; };
 		643952771603EF9B00BB7AFF /* PBGitSVSubmoduleItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 643952761603EF9B00BB7AFF /* PBGitSVSubmoduleItem.m */; };
 		8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
 		911112370E5A097800BF76B4 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 911112360E5A097800BF76B4 /* Security.framework */; };
@@ -196,7 +197,6 @@
 		BC067C75175A149000D86938 /* MergeTemplate@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = BC067C74175A149000D86938 /* MergeTemplate@2x.png */; };
 		BC067C77175A16A500D86938 /* RebaseTemplate@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = BC067C76175A16A500D86938 /* RebaseTemplate@2x.png */; };
 		BC0AAF6117590F5100F4EE9A /* StageView@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = BC0AAF6017590F5100F4EE9A /* StageView@2x.png */; };
-		BC0AAF6C17590F5B00F4EE9A /* Branch@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = BC0AAF6B17590F5B00F4EE9A /* Branch@2x.png */; };
 		BC0AAF6E17590F6400F4EE9A /* RemoteBranch@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = BC0AAF6D17590F6400F4EE9A /* RemoteBranch@2x.png */; };
 		BC0AAF701759140C00F4EE9A /* deleted_file@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = BC0AAF6F1759140C00F4EE9A /* deleted_file@2x.png */; };
 		BC0AAF721759141400F4EE9A /* empty_file@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = BC0AAF711759141400F4EE9A /* empty_file@2x.png */; };
@@ -205,7 +205,6 @@
 		BC0AAF78175915F400F4EE9A /* Remote@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = BC0AAF76175915F400F4EE9A /* Remote@2x.png */; };
 		BC0AAF7B175916D700F4EE9A /* Folder.png in Resources */ = {isa = PBXBuildFile; fileRef = BC0AAF79175916D700F4EE9A /* Folder.png */; };
 		BC0AAF7C175916D700F4EE9A /* Folder@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = BC0AAF7A175916D700F4EE9A /* Folder@2x.png */; };
-		BC77578C176766B60048BB48 /* BranchTemplate@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = BC77578B176766B60048BB48 /* BranchTemplate@2x.png */; };
 		BC775797176766C60048BB48 /* RemoteBranchTemplate@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = BC775796176766C60048BB48 /* RemoteBranchTemplate@2x.png */; };
 		BCFBAF6917636C4E004D727A /* RemoteHighlighted@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = BCFBAF6817636C4E004D727A /* RemoteHighlighted@2x.png */; };
 		BCFBAF7617637118004D727A /* FolderClosed@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = BCFBAF7317637118004D727A /* FolderClosed@2x.png */; };
@@ -367,12 +366,12 @@
 		29B97325FDCFA39411CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
 		4A0B5BD215FE2DA600ACCB61 /* libssl.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libssl.dylib; path = usr/lib/libssl.dylib; sourceTree = SDKROOT; };
 		4A0B5BD415FE2DC900ACCB61 /* libcrypto.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcrypto.dylib; path = usr/lib/libcrypto.dylib; sourceTree = SDKROOT; };
-		4A1223321765D1DD0041B567 /* libgit2 */ = {isa = PBXFileReference; lastKnownFileType = folder; name = libgit2; path = "objective-git/libgit2"; sourceTree = "<group>"; };
+		4A2125A217C0C78A00B5B582 /* NSColor+RGB.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSColor+RGB.h"; sourceTree = "<group>"; };
+		4A2125A317C0C78A00B5B582 /* NSColor+RGB.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSColor+RGB.m"; sourceTree = "<group>"; };
 		4A40159614067B6300DB9C07 /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
 		4A40159814067B7A00DB9C07 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
 		4A4EF09F142CBAD5001B8CDF /* ObjectiveGitFramework.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = ObjectiveGitFramework.xcodeproj; path = "objective-git/ObjectiveGitFramework.xcodeproj"; sourceTree = "<group>"; };
 		4A4EF0BD142CBC59001B8CDF /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = usr/lib/libz.dylib; sourceTree = SDKROOT; };
-		4A52D2CC1558187800B778A5 /* appcast.pl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.perl; name = appcast.pl; path = updates/appcast.pl; sourceTree = SOURCE_ROOT; };
 		4A52D2CD1558187800B778A5 /* GitX-dev.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = "GitX-dev.html"; path = "updates/GitX-dev.html"; sourceTree = SOURCE_ROOT; };
 		4A5D757D14A9A90500DF6C68 /* Credits.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = Credits.html; sourceTree = "<group>"; };
 		4A5D757E14A9A90500DF6C68 /* gitx.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = gitx.icns; sourceTree = "<group>"; };
@@ -636,8 +635,6 @@
 		4AB71FF614B7EDD400F1DFFC /* RJModalRepoSheet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RJModalRepoSheet.h; sourceTree = "<group>"; };
 		4AB71FF714B7EDD400F1DFFC /* RJModalRepoSheet.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RJModalRepoSheet.m; sourceTree = "<group>"; };
 		551BF111112F371800265053 /* gitx_askpasswd */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = gitx_askpasswd; sourceTree = BUILT_PRODUCTS_DIR; };
-		643952721603E9BC00BB7AFF /* PBGitSubmodule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PBGitSubmodule.h; sourceTree = "<group>"; };
-		643952731603E9BC00BB7AFF /* PBGitSubmodule.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PBGitSubmodule.m; sourceTree = "<group>"; };
 		643952751603EF9B00BB7AFF /* PBGitSVSubmoduleItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PBGitSVSubmoduleItem.h; sourceTree = "<group>"; };
 		643952761603EF9B00BB7AFF /* PBGitSVSubmoduleItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PBGitSVSubmoduleItem.m; sourceTree = "<group>"; };
 		77C82804067257F0000B614F /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = /System/Library/Frameworks/CoreData.framework; sourceTree = "<absolute>"; };
@@ -668,7 +665,6 @@
 		BC0AAF76175915F400F4EE9A /* Remote@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Remote@2x.png"; sourceTree = "<group>"; };
 		BC0AAF79175916D700F4EE9A /* Folder.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Folder.png; sourceTree = "<group>"; };
 		BC0AAF7A175916D700F4EE9A /* Folder@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Folder@2x.png"; sourceTree = "<group>"; };
-		BC77578B176766B60048BB48 /* BranchTemplate@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "BranchTemplate@2x.png"; sourceTree = "<group>"; };
 		BC775796176766C60048BB48 /* RemoteBranchTemplate@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "RemoteBranchTemplate@2x.png"; sourceTree = "<group>"; };
 		BCFBAF6817636C4E004D727A /* RemoteHighlighted@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "RemoteHighlighted@2x.png"; sourceTree = "<group>"; };
 		BCFBAF7317637118004D727A /* FolderClosed@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "FolderClosed@2x.png"; sourceTree = "<group>"; };
@@ -759,6 +755,7 @@
 			);
 			name = GitTest;
 			sourceTree = "<group>";
+			usesTabs = 1;
 		};
 		29B97323FDCFA39411CA2CEA /* Frameworks */ = {
 			isa = PBXGroup;
@@ -787,8 +784,8 @@
 			isa = PBXGroup;
 			children = (
 				4A4EF0AF142CBAD5001B8CDF /* ObjectiveGit.framework */,
-				4ADAA9C21602ADB8007A0E6F /* ObjectiveGitTests.octest */,
 				4A4EF0B3142CBAD5001B8CDF /* libObjectiveGit-iOS.a */,
+				4ADAA9C21602ADB8007A0E6F /* ObjectiveGitTests.octest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -796,7 +793,6 @@
 		4A5D757C14A9A90500DF6C68 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				4A52D2CC1558187800B778A5 /* appcast.pl */,
 				4A52D2CD1558187800B778A5 /* GitX-dev.html */,
 				4A90A73414A9D24300D0DA02 /* GitX.sdef */,
 				4A90A72714A9C12F00D0DA02 /* Common.xcconfig */,
@@ -822,7 +818,6 @@
 		4A5D758114A9A90500DF6C68 /* Images */ = {
 			isa = PBXGroup;
 			children = (
-				BC77578B176766B60048BB48 /* BranchTemplate@2x.png */,
 				BC775796176766C60048BB48 /* RemoteBranchTemplate@2x.png */,
 				4A5D758214A9A90500DF6C68 /* add_branch.psd */,
 				4A5D758314A9A90500DF6C68 /* AddBranchTemplate.png */,
@@ -966,6 +961,8 @@
 				4A5D768914A9A9CC00DF6C68 /* GitXRelativeDateFormatter.m */,
 				4A5D768A14A9A9CC00DF6C68 /* GitXScriptingConstants.h */,
 				4A5D768B14A9A9CC00DF6C68 /* main.m */,
+				4A2125A217C0C78A00B5B582 /* NSColor+RGB.h */,
+				4A2125A317C0C78A00B5B582 /* NSColor+RGB.m */,
 				4A5D768C14A9A9CC00DF6C68 /* PBChangedFile.h */,
 				4A5D768D14A9A9CC00DF6C68 /* PBChangedFile.m */,
 				4A5D768E14A9A9CC00DF6C68 /* PBCLIProxy.h */,
@@ -1090,8 +1087,6 @@
 				4A5D768214A9A9CC00DF6C68 /* PBGitXErrors.m */,
 				4A5D768314A9A9CC00DF6C68 /* PBGitXProtocol.h */,
 				4A5D768414A9A9CC00DF6C68 /* PBGitXProtocol.m */,
-				643952721603E9BC00BB7AFF /* PBGitSubmodule.h */,
-				643952731603E9BC00BB7AFF /* PBGitSubmodule.m */,
 				643952751603EF9B00BB7AFF /* PBGitSVSubmoduleItem.h */,
 				643952761603EF9B00BB7AFF /* PBGitSVSubmoduleItem.m */,
 				4AB057E11652652000DE751D /* GitRepoFinder.h */,
@@ -1182,7 +1177,6 @@
 		4A5D773E14A9AB3A00DF6C68 /* External Sources */ = {
 			isa = PBXGroup;
 			children = (
-				4A1223321765D1DD0041B567 /* libgit2 */,
 				4A8F6B3B14A9B6100002F4D7 /* MGScopeBar.xcodeproj */,
 				4A4EF09F142CBAD5001B8CDF /* ObjectiveGitFramework.xcodeproj */,
 				4A68AD5814A0050E006DE321 /* Sparkle.xcodeproj */,
@@ -1279,7 +1273,7 @@
 		29B97313FDCFA39411CA2CEA /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0420;
+				LastUpgradeCheck = 0460;
 			};
 			buildConfigurationList = 26FC0A880875C7B200E6366F /* Build configuration list for PBXProject "GitX" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -1402,7 +1396,6 @@
 				4A5D75C814A9A90500DF6C68 /* AddLabelTemplate.png in Resources */,
 				4A5D75CC14A9A90500DF6C68 /* AddRemoteBranchFireworksTemplate.png in Resources */,
 				4A5D75CD14A9A90500DF6C68 /* AddRemoteBranchTemplate.png in Resources */,
-				4A5D75CE14A9A90500DF6C68 /* Branch.png in Resources */,
 				4A5D75CF14A9A90500DF6C68 /* branch.tiff in Resources */,
 				4A5D75D014A9A90500DF6C68 /* CherryPickTemplate.png in Resources */,
 				4A5D75D114A9A90500DF6C68 /* CloneRepositoryFireworksTemplate.png in Resources */,
@@ -1421,6 +1414,7 @@
 				4A5D75E214A9A90500DF6C68 /* Updates.png in Resources */,
 				4A5D75E314A9A90500DF6C68 /* PullFireworksTemplate.png in Resources */,
 				4A5D75E414A9A90500DF6C68 /* PullPopUpFireworksTemplate.png in Resources */,
+				4A74FA76183E3B6E003F7184 /* Branch@2x.png in Resources */,
 				4A5D75E514A9A90500DF6C68 /* PullPopUpTemplate.png in Resources */,
 				4A5D75E614A9A90500DF6C68 /* PullTemplate.png in Resources */,
 				4A5D75E714A9A90500DF6C68 /* PushFireworksTemplate.png in Resources */,
@@ -1435,6 +1429,7 @@
 				4A5D75F014A9A90500DF6C68 /* RemoteBranch.png in Resources */,
 				4A5D75F114A9A90500DF6C68 /* rewindImage.pdf in Resources */,
 				4A5D75F214A9A90500DF6C68 /* site_download_background.png in Resources */,
+				4A74FA75183E3B6A003F7184 /* Branch.png in Resources */,
 				4A5D75F314A9A90500DF6C68 /* StageView.png in Resources */,
 				4A5D75F414A9A90500DF6C68 /* Tag.png in Resources */,
 				4A5D75F514A9A90500DF6C68 /* tag.tiff in Resources */,
@@ -1458,7 +1453,6 @@
 				4A5D762014A9A99E00DF6C68 /* RepositoryWindow.xib in Resources */,
 				4A90A73514A9D24300D0DA02 /* GitX.sdef in Resources */,
 				BC0AAF6117590F5100F4EE9A /* StageView@2x.png in Resources */,
-				BC0AAF6C17590F5B00F4EE9A /* Branch@2x.png in Resources */,
 				BC0AAF6E17590F6400F4EE9A /* RemoteBranch@2x.png in Resources */,
 				BC0AAF701759140C00F4EE9A /* deleted_file@2x.png in Resources */,
 				BC0AAF721759141400F4EE9A /* empty_file@2x.png in Resources */,
@@ -1497,7 +1491,6 @@
 				BC0444C217648E7D00353E6D /* RemoteBranchHighlighted.png in Resources */,
 				BC0444C417648EA400353E6D /* StageViewHighlighted.png in Resources */,
 				BC0444C617648EBE00353E6D /* TagHighlighted.png in Resources */,
-				BC77578C176766B60048BB48 /* BranchTemplate@2x.png in Resources */,
 				BC775797176766C60048BB48 /* RemoteBranchTemplate@2x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1639,9 +1632,9 @@
 				4A5D777414A9AEB000DF6C68 /* PBSourceViewBadge.m in Sources */,
 				4A5D777514A9AEB000DF6C68 /* PBSourceViewRemote.m in Sources */,
 				4AB71FF814B7EDD400F1DFFC /* RJModalRepoSheet.m in Sources */,
-				643952741603E9BC00BB7AFF /* PBGitSubmodule.m in Sources */,
 				643952771603EF9B00BB7AFF /* PBGitSVSubmoduleItem.m in Sources */,
 				4AB057E31652652000DE751D /* GitRepoFinder.m in Sources */,
+				4A2125A417C0C78A00B5B582 /* NSColor+RGB.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1770,16 +1763,13 @@
 		26FC0A850875C7B200E6366F /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CLANG_ENABLE_OBJC_ARC = YES;
 				FRAMEWORK_SEARCH_PATHS = "\"$(PROJECT_DIR)\"";
 				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = GitX_Prefix.pch;
 				INFOPLIST_FILE = Resources/Info.plist;
 				INFOPLIST_OTHER_PREPROCESSOR_FLAGS = "-traditional";
 				INSTALL_PATH = /Applications;
-				OTHER_CFLAGS = "-Werror=incompatible-pointer-types";
 				PRODUCT_NAME = GitX;
 				VERSIONING_SYSTEM = "apple-generic";
 				WRAPPER_EXTENSION = app;
@@ -1789,16 +1779,13 @@
 		26FC0A860875C7B200E6366F /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CLANG_ENABLE_OBJC_ARC = YES;
 				FRAMEWORK_SEARCH_PATHS = "\"$(PROJECT_DIR)\"";
-				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = GitX_Prefix.pch;
 				GCC_PREPROCESSOR_DEFINITIONS_NOT_USED_IN_PRECOMPS = "";
 				INFOPLIST_FILE = Resources/Info.plist;
 				INFOPLIST_OTHER_PREPROCESSOR_FLAGS = "-traditional";
 				INSTALL_PATH = /Applications;
-				OTHER_CFLAGS = "-Werror=incompatible-pointer-types";
 				PRODUCT_NAME = GitX;
 				STRIP_INSTALLED_PRODUCT = YES;
 				VERSIONING_SYSTEM = "apple-generic";
@@ -1813,15 +1800,20 @@
 				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
 				CLANG_ENABLE_OBJC_ARC = YES;
 				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 0.12;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREPROCESSOR_DEFINITIONS = "DEBUG=1";
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				HEADER_SEARCH_PATHS = "\"$(PROJECT_DIR)/objective-git/libgit2/include\"";
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/objective-git/External/libgit2/include",
+				);
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				ONLY_ACTIVE_ARCH = YES;
+				OTHER_CFLAGS = "-Werror=incompatible-pointer-types";
 				SDKROOT = macosx;
 				STRIP_INSTALLED_PRODUCT = NO;
 				VALID_ARCHS = x86_64;
@@ -1834,12 +1826,17 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CURRENT_PROJECT_VERSION = 0.12;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				HEADER_SEARCH_PATHS = "\"$(PROJECT_DIR)/objective-git/libgit2/include\"";
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/objective-git/External/libgit2/include",
+				);
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				OTHER_CFLAGS = "-Werror=incompatible-pointer-types";
 				SDKROOT = macosx;
 				VALID_ARCHS = x86_64;
 			};
@@ -1850,6 +1847,7 @@
 			buildSettings = {
 				INSTALL_PATH = /usr/local/bin;
 				PRODUCT_NAME = gitx_askpasswd;
+				SKIP_INSTALL = YES;
 			};
 			name = Debug;
 		};
@@ -1860,6 +1858,7 @@
 				INFOPLIST_PREPROCESS = YES;
 				INSTALL_PATH = /usr/local/bin;
 				PRODUCT_NAME = gitx_askpasswd;
+				SKIP_INSTALL = YES;
 			};
 			name = Release;
 		};
@@ -1868,6 +1867,7 @@
 			buildSettings = {
 				INSTALL_PATH = /usr/local/bin;
 				PRODUCT_NAME = gitx_askpasswd;
+				SKIP_INSTALL = YES;
 			};
 			name = Install;
 		};
@@ -1878,6 +1878,7 @@
 				GCC_PREFIX_HEADER = GitX_Prefix.pch;
 				INSTALL_PATH = /usr/local/bin;
 				PRODUCT_NAME = gitx;
+				SKIP_INSTALL = YES;
 			};
 			name = Debug;
 		};
@@ -1888,6 +1889,7 @@
 				GCC_PREFIX_HEADER = GitX_Prefix.pch;
 				INSTALL_PATH = /usr/local/bin;
 				PRODUCT_NAME = gitx;
+				SKIP_INSTALL = YES;
 				STRIP_INSTALLED_PRODUCT = YES;
 			};
 			name = Release;

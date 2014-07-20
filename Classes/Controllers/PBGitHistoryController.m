@@ -6,6 +6,13 @@
 //  Copyright 2008 __MyCompanyName__. All rights reserved.
 //
 
+#import "PBGitSHA.h"
+#import "PBGitCommit.h"
+#import "PBGitTree.h"
+#import "PBGitRef.h"
+#import "PBGitHistoryList.h"
+#import "PBGitRevSpecifier.h"
+#import "PBCollapsibleSplitView.h"
 #import "PBGitHistoryController.h"
 #import "PBWebHistoryController.h"
 #import "CWQuickLook.h"
@@ -97,8 +104,13 @@
 				  bottomColor:[NSColor colorWithCalibratedHue:0.579 saturation:0.119 brightness:0.765 alpha:1.000]];
 	[self updateBranchFilterMatrix];
 
-  // listen for updates
-  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_repositoryUpdatedNotification:) name:PBGitRepositoryEventNotification object:repository];
+	// listen for updates
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_repositoryUpdatedNotification:) name:PBGitRepositoryEventNotification object:repository];
+
+	__unsafe_unretained PBGitHistoryController *weakSelf = self;
+	commitList.findPanelActionBlock = ^(id sender) {
+		[weakSelf.view.window makeFirstResponder:weakSelf->searchField];
+	};
 
 	[super awakeFromNib];
 }

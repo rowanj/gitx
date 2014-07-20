@@ -20,8 +20,8 @@
 @interface PBGitSidebarController ()
 
 - (void)populateList;
-- (void)addRevSpec:(PBGitRevSpecifier *)revSpec;
-- (PBSourceViewItem *) itemForRev:(PBGitRevSpecifier *)rev;
+- (PBSourceViewItem *)addRevSpec:(PBGitRevSpecifier *)revSpec;
+- (PBSourceViewItem *)itemForRev:(PBGitRevSpecifier *)rev;
 - (void) removeRevSpec:(PBGitRevSpecifier *)rev;
 - (void) updateActionMenu;
 - (void) updateRemoteControls;
@@ -98,8 +98,7 @@
 		if (changeKind == NSKeyValueChangeInsertion) {
 			NSArray *newRevSpecs = [change objectForKey:NSKeyValueChangeNewKey];
 			for (PBGitRevSpecifier *rev in newRevSpecs) {
-				[self addRevSpec:rev];
-				PBSourceViewItem *item = [self itemForRev:rev];
+				PBSourceViewItem *item = [self addRevSpec:rev];
 				[sourceView PBExpandItem:item expandParents:YES];
 			}
 		}
@@ -136,25 +135,16 @@
 		[repository readCurrentBranch];
 		return;
 	}
+
+	PBSourceViewItem *item = [self addRevSpec:rev];
+    if (item) {
+        [sourceView reloadData];
 	
-	PBSourceViewItem *item = nil;
-	for (PBSourceViewItem *it in items)
-		if ( (item = [it findRev:rev]) != nil )
-			break;
+        [sourceView PBExpandItem:item expandParents:YES];
+        NSIndexSet *index = [NSIndexSet indexSetWithIndex:[sourceView rowForItem:item]];
 	
-	if (!item) {
-		[self addRevSpec:rev];
-		// Try to find the just added item again.
-		// TODO: refactor with above.
-		for (PBSourceViewItem *it in items)
-			if ( (item = [it findRev:rev]) != nil )
-				break;
-	}
-	
-	[sourceView PBExpandItem:item expandParents:YES];
-	NSIndexSet *index = [NSIndexSet indexSetWithIndex:[sourceView rowForItem:item]];
-	
-	[sourceView selectRowIndexes:index byExtendingSelection:NO];
+        [sourceView selectRowIndexes:index byExtendingSelection:NO];
+    }
 }
 
 - (PBSourceViewItem *) itemForRev:(PBGitRevSpecifier *)rev
@@ -166,12 +156,16 @@
 	return nil;
 }
 
-- (void)addRevSpec:(PBGitRevSpecifier *)rev
+- (PBSourceViewItem *)addRevSpec:(PBGitRevSpecifier *)rev
 {
+    PBSourceViewItem *item = nil;
+    for (PBSourceViewItem *it in items)
+        if ( (item = [it findRev:rev]) != nil )
+            return item;
+
 	if (![rev isSimpleRef]) {
 		[others addChild:[PBSourceViewItem itemWithRevSpec:rev]];
-		[sourceView reloadData];
-		return;
+		return item;
 	}
 
 	NSArray *pathComponents = [[rev simpleRef] componentsSeparatedByString:@"/"];
@@ -183,7 +177,7 @@
 		[tags addRev:rev toPath:[pathComponents subarrayWithRange:NSMakeRange(2, [pathComponents count] - 2)]];
 	else if ([[rev simpleRef] hasPrefix:@"refs/remotes/"])
 		[remotes addRev:rev toPath:[pathComponents subarrayWithRange:NSMakeRange(2, [pathComponents count] - 2)]];
-	[sourceView reloadData];
+    return item;
 }
 
 - (void) removeRevSpec:(PBGitRevSpecifier *)rev
@@ -230,12 +224,15 @@
     NSInteger rowNumber = [sourceView selectedRow];
     if ([[sourceView itemAtRow:rowNumber] isKindOfClass:[PBGitSVSubmoduleItem class]]) {
         PBGitSVSubmoduleItem *subModule = [sourceView itemAtRow:rowNumber];
-        
-        NSURL *url = [NSURL fileURLWithPath:subModule.submodule.path];
-        [[NSDocumentController sharedDocumentController] openDocumentWithContentsOfURL:url
-                                                                               display:YES
-                                                                                 error:nil];
 
+		NSURL *url = subModule.path;
+		[[NSDocumentController sharedDocumentController] openDocumentWithContentsOfURL:url
+																			   display:YES
+																	 completionHandler:^(NSDocument *document, BOOL documentWasAlreadyOpen, NSError *error) {
+																		 if (error) {
+																			 [self.repository.windowController showErrorSheet:error];
+																		 }
+																	 }];
         ;
     }
 }
@@ -289,11 +286,13 @@
 	submodules = [PBSourceViewItem groupItemWithTitle:@"Submodules"];
 	others = [PBSourceViewItem groupItemWithTitle:@"Other"];
 
-	for (PBGitRevSpecifier *rev in repository.branches)
+	for (PBGitRevSpecifier *rev in repository.branches) {
 		[self addRevSpec:rev];
+	}
     
-    for (PBGitSubmodule *sub in repository.submodules)
+    for (GTSubmodule *sub in repository.submodules) {
         [submodules addChild: [PBGitSVSubmoduleItem itemWithSubmodule:sub]];
+	}
     
 	[items addObject:project];
 	[items addObject:branches];

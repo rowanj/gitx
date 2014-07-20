@@ -6,11 +6,12 @@
 //  Copyright 2008 __MyCompanyName__. All rights reserved.
 //
 
+#import "PBGitRepository.h"
 #import "PBGitCommit.h"
+#import "PBGitTree.h"
 #import "PBGitSHA.h"
+#import "PBGitRef.h"
 #import "PBGitDefaults.h"
-
-#import <ObjectiveGit/ObjectiveGit.h>
 
 NSString * const kGitXCommitType = @"commit";
 
@@ -31,6 +32,7 @@ NSString * const kGitXCommitType = @"commit";
 - (NSDate *) date
 {
 	return self.gtCommit.commitDate;
+	// previous behaviour was equiv. to:  return self.gtCommit.author.time;
 }
 
 - (NSString *) dateString
@@ -84,11 +86,7 @@ NSString * const kGitXCommitType = @"commit";
 - (NSString *)committer
 {
 	GTSignature *sig = self.gtCommit.committer;
-	if (![sig isEqual:self.gtCommit.author]) {
-		return sig.name
-		;
-	}
-	return nil;
+	return sig.name;
 }
 
 - (NSString *)SVNRevision
@@ -119,9 +117,9 @@ NSString * const kGitXCommitType = @"commit";
 - (PBGitSHA *)sha
 {
 	if (!self->_sha) {
-		const git_oid *oid = git_commit_id(self.gtCommit.git_commit);
+		const git_oid *oid = self.gtCommit.OID.git_oid;
 		if (oid) {
-			PBGitSHA *newSha = [PBGitSHA shaWithOID:*oid];
+			PBGitSHA *newSha = [PBGitSHA shaWithOID:oid];
 			self.sha = newSha;
 		}
 	}
@@ -214,12 +212,12 @@ NSString * const kGitXCommitType = @"commit";
 
 - (NSMutableArray *)refs
 {
-	return [[self.repository refs] objectForKey:self.sha];
+	return self.repository.refs[self.sha];
 }
 
 - (void) setRefs:(NSMutableArray *)refs
 {
-	[[self.repository refs] setObject:refs forKey:self.sha];
+	self.repository.refs[self.sha] = [NSMutableArray arrayWithArray:refs];
 }
 
 
