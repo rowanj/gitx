@@ -25,29 +25,29 @@
 
 @interface PBGitHistoryController : PBViewController {
 	IBOutlet PBRefController *refController;
-	IBOutlet NSSearchField *searchField;
+	IBOutlet __weak NSSearchField *searchField;
 	IBOutlet NSArrayController* commitController;
 	IBOutlet NSTreeController* treeController;
-	IBOutlet NSOutlineView* fileBrowser;
+	IBOutlet __weak NSOutlineView* fileBrowser;
 	NSArray *currentFileBrowserSelectionPath;
-	IBOutlet PBCommitList* commitList;
-	IBOutlet PBCollapsibleSplitView *historySplitView;
+	IBOutlet __weak PBCommitList* commitList;
+	IBOutlet __weak PBCollapsibleSplitView *historySplitView;
 	IBOutlet PBWebHistoryController *webHistoryController;
     QLPreviewPanel* previewPanel;
 	IBOutlet PBHistorySearchController *searchController;
 	IBOutlet GLFileView *fileView;
 
-	IBOutlet PBGitGradientBarView *upperToolbarView;
-	IBOutlet NSButton *mergeButton;
-	IBOutlet NSButton *cherryPickButton;
-	IBOutlet NSButton *rebaseButton;
+	IBOutlet __weak PBGitGradientBarView *upperToolbarView;
+	IBOutlet __weak NSButton *mergeButton;
+	IBOutlet __weak NSButton *cherryPickButton;
+	IBOutlet __weak NSButton *rebaseButton;
 
-	IBOutlet PBGitGradientBarView *scopeBarView;
-	IBOutlet NSButton *allBranchesFilterItem;
-	IBOutlet NSButton *localRemoteBranchesFilterItem;
-	IBOutlet NSButton *selectedBranchFilterItem;
+	IBOutlet __weak PBGitGradientBarView *scopeBarView;
+	IBOutlet __weak NSButton *allBranchesFilterItem;
+	IBOutlet __weak NSButton *localRemoteBranchesFilterItem;
+	IBOutlet __weak NSButton *selectedBranchFilterItem;
 
-	IBOutlet id webView;
+	IBOutlet __weak id webView;
 	int selectedCommitDetailsIndex;
 	BOOL forceSelectionUpdate;
 	
@@ -63,7 +63,7 @@
 @property (readonly) NSArrayController *commitController;
 @property (readonly) PBRefController *refController;
 @property (readonly) PBHistorySearchController *searchController;
-@property (readonly) PBCommitList *commitList;
+@property (weak, readonly) PBCommitList *commitList;
 
 - (IBAction) setDetailedView:(id)sender;
 - (IBAction) setTreeView:(id)sender;

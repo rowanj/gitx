@@ -61,4 +61,9 @@
 {
 }
 
+- (void)didMoveFromSupercontroller;
+{
+    superController = nil;
+}
+
 @end

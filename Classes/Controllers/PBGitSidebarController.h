@@ -14,11 +14,10 @@
 @class PBGitCommitController;
 
 @interface PBGitSidebarController : PBViewController<NSOutlineViewDelegate> {
-	IBOutlet NSWindow *window;
-	IBOutlet NSOutlineView *sourceView;
+	IBOutlet __weak NSOutlineView *sourceView;
 	IBOutlet NSView *sourceListControlsView;
-	IBOutlet NSPopUpButton *actionButton;
-	IBOutlet NSSegmentedControl *remoteControls;
+	IBOutlet __weak NSPopUpButton *actionButton;
+	IBOutlet __weak NSSegmentedControl *remoteControls;
 
 	NSMutableArray *items;
 

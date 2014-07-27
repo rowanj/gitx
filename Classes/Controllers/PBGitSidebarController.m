@@ -36,7 +36,6 @@
 - (id)initWithRepository:(PBGitRepository *)theRepository superController:(PBGitWindowController *)controller
 {
 	self = [super initWithRepository:theRepository superController:controller];
-	[sourceView setDelegate:self];
 	items = [NSMutableArray array];
 
 	return self;
@@ -45,7 +44,6 @@
 - (void)awakeFromNib
 {
 	[super awakeFromNib];
-	window.contentView = self.view;
 	[self populateList];
 
 	historyViewController = [[PBGitHistoryController alloc] initWithRepository:repository superController:superController];

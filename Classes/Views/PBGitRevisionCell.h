@@ -16,8 +16,8 @@
 	PBGitCommit *objectValue;
 	PBGraphCellInfo *cellInfo;
 	NSTextFieldCell *textCell;
-	IBOutlet PBGitHistoryController *controller;
-	IBOutlet id<PBRefContextDelegate> contextMenuDelegate;
+	IBOutlet __unsafe_unretained PBGitHistoryController *controller;
+	IBOutlet __weak id<PBRefContextDelegate> contextMenuDelegate;
 }
 
 - (int) indexAtX:(float)x;

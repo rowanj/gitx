@@ -107,8 +107,10 @@
 	if (!controller || (contentController == controller))
 		return;
 
-	if (contentController)
+	if (contentController) {
 		[contentController removeObserver:self forKeyPath:@"status"];
+        [contentController didMoveFromSupercontroller];
+    }
 
 	[self removeAllContentSubViews];
 
@@ -298,6 +300,12 @@
 
 	[sourceView setFrame:sourceFrame];
 	[mainView setFrame:mainFrame];
+}
+
+- (void)dealloc;
+{
+    NSLog( @"%@ dealloc", self.class );
+    [contentController didMoveFromSupercontroller];
 }
 
 @end

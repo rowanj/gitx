@@ -17,14 +17,15 @@
 	// object sometime
 	PBGitIndex *index;
 	
-	IBOutlet NSTextView *commitMessageView;
+	IBOutlet __unsafe_unretained NSTextView *commitMessageView;
+	IBOutlet __weak NSButton *commitButton;
+	IBOutlet __weak PBNiceSplitView *commitSplitView;
+
 	IBOutlet NSArrayController *unstagedFilesController;
 	IBOutlet NSArrayController *cachedFilesController;
-	IBOutlet NSButton *commitButton;
 
 	IBOutlet PBGitIndexController *indexController;
 	IBOutlet PBWebChangesController *webController;
-	IBOutlet PBNiceSplitView *commitSplitView;
 }
 
 @property(readonly) PBGitIndex *index;
