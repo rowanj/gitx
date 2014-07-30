@@ -24,11 +24,24 @@
 #pragma mark -
 #pragma mark PBAddRemoteSheet
 
+static NSMutableArray *remoteSheets;
+
++ (void)initialize
+{
+	static dispatch_once_t onceToken;
+	dispatch_once(&onceToken, ^{
+		remoteSheets = [[NSMutableArray alloc] init];
+	});
+}
+
 - (id) initWithRepository:(PBGitRepository *)repo
 {
 	self = [super initWithWindowNibName:@"PBAddRemoteSheet" forRepo:repo];
 	if (!self)
 		return nil;
+
+	// FIXME: Kludge so we don't get deallocated when calling -hide
+	[remoteSheets addObject:self];
 
 	return self;
 }
@@ -57,7 +70,6 @@
 
     [browseSheet beginSheetModalForWindow:self.repoWindow.window
                         completionHandler:^(NSInteger result) {
-                            [self hide];
                             if (result == NSOKButton) {
                                 NSString* directory = browseSheet.directoryURL.path;
                                 [self.remoteURL setStringValue:directory];
@@ -89,8 +101,9 @@
 		return;
 	}
 
-	PBGitRepository* repo = self.repository;
-	[self hide]; // may deallocate self
+	PBGitRepository *repo = self.repository;
+	[self hide];
+	[remoteSheets removeObject:self];// *will* deallocate self
 	[repo beginAddRemote:name forURL:url];
 }
 
