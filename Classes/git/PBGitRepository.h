@@ -77,6 +77,8 @@ static NSString * PBStringFromBranchFilterType(PBGitXBranchFilterType type) {
 - (BOOL) checkoutRefish:(id <PBGitRefish>)ref;
 - (BOOL) checkoutFiles:(NSArray *)files fromRefish:(id <PBGitRefish>)ref;
 - (BOOL) mergeWithRefish:(id <PBGitRefish>)ref;
+- (BOOL) doMergeWithRefish:(id <PBGitRefish>)ref;
+- (BOOL) doFastForwardWithRefish:(id <PBGitRefish>)ref;
 - (BOOL) cherryPickRefish:(id <PBGitRefish>)ref;
 - (BOOL) rebaseBranch:(id <PBGitRefish>)branch onRefish:(id <PBGitRefish>)upstream;
 - (BOOL) createBranch:(NSString *)branchName atRefish:(id <PBGitRefish>)ref;
