@@ -84,6 +84,8 @@
         } else {
             // NSLog(@"[%@ %s] selectedRow.origin.y == proposedVisibleRect.origin.y. leaving as is", [self class], _cmd);
         }
+		
+        newRect.origin.y -= [self headerView].frame.size.height;
     }
     //NSLog(@"[%@ %s]: newRect: %@", [self class], _cmd, NSStringFromRect(newRect));
     return newRect;
