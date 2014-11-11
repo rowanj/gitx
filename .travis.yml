@@ -1,0 +1,12 @@
+# Alphabetical for a reason.
+
+before_install:
+- brew install libssh2
+- brew info libssh2
+- git submodule update --init --recursive
+
+language: objective-c
+
+xcode_project: GitX.xcodeproj
+xcode_scheme: Release
+# xcode_sdk: iphonesimulator7.1
