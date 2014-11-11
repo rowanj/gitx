@@ -130,12 +130,6 @@ using namespace std;
 
 	NSAssert(commit, @"Can't add nil commit to set");
 
-	for (GTCommit *item in set) {
-		if ([item.OID isEqual:commit.OID]) {
-			return;
-		}
-	}
-
 	[set addObject:commit];
 }
 
