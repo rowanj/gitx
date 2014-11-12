@@ -99,7 +99,7 @@
 	[webController closeView];
 }
 
-- (NSResponder *)firstResponder;
+- (NSResponder *)firstResponder
 {
 	return commitMessageView;
 }
