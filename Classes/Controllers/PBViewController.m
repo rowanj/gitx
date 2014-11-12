@@ -43,7 +43,7 @@
 	hasViewLoaded = YES;
 }
 
-- (NSResponder *)firstResponder;
+- (NSResponder *)firstResponder
 {
 	return nil;
 }

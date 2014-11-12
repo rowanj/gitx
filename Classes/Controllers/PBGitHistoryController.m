@@ -458,7 +458,7 @@
 	[self updateKeys];
 }
 
-- (NSResponder *)firstResponder;
+- (NSResponder *)firstResponder
 {
 	return commitList;
 }
