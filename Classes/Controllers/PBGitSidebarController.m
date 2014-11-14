@@ -170,7 +170,9 @@
 		return item;
 	}
 
-	NSArray *pathComponents = [[rev simpleRef] componentsSeparatedByString:@"/"];
+	NSString *str = [[[rev simpleRef] componentsSeparatedByString:@"/"] componentsJoinedByString:@"-"];
+	NSArray *pathComponents = [str componentsSeparatedByString:@"-"];
+
 	if ([pathComponents count] < 2)
 		[branches addChild:[PBSourceViewItem itemWithRevSpec:rev]];
 	else if ([[pathComponents objectAtIndex:1] isEqualToString:@"heads"])

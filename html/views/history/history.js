@@ -132,7 +132,7 @@ var setGravatar = function(email, image) {
 	}
 
 	image.src = "http://www.gravatar.com/avatar/" +
-		hex_md5(email.toLowerCase().replace(/ /g, "")) + "?d=wavatar&s=60";
+		hex_md5(email.toLowerCase().replace(/ /g, "")) + "?r=r&s=60";
 }
 
 var selectCommit = function(a) {
