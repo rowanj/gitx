@@ -16,7 +16,7 @@
 #import "NSColor+RGB.h"
 
 const int COLUMN_WIDTH = 10;
-const BOOL ENABLE_SHADOW = YES;
+const BOOL ENABLE_SHADOW = NO;
 const BOOL SHUFFLE_COLORS = NO;
 
 @implementation PBGitRevisionCell
@@ -28,15 +28,31 @@ const BOOL SHUFFLE_COLORS = NO;
 	return self;
 }
 
+#define HEX_COLOR(hex)                        \
+{                                             \
+	(CGFloat)((((hex) >> 16) & 0xFF) / 255.0f), \
+	(CGFloat)((((hex) >> 8)  & 0xFF) / 255.0f), \
+	(CGFloat)((((hex) >> 0)  & 0xFF) / 255.0f)  \
+}
+
 + (NSArray *)laneColors
 {
-	static const size_t colorCount = 8;
+	static const CGFloat colorPalette[][3] = {
+		HEX_COLOR(0xF00000), // red
+		HEX_COLOR(0xFF8000), // tangerine (orange)
+		HEX_COLOR(0xE0D030), // yellow
+		HEX_COLOR(0x008000), // clover (green)
+		HEX_COLOR(0x00D0D0), // cyan
+		HEX_COLOR(0x0000FF), // blueberry (navy)
+		HEX_COLOR(0x0080FF), // aqua (sky blue)
+		HEX_COLOR(0x8000FF), // grape (violet)
+		HEX_COLOR(0xFF00FF), // magenta
+	};
 	static NSArray *laneColors = nil;
 	if (!laneColors) {
-		float segment = 1.0f / colorCount;
 		NSMutableArray *colors = [NSMutableArray new];
-		for (size_t i = 0; i < colorCount; ++i) {
-			NSColor *newColor = [NSColor colorWithCalibratedHue:(segment * i) saturation:0.9f brightness:0.9f alpha:1.0f];
+		for (size_t i = 0; i < sizeof(colorPalette)/sizeof(*colorPalette); ++i) {
+			NSColor *newColor = [NSColor colorWithCalibratedRed:colorPalette[i][0] green:colorPalette[i][1] blue:colorPalette[i][2] alpha:1.0f];
 			[colors addObject:newColor];
 		}
 		if (SHUFFLE_COLORS) {
@@ -54,23 +70,35 @@ const BOOL SHUFFLE_COLORS = NO;
 	return laneColors;
 }
 
-+ (NSColor *)shadowColor
++ (NSShadow *)shadow
 {
-	static NSColor *shadowColor = nil;
-	if (!shadowColor) {
-		uint8_t l = 64;
-		shadowColor = [NSColor colorWithR:l G:l B:l];
+	static NSShadow *shadow = nil;
+	if (!shadow) {
+		shadow = [NSShadow new];
+		[shadow setShadowOffset:NSMakeSize(.5, -.5)];
+		[shadow setShadowBlurRadius:2];
+		[shadow setShadowColor:[NSColor colorWithWhite:0 alpha:.7]];
 	}
-	return shadowColor;
+	return shadow;
 }
-+ (NSColor *)lineShadowColor
++ (NSShadow *)textInsetShadow
 {
-	static NSColor *shadowColor = nil;
-	if (!shadowColor) {
-		uint8_t l = 200;
-		shadowColor = [NSColor colorWithR:l G:l B:l];
+	static NSShadow *shadow = nil;
+	if (!shadow) {
+		shadow = [NSShadow new];
+		[shadow setShadowOffset:NSMakeSize(0, -.5)];
+		[shadow setShadowBlurRadius:0];
+		[shadow setShadowColor:[NSColor colorWithWhite:1 alpha:.5]];
 	}
-	return shadowColor;
+	return shadow;
+}
++ (NSShadow *)lineShadow
+{
+	static NSShadow *shadow = nil;
+	if (!shadow) {
+		shadow = [NSShadow new];
+	}
+	return shadow;
 }
 
 - (void) drawLineFromColumn: (int) from toColumn: (int) to inRect: (NSRect) r offset: (int) offset color: (int) c
@@ -80,14 +108,9 @@ const BOOL SHUFFLE_COLORS = NO;
 	NSPoint source = NSMakePoint(origin.x + COLUMN_WIDTH * from, origin.y + offset);
 	NSPoint center = NSMakePoint( origin.x + COLUMN_WIDTH * to, origin.y + r.size.height * 0.5 + 0.5);
 
-	if (ENABLE_SHADOW)
-	{
+	if (ENABLE_SHADOW) {
 		[NSGraphicsContext saveGraphicsState];
-
-		NSShadow *shadow = [NSShadow new];
-		[shadow setShadowColor:[[self class] lineShadowColor]];
-		[shadow setShadowOffset:NSMakeSize(0.5f, -0.5f)];
-		[shadow set];
+		[[[self class] lineShadow] set];
 	}
 	NSArray* colors = [PBGitRevisionCell laneColors];
 	[(NSColor*)[colors objectAtIndex: (c % [colors count])] set];
@@ -114,24 +137,21 @@ const BOOL SHUFFLE_COLORS = NO;
 	return [currentSha isEqual:thisSha];
 }
 
-- (void) drawCircleInRect: (NSRect) r
+- (void) drawCircleInRect: (NSRect) r color: (int) c
 {
-	int c = cellInfo.position;
+	int p = cellInfo.position;
 	NSPoint origin = r.origin;
-	NSPoint columnOrigin = { origin.x + COLUMN_WIDTH * c, origin.y};
+	NSPoint columnOrigin = { origin.x + COLUMN_WIDTH * p, origin.y};
 
 	NSRect oval = { columnOrigin.x - 5, columnOrigin.y + r.size.height * 0.5 - 5, 10, 10};
 
 	NSBezierPath * path = [NSBezierPath bezierPathWithOvalInRect:oval];
 	if (ENABLE_SHADOW && false) {
 		[NSGraphicsContext saveGraphicsState];
-		NSShadow *shadow = [NSShadow new];
-		[shadow setShadowColor:[[self class] shadowColor]];
-		[shadow setShadowOffset:NSMakeSize(0.5f, -0.5f)];
-		[shadow setShadowBlurRadius:2.0f];
-		[shadow set];
+		[[[self class] shadow] set];
 	}
-	[[NSColor blackColor] set];
+	NSArray* colors = [PBGitRevisionCell laneColors];
+	[(NSColor*)[colors objectAtIndex: (c % [colors count])] set];
 	[path fill];
 	if (ENABLE_SHADOW && false) {
 		[NSGraphicsContext restoreGraphicsState];
@@ -150,17 +170,17 @@ const BOOL SHUFFLE_COLORS = NO;
 
 }
 
-- (void) drawTriangleInRect: (NSRect) r sign: (char) sign
+- (void) drawTriangleInRect: (NSRect) r sign: (char) sign color: (int) c
 {
-	int c = cellInfo.position;
+	int p = cellInfo.position;
 	int columnHeight = 10;
 	int columnWidth = 8;
 
 	NSPoint top;
 	if (sign == '<')
-		top.x = round(r.origin.x) + 10 * c + 4;
+		top.x = round(r.origin.x) + 10 * p + 4;
 	else {
-		top.x = round(r.origin.x) + 10 * c - 4;
+		top.x = round(r.origin.x) + 10 * p - 4;
 		columnWidth *= -1;
 	}
 	top.y = r.origin.y + (r.size.height - columnHeight) / 2;
@@ -177,7 +197,8 @@ const BOOL SHUFFLE_COLORS = NO;
 
 	[[NSColor whiteColor] set];
 	[path fill];
-	[[NSColor blackColor] set];
+	NSArray* colors = [PBGitRevisionCell laneColors];
+	[(NSColor*)[colors objectAtIndex: (c % [colors count])] set];
 	[path setLineWidth: 2];
 	[path stroke];
 }
@@ -189,21 +210,11 @@ const BOOL SHUFFLE_COLORS = NO;
 	
 	[style setAlignment:NSCenterTextAlignment];
 	[attributes setObject:style forKey:NSParagraphStyleAttributeName];
-	[attributes setObject:[NSFont fontWithName:@"LucidaGrande" size:10] forKey:NSFontAttributeName];
+	[attributes setObject:[NSFont boldSystemFontOfSize:9] forKey:NSFontAttributeName];
+	[attributes setObject:[NSColor colorWithWhite:0 alpha:.6] forKey:NSForegroundColorAttributeName];
 
-	NSShadow *shadow = nil;
-
-	if (selected && false) { // white text is a bit too hard to read (even with shadow) on refs
-		[attributes setObject:[NSColor alternateSelectedControlTextColor] forKey:NSForegroundColorAttributeName];
-		if (ENABLE_SHADOW) {
-			shadow = [NSShadow new];
-			[shadow setShadowColor:[NSColor blackColor]];
-			[shadow setShadowBlurRadius:2.0f];
-		}
-	}
-
-	if (shadow) {
-		attributes[NSShadowAttributeName] = shadow;
+	if (ENABLE_SHADOW) {
+		attributes[NSShadowAttributeName] = [[self class] textInsetShadow];
 	}
 
 	return attributes;
@@ -246,8 +257,8 @@ const BOOL SHUFFLE_COLORS = NO;
 		
 		NSRect newRect = lastRect;
 		newRect.size.width = textSize.width + ref_padding;
-		newRect.size.height = textSize.height;
-		newRect.origin.y = rect.origin.y + (rect.size.height - newRect.size.height) / 2;
+		newRect.size.height = textSize.height + 1;
+		newRect.origin.y = ceil(rect.origin.y + (rect.size.height - newRect.size.height) / 2);
 		
 		if (NSContainsRect(rect, newRect)) {
 			[array addObject:[NSValue valueWithRect:newRect]];
@@ -271,12 +282,7 @@ const BOOL SHUFFLE_COLORS = NO;
 
 	if (ENABLE_SHADOW) {
 		[NSGraphicsContext saveGraphicsState];
-
-		NSShadow *shadow = [NSShadow new];
-		[shadow setShadowColor:[NSColor grayColor]];//[[self class] shadowColor]];
-		[shadow setShadowOffset:NSMakeSize(0.5f, -0.5f)];
-		[shadow setShadowBlurRadius:2.0f];
-		[shadow set];
+		[[[self class] shadow] set];
 	}
 	[border fill];
 	if (ENABLE_SHADOW) {
@@ -320,19 +326,22 @@ const BOOL SHUFFLE_COLORS = NO;
 		NSRect ownRect;
 		NSDivideRect(rect, &ownRect, &rect, pathWidth, NSMinXEdge);
 
-		int i;
+		int i, cellColorIndex = 0;
 		struct PBGitGraphLine *lines = cellInfo.lines;
 		for (i = 0; i < cellInfo.nLines; i++) {
+			int colorIndex = lines[i].colorIndex;
+			if (lines[i].from == cellInfo.position && lines[i].to == cellInfo.position)
+				cellColorIndex = colorIndex;
 			if (lines[i].upper == 0)
-				[self drawLineFromColumn: lines[i].from toColumn: lines[i].to inRect:ownRect offset: ownRect.size.height color: lines[i].colorIndex];
+				[self drawLineFromColumn: lines[i].from toColumn: lines[i].to inRect:ownRect offset: ownRect.size.height color: colorIndex];
 			else
-				[self drawLineFromColumn: lines[i].from toColumn: lines[i].to inRect:ownRect offset: 0 color:lines[i].colorIndex];
+				[self drawLineFromColumn: lines[i].from toColumn: lines[i].to inRect:ownRect offset: 0 color: colorIndex];
 		}
 
 		if (cellInfo.sign == '<' || cellInfo.sign == '>')
-			[self drawTriangleInRect: ownRect sign: cellInfo.sign];
+			[self drawTriangleInRect: ownRect sign: cellInfo.sign color: cellColorIndex];
 		else
-			[self drawCircleInRect: ownRect];
+			[self drawCircleInRect: ownRect color: cellColorIndex];
 	}
 
 
