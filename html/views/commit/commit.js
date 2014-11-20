@@ -277,8 +277,8 @@ var findsubhunk = function(start) {
 var deselect = function() {
 	var selection = document.getElementById("selected");
 	if (selection) {
-		while (selection.childNodes[1])
-			selection.parentNode.insertBefore(selection.childNodes[1], selection);
+		while (selection.childNodes[2])
+			selection.parentNode.insertBefore(selection.childNodes[2], selection);
 		selection.parentNode.removeChild(selection);
 	}
 }
@@ -442,22 +442,36 @@ var showSelection = function(file, from, to, trust)
 	var selection = document.createElement("div");
 	selection.setAttribute("id", "selected");
 
-	var button = document.createElement('a');
-	button.setAttribute("href","#");
-	button.appendChild(document.createTextNode(
-				   (originalCached?"Uns":"S")+"tage line"+
+    var discardButton = document.createElement('a');
+    discardButton.setAttribute("href","#");
+    discardButton.appendChild(document.createTextNode("Discard line"+
+                    (elementList.length > 1?"s":"")));
+    discardButton.setAttribute("class","hunkbutton");
+    discardButton.setAttribute("id","discardlines");
+    
+    if (sel.good) {
+        discardButton.setAttribute('onclick','discardLines(); return false;');
+    } else {
+        discardButton.setAttribute("class","disabled");
+    }
+    selection.appendChild(discardButton);
+    
+	var stageButton = document.createElement('a');
+	stageButton.setAttribute("href","#");
+	stageButton.appendChild(document.createTextNode(
+				   (originalCached?"Unstage line":"Stage line")+
 				   (elementList.length > 1?"s":"")));
-	button.setAttribute("class","hunkbutton");
-	button.setAttribute("id","stagelines");
+	stageButton.setAttribute("class","hunkbutton");
+	stageButton.setAttribute("id","stagelines");
 
 	if (sel.good) {
-		button.setAttribute('onclick','stageLines('+
-				    (originalCached?'true':'false')+
-				    '); return false;');
+		stageButton.setAttribute('onclick','stageLines('+
+                        (originalCached?'true':'false')+
+                        '); return false;');
 	} else {
-		button.setAttribute("class","disabled");
+		stageButton.setAttribute("class","disabled");
 	}
-	selection.appendChild(button);
+	selection.appendChild(stageButton);
 
 	file.insertBefore(selection, from);
 	for (i = 0; i < elementList.length; i++)
