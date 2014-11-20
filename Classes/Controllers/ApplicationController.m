@@ -98,7 +98,45 @@ static OpenRecentController* recentsDialog = nil;
 	setenv( "DISPLAY", "localhost:0", 1 );
 
 	[self registerServices];
+    
+    [[NSAppleEventManager sharedAppleEventManager] setEventHandler: self andSelector: @selector(handleGetURLEvent:withReplyEvent:) forEventClass: kInternetEventClass andEventID: kAEGetURL];
+    
 	started = YES;
+}
+
+- (void)handleGetURLEvent: (NSAppleEventDescriptor *)event withReplyEvent: (NSAppleEventDescriptor *)replyEvent;
+{
+    NSURL *url = [NSURL URLWithString: [[event paramDescriptorForKeyword: keyDirectObject] stringValue]];
+    if ([url.scheme.lowercaseString isEqualToString: @"gitx"]) {
+        [self handleGitXURL: url];
+    }
+}
+
+- (void)handleGitXURL: (NSURL *)url;
+{
+    NSString *command = url.host.lowercaseString;
+    if ([command isEqualToString: @"clonerepo"]) {
+        [self showClonePanelForURL: url.path];
+        return;
+    }
+}
+
+- (void)showClonePanelForURL: (NSString *)url;
+{
+    if (!cloneRepositoryPanel) {
+        cloneRepositoryPanel = [PBCloneRepositoryPanel panel];
+    }
+    
+    if (url) {
+        NSRegularExpression *expr = [NSRegularExpression regularExpressionWithPattern: @"^/[a-z][a-z0-9+.-]*://" options: NSRegularExpressionCaseInsensitive error: NULL];
+        if ([expr rangeOfFirstMatchInString: url options: 0 range: NSMakeRange( 0, url.length )].location != NSNotFound) {
+            url = [url substringFromIndex: 1];
+        }
+    }
+    
+    [cloneRepositoryPanel window]; // Need to load the window before we can access the repositoryURL outlet.
+    cloneRepositoryPanel.repositoryURL.stringValue = url;
+    [cloneRepositoryPanel showWindow: self];
 }
 
 - (void) windowWillClose: sender
@@ -129,10 +167,7 @@ static OpenRecentController* recentsDialog = nil;
 
 - (IBAction) showCloneRepository:(id)sender
 {
-	if (!cloneRepositoryPanel)
-		cloneRepositoryPanel = [PBCloneRepositoryPanel panel];
-
-	[cloneRepositoryPanel showWindow:self];
+    [self showClonePanelForURL: nil];
 }
 
 - (IBAction)installCliTool:(id)sender;
