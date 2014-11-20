@@ -131,6 +131,13 @@
 		}
 	}
 
+  if (isRemote) {
+    // prune
+    [items addObject:[PBRefMenuItem separatorItem]];
+	  NSString *pruneTitle = [NSString stringWithFormat:@"Prune %@", remoteName];
+    [items addObject:[PBRefMenuItem itemWithTitle:pruneTitle action:@selector(pruneRemote:) enabled:YES]];
+  }
+
 	// delete ref
 	[items addObject:[PBRefMenuItem separatorItem]];
 	{

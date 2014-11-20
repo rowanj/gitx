@@ -28,6 +28,16 @@
 	[commitList registerForDraggedTypes:[NSArray arrayWithObject:@"PBGitRef"]];
 }
 
+#pragma mark Prune
+
+- (void) pruneRemote:(PBRefMenuItem *)sender
+{
+	id <PBGitRefish> refish = [sender refish];
+	if ([refish refishType] == kGitXCommitType)
+		return;
+
+	[historyController.repository beginPruneRemoteForRef:refish];
+}
 
 #pragma mark Fetch
 
