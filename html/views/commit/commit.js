@@ -274,15 +274,24 @@ var findsubhunk = function(start) {
 		return element; 
         }
         return [findBound("previousSibling"), findBound("nextSibling")]; 
-} 
+}
+
+var selectionButtons = function() {
+    var selection = document.getElementById("selected");
+    if (selection) {
+        return selection.getElementsByClassName("hunkbutton");
+    } else {
+        return [];
+    }
+}
 
 /* Remove existing selection */
 var deselect = function() {
 	var selection = document.getElementById("selected");
 	if (selection) {
-        var buttons = selection.getElementsByClassName("hunkbutton");
-		while (selection.childNodes[buttons.length])
-			selection.parentNode.insertBefore(selection.childNodes[buttons.length], selection);
+        var buttonsCount = selectionButtons().length;
+		while (selection.childNodes[buttonsCount])
+			selection.parentNode.insertBefore(selection.childNodes[buttonsCount], selection);
 		selection.parentNode.removeChild(selection);
 	}
 }
@@ -305,7 +314,7 @@ var patchFromCurrentSelection = function(reverse) {
     
     if (!hunkHeader) return false;
     
-    var sel_len = selection.children.length-1;
+    var sel_len = selection.children.length - selectionButtons().length;
     var subhunkText = getLines(hunkHeader);
     var lines = subhunkText.split('\n');
     lines.shift();  // Trim old hunk header (we'll compute our own)
