@@ -465,19 +465,21 @@ var showSelection = function(file, from, to, trust)
 	var selection = document.createElement("div");
 	selection.setAttribute("id", "selected");
 
-    var discardButton = document.createElement('a');
-    discardButton.setAttribute("href","#");
-    discardButton.appendChild(document.createTextNode("Discard line"+
-                    (elementList.length > 1?"s":"")));
-    discardButton.setAttribute("class","hunkbutton");
-    discardButton.setAttribute("id","discardlines");
-    
-    if (sel.good) {
-        discardButton.setAttribute('onclick','discardLines(event); return false;');
-    } else {
-        discardButton.setAttribute("class","disabled");
+    if (!originalCached) {
+        var discardButton = document.createElement('a');
+        discardButton.setAttribute("href","#");
+        discardButton.appendChild(document.createTextNode("Discard line"+
+                        (elementList.length > 1?"s":"")));
+        discardButton.setAttribute("class","hunkbutton");
+        discardButton.setAttribute("id","discardlines");
+        
+        if (sel.good) {
+            discardButton.setAttribute('onclick','discardLines(event); return false;');
+        } else {
+            discardButton.setAttribute("class","disabled");
+        }
+        selection.appendChild(discardButton);
     }
-    selection.appendChild(discardButton);
     
 	var stageButton = document.createElement('a');
 	stageButton.setAttribute("href","#");
