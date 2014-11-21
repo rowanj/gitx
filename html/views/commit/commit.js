@@ -280,8 +280,9 @@ var findsubhunk = function(start) {
 var deselect = function() {
 	var selection = document.getElementById("selected");
 	if (selection) {
-		while (selection.childNodes[2])
-			selection.parentNode.insertBefore(selection.childNodes[2], selection);
+        var buttons = selection.getElementsByClassName("hunkbutton");
+		while (selection.childNodes[buttons.length])
+			selection.parentNode.insertBefore(selection.childNodes[buttons.length], selection);
 		selection.parentNode.removeChild(selection);
 	}
 }
