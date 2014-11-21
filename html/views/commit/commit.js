@@ -246,15 +246,18 @@ var addHunk = function(hunk, reverse)
 	addHunkText(getFullHunk(hunk),reverse);
 }
 
-var discardHunk = function(hunk, event)
+var discardHunkText = function(hunkText, skipConfirm)
 {
-	var hunkText = getFullHunk(hunk);
-
 	if (Controller.discardHunk_altKey_) {
-		Controller.discardHunk_altKey_(hunkText, event.altKey == true);
+		Controller.discardHunk_altKey_(hunkText, skipConfirm);
 	} else {
 		alert(hunkText);
 	}
+}
+
+var discardHunk = function(hunk, event)
+{
+    discardHunkText(getFullHunk(hunk), event.altKey == true);
 }
 
 /* Find all contiguous add/del lines. A quick way to select "just this
@@ -283,64 +286,74 @@ var deselect = function() {
 	}
 }
 
+var patchFromCurrentSelection = function(reverse) {
+    var selection = document.getElementById("selected");
+    if(!selection) return false;
+    currentSelection = false;
+    var hunkHeader = false;
+    var preselect = 0,elem_class;
+    
+    for(var next = selection.previousSibling; next; next = next.previousSibling) {
+        elem_class = next.getAttribute("class");
+        if(elem_class == "hunkheader") {
+            hunkHeader = next.lastChild.data;
+            break;
+        }
+        preselect++;
+    }
+    
+    if (!hunkHeader) return false;
+    
+    var sel_len = selection.children.length-1;
+    var subhunkText = getLines(hunkHeader);
+    var lines = subhunkText.split('\n');
+    lines.shift();  // Trim old hunk header (we'll compute our own)
+    if (lines[lines.length-1] == "") lines.pop(); // Omit final newline
+    
+    var m;
+    if (m = hunkHeader.match(/@@ \-(\d+)(,\d+)? \+(\d+)(,\d+)? @@/)) {
+        var start_old = parseInt(m[1]);
+        var start_new = parseInt(m[3]);
+    } else return false;
+    
+    var patch = "", count = [0,0];
+    for (var i = 0; i < lines.length; i++) {
+        var l = lines[i];
+        var firstChar = l.charAt(0);
+        if (i < preselect || i >= preselect+sel_len) {    // Before/after select
+            if(firstChar == (reverse?'+':"-"))   // It's context now, make it so!
+                l = ' '+l.substr(1);
+            if(firstChar != (reverse?'-':"+")) { // Skip unincluded changes
+                patch += l+"\n";
+                count[0]++; count[1]++;
+            }
+        } else {                                      // In the selection
+            if (firstChar == '-') {
+                count[0]++;
+            } else if (firstChar == '+') {
+                count[1]++;
+            } else {
+                count[0]++; count[1]++;
+            }
+            patch += l+"\n";
+        }
+    }
+    patch = diffHeader + '\n' + "@@ -" + start_old.toString() + "," + count[0].toString() +
+    " +" + start_new.toString() + "," + count[1].toString() + " @@\n"+patch;
+    
+    return patch;
+}
+
 /* Stage individual selected lines.  Note that for staging, unselected
  * delete lines are context, and v.v. for unstaging. */
 var stageLines = function(reverse) {
-	var selection = document.getElementById("selected");
-	if(!selection) return false;
-	currentSelection = false;
-	var hunkHeader = false;
-	var preselect = 0,elem_class;
-
-	for(var next = selection.previousSibling; next; next = next.previousSibling) {
-		elem_class = next.getAttribute("class");
-		if(elem_class == "hunkheader") {
-			hunkHeader = next.lastChild.data;
-			break;
-		}
-		preselect++;
-	}
-
-	if (!hunkHeader) return false;
-
-	var sel_len = selection.children.length-1;
-	var subhunkText = getLines(hunkHeader);
-	var lines = subhunkText.split('\n');
-	lines.shift();  // Trim old hunk header (we'll compute our own)
-	if (lines[lines.length-1] == "") lines.pop(); // Omit final newline
-
-	var m;
-	if (m = hunkHeader.match(/@@ \-(\d+)(,\d+)? \+(\d+)(,\d+)? @@/)) {
-		var start_old = parseInt(m[1]);
-		var start_new = parseInt(m[3]);
-	} else return false;
-
-	var patch = "", count = [0,0];
-	for (var i = 0; i < lines.length; i++) {
-		var l = lines[i];
-		var firstChar = l.charAt(0);
-		if (i < preselect || i >= preselect+sel_len) {    // Before/after select
-			if(firstChar == (reverse?'+':"-"))   // It's context now, make it so!
-				l = ' '+l.substr(1);
-			if(firstChar != (reverse?'-':"+")) { // Skip unincluded changes
-				patch += l+"\n";
-				count[0]++; count[1]++;
-			}
-		} else {                                      // In the selection
-			if (firstChar == '-') {
-				count[0]++;
-			} else if (firstChar == '+') {
-				count[1]++;
-			} else {
-				count[0]++; count[1]++;
-			}
-			patch += l+"\n";
-		}
-	}
-	patch = diffHeader + '\n' + "@@ -" + start_old.toString() + "," + count[0].toString() +
-		" +" + start_new.toString() + "," + count[1].toString() + " @@\n"+patch;
-
+    var patch = patchFromCurrentSelection(reverse);
 	addHunkText(patch,reverse);
+}
+
+var discardLines = function(event) {
+    var patch = patchFromCurrentSelection(true);
+    discardHunkText(patch, event.altKey == true);
 }
 
 /* Compute the selection before actually making it.  Return as object
@@ -450,7 +463,7 @@ var showSelection = function(file, from, to, trust)
     discardButton.setAttribute("id","discardlines");
     
     if (sel.good) {
-        discardButton.setAttribute('onclick','discardLines(); return false;');
+        discardButton.setAttribute('onclick','discardLines(event); return false;');
     } else {
         discardButton.setAttribute("class","disabled");
     }
