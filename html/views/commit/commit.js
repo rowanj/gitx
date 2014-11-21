@@ -476,7 +476,7 @@ var showSelection = function(file, from, to, trust)
         if (sel.good) {
             discardButton.setAttribute('onclick','discardLines(event); return false;');
         } else {
-            discardButton.setAttribute("class","disabled");
+            discardButton.setAttribute("class","hunkbutton disabled");
         }
         selection.appendChild(discardButton);
     }
@@ -494,7 +494,7 @@ var showSelection = function(file, from, to, trust)
                         (originalCached?'true':'false')+
                         '); return false;');
 	} else {
-		stageButton.setAttribute("class","disabled");
+		stageButton.setAttribute("class","hunkbutton disabled");
 	}
 	selection.appendChild(stageButton);
 
