@@ -257,7 +257,7 @@ var discardHunkText = function(hunkText, skipConfirm)
 
 var discardHunk = function(hunk, event)
 {
-    discardHunkText(getFullHunk(hunk), event.altKey == true);
+	discardHunkText(getFullHunk(hunk), event.altKey == true);
 }
 
 /* Find all contiguous add/del lines. A quick way to select "just this
@@ -277,19 +277,19 @@ var findsubhunk = function(start) {
 }
 
 var selectionButtons = function() {
-    var selection = document.getElementById("selected");
-    if (selection) {
-        return selection.getElementsByClassName("hunkbutton");
-    } else {
-        return [];
-    }
+	var selection = document.getElementById("selected");
+	if (selection) {
+		return selection.getElementsByClassName("hunkbutton");
+	} else {
+		return [];
+	}
 }
 
 /* Remove existing selection */
 var deselect = function() {
 	var selection = document.getElementById("selected");
 	if (selection) {
-        var buttonsCount = selectionButtons().length;
+		var buttonsCount = selectionButtons().length;
 		while (selection.childNodes[buttonsCount])
 			selection.parentNode.insertBefore(selection.childNodes[buttonsCount], selection);
 		selection.parentNode.removeChild(selection);
@@ -297,73 +297,73 @@ var deselect = function() {
 }
 
 var patchFromCurrentSelection = function(reverse) {
-    var selection = document.getElementById("selected");
-    if(!selection) return false;
-    currentSelection = false;
-    var hunkHeader = false;
-    var preselect = 0,elem_class;
-    
-    for(var next = selection.previousSibling; next; next = next.previousSibling) {
-        elem_class = next.getAttribute("class");
-        if(elem_class == "hunkheader") {
-            hunkHeader = next.lastChild.data;
-            break;
-        }
-        preselect++;
-    }
-    
-    if (!hunkHeader) return false;
-    
-    var sel_len = selection.children.length - selectionButtons().length;
-    var subhunkText = getLines(hunkHeader);
-    var lines = subhunkText.split('\n');
-    lines.shift();  // Trim old hunk header (we'll compute our own)
-    if (lines[lines.length-1] == "") lines.pop(); // Omit final newline
-    
-    var m;
-    if (m = hunkHeader.match(/@@ \-(\d+)(,\d+)? \+(\d+)(,\d+)? @@/)) {
-        var start_old = parseInt(m[1]);
-        var start_new = parseInt(m[3]);
-    } else return false;
-    
-    var patch = "", count = [0,0];
-    for (var i = 0; i < lines.length; i++) {
-        var l = lines[i];
-        var firstChar = l.charAt(0);
-        if (i < preselect || i >= preselect+sel_len) {    // Before/after select
-            if(firstChar == (reverse?'+':"-"))   // It's context now, make it so!
-                l = ' '+l.substr(1);
-            if(firstChar != (reverse?'-':"+")) { // Skip unincluded changes
-                patch += l+"\n";
-                count[0]++; count[1]++;
-            }
-        } else {                                      // In the selection
-            if (firstChar == '-') {
-                count[0]++;
-            } else if (firstChar == '+') {
-                count[1]++;
-            } else {
-                count[0]++; count[1]++;
-            }
-            patch += l+"\n";
-        }
-    }
-    patch = diffHeader + '\n' + "@@ -" + start_old.toString() + "," + count[0].toString() +
-    " +" + start_new.toString() + "," + count[1].toString() + " @@\n"+patch;
-    
-    return patch;
+	var selection = document.getElementById("selected");
+	if(!selection) return false;
+	currentSelection = false;
+	var hunkHeader = false;
+	var preselect = 0,elem_class;
+
+	for(var next = selection.previousSibling; next; next = next.previousSibling) {
+		elem_class = next.getAttribute("class");
+		if(elem_class == "hunkheader") {
+			hunkHeader = next.lastChild.data;
+			break;
+		}
+		preselect++;
+	}
+
+	if (!hunkHeader) return false;
+
+	var sel_len = selection.children.length - selectionButtons().length;
+	var subhunkText = getLines(hunkHeader);
+	var lines = subhunkText.split('\n');
+	lines.shift();  // Trim old hunk header (we'll compute our own)
+	if (lines[lines.length-1] == "") lines.pop(); // Omit final newline
+
+	var m;
+	if (m = hunkHeader.match(/@@ \-(\d+)(,\d+)? \+(\d+)(,\d+)? @@/)) {
+		var start_old = parseInt(m[1]);
+		var start_new = parseInt(m[3]);
+	} else return false;
+
+	var patch = "", count = [0,0];
+	for (var i = 0; i < lines.length; i++) {
+		var l = lines[i];
+		var firstChar = l.charAt(0);
+		if (i < preselect || i >= preselect+sel_len) {    // Before/after select
+			if(firstChar == (reverse?'+':"-"))   // It's context now, make it so!
+				l = ' '+l.substr(1);
+			if(firstChar != (reverse?'-':"+")) { // Skip unincluded changes
+				patch += l+"\n";
+				count[0]++; count[1]++;
+			}
+		} else {                                      // In the selection
+			if (firstChar == '-') {
+				count[0]++;
+			} else if (firstChar == '+') {
+				count[1]++;
+			} else {
+				count[0]++; count[1]++;
+			}
+			patch += l+"\n";
+		}
+	}
+	patch = diffHeader + '\n' + "@@ -" + start_old.toString() + "," + count[0].toString() +
+		" +" + start_new.toString() + "," + count[1].toString() + " @@\n"+patch;
+
+	return patch;
 }
 
 /* Stage individual selected lines.  Note that for staging, unselected
  * delete lines are context, and v.v. for unstaging. */
 var stageLines = function(reverse) {
-    var patch = patchFromCurrentSelection(reverse);
+	var patch = patchFromCurrentSelection(reverse);
 	addHunkText(patch,reverse);
 }
 
 var discardLines = function(event) {
-    var patch = patchFromCurrentSelection(true);
-    discardHunkText(patch, event.altKey == true);
+	var patch = patchFromCurrentSelection(true);
+	discardHunkText(patch, event.altKey == true);
 }
 
 /* Compute the selection before actually making it.  Return as object
@@ -465,34 +465,34 @@ var showSelection = function(file, from, to, trust)
 	var selection = document.createElement("div");
 	selection.setAttribute("id", "selected");
 
-    if (!originalCached) {
-        var discardButton = document.createElement('a');
-        discardButton.setAttribute("href","#");
-        discardButton.appendChild(document.createTextNode("Discard line"+
-                        (elementList.length > 1?"s":"")));
-        discardButton.setAttribute("class","hunkbutton");
-        discardButton.setAttribute("id","discardlines");
-        
-        if (sel.good) {
-            discardButton.setAttribute('onclick','discardLines(event); return false;');
-        } else {
-            discardButton.setAttribute("class","hunkbutton disabled");
-        }
-        selection.appendChild(discardButton);
-    }
-    
+	if (!originalCached) {
+		var discardButton = document.createElement('a');
+		discardButton.setAttribute("href","#");
+		discardButton.appendChild(document.createTextNode("Discard line"+
+				(elementList.length > 1?"s":"")));
+		discardButton.setAttribute("class","hunkbutton");
+		discardButton.setAttribute("id","discardlines");
+		
+		if (sel.good) {
+				discardButton.setAttribute('onclick','discardLines(event); return false;');
+		} else {
+				discardButton.setAttribute("class","hunkbutton disabled");
+		}
+		selection.appendChild(discardButton);
+	}
+	
 	var stageButton = document.createElement('a');
 	stageButton.setAttribute("href","#");
 	stageButton.appendChild(document.createTextNode(
-				   (originalCached?"Unstage line":"Stage line")+
-				   (elementList.length > 1?"s":"")));
+				(originalCached?"Unstage line":"Stage line")+
+				(elementList.length > 1?"s":"")));
 	stageButton.setAttribute("class","hunkbutton");
 	stageButton.setAttribute("id","stagelines");
 
 	if (sel.good) {
 		stageButton.setAttribute('onclick','stageLines('+
-                        (originalCached?'true':'false')+
-                        '); return false;');
+				    (originalCached?'true':'false')+
+				    '); return false;');
 	} else {
 		stageButton.setAttribute("class","hunkbutton disabled");
 	}
