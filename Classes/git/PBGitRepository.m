@@ -794,21 +794,84 @@ NSString *PBGitRepositoryDocumentType = @"Git Repository";
 
 - (BOOL) mergeWithRefish:(id <PBGitRefish>)ref
 {
-	NSString *refName = [ref refishName];
+	NSString *headName = [[[self headRef] ref] shortName];
 
 	int retValue = 1;
-	NSArray *arguments = [NSArray arrayWithObjects:@"merge", refName, nil];
+
+	NSArray *arguments = [NSArray arrayWithObjects:@"rev-list", headName, [NSString stringWithFormat:@"^%@", [ref refishName]], nil];
 	NSString *output = [self outputInWorkdirForArguments:arguments retValue:&retValue];
-	if (retValue) {
-		NSString *headName = [[[self headRef] ref] shortName];
+	if ( ! retValue )
+	{
+		if ( [output length] == 0 )
+		{
+			NSAlert * alert = [[NSAlert alloc] init];
+			[alert setAlertStyle:NSInformationalAlertStyle];
+			[alert addButtonWithTitle:@"Explicit Merge"];
+			[alert addButtonWithTitle:@"Fast-Forward"];
+			[alert addButtonWithTitle:@"Cancel"];
+			[alert setMessageText:[NSString stringWithFormat:@"%@ can be fast-forwarded to %@\nDo you prefer to fast-forward or create an explicit merge commit?", headName, [ref shortName]]];
+			[alert beginSheetModalForWindow:self.windowController.window completionHandler:^(NSModalResponse returnCode)
+			{
+				switch (returnCode)
+				{
+					case NSAlertFirstButtonReturn:
+						[self doMergeWithRefish:ref];
+						break;
+					case NSAlertSecondButtonReturn:
+						[self doFastForwardWithRefish:ref];
+						break;
+					default:
+						break;
+				}
+			}];
+		}
+		else
+		{
+			[self doMergeWithRefish:ref];
+		}
+	}
+	return YES;
+}
+
+- (BOOL) doMergeWithRefish:(id<PBGitRefish>)ref
+{
+	NSString *refName = [ref refishName];
+	NSString *headName = [[[self headRef] ref] shortName];
+	int retValue = 1;
+
+	NSArray *arguments = [NSArray arrayWithObjects:@"merge", @"--no-ff", refName, nil];
+	NSString *output = [self outputInWorkdirForArguments:arguments retValue:&retValue];
+	if (retValue)
+	{
 		NSString *message = [NSString stringWithFormat:@"There was an error merging %@ into %@.", refName, headName];
 		[self.windowController showErrorSheetTitle:@"Merge failed!" message:message arguments:arguments output:output];
 		return NO;
 	}
-
+	
 	[self reloadRefs];
 	[self readCurrentBranch];
-	return YES;
+	return retValue == 0;
+}
+
+- (BOOL) doFastForwardWithRefish:(id<PBGitRefish>)ref
+{
+	NSString *refName = [ref refishName];
+	NSString *headName = [[[self headRef] ref] shortName];
+	int retValue = 1;
+	
+	NSArray *arguments = [NSArray arrayWithObjects:@"merge", @"--ff-only", refName, nil];
+	NSString *output = [self outputInWorkdirForArguments:arguments retValue:&retValue];
+	if (retValue)
+	{
+		NSString *message = [NSString stringWithFormat:@"There was an error merging %@ into %@.", refName, headName];
+		[self.windowController showErrorSheetTitle:@"Merge failed!" message:message arguments:arguments output:output];
+		return NO;
+	}
+	
+	[self reloadRefs];
+	[self readCurrentBranch];
+	return retValue == 0;
+
 }
 
 - (BOOL) cherryPickRefish:(id <PBGitRefish>)ref
