@@ -115,7 +115,13 @@ NSString * const kGitXCommitType = @"commit";
 
 - (GTOID *)sha
 {
-    return self.gtCommit.OID;
+	GTOID *result = _sha;
+	if (result) {
+		return result;
+	}
+    result = self.gtCommit.OID;
+	_sha = result;
+	return result;
 }
 
 - (NSString *)realSha
