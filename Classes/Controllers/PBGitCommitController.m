@@ -162,7 +162,7 @@
 	}		
 	
 	NSString *commitMessage = [commitMessageView string];
-	if ([commitMessage length] < 3) {
+	if ([commitMessage length] == 0) {
 		[[repository windowController] showMessageSheet:@"Commitmessage missing" infoText:@"Please enter a commit message before committing"];
 		return;
 	}
@@ -216,9 +216,8 @@
 
 - (void)amendCommit:(NSNotification *)notification
 {
-	// Replace commit message with the old one if it's less than 3 characters long.
-	// This is just a random number.
-	if ([[commitMessageView string] length] > 3)
+	// Replace commit message with the old one if it's empty.
+	if ([[commitMessageView string] length] > 0)
 		return;
 	
 	NSString *message = [[notification userInfo] objectForKey:@"message"];
