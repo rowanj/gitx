@@ -608,7 +608,7 @@ NSString *PBGitIndexOperationFailed = @"PBGitIndexOperationFailed";
 			// Unstaged, untracked dictionary ("Other" files), and file
 			// is indicated as new (which would be untracked), so let's
 			// remove it
-			else if (!tracked && file.status == NEW)
+			else if (!tracked && file.status == NEW && file.commitBlobSHA == nil)
 				file.hasUnstagedChanges = NO;
 		}
 	}
