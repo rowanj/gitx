@@ -95,13 +95,13 @@ table.diff {
     background-color: #7795c7;
 }
 
-#selected #stagelines {
+#selected #stagelines, #selected #discardlines {
     padding-left: 2px;
     width: auto;
     padding-right: 2px;
     margin-right: 2px;
     margin-top: 1px;
-    clear: right;
+    float: right;
     background-color: #FFF;
 }
 

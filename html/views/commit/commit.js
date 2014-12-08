@@ -246,15 +246,18 @@ var addHunk = function(hunk, reverse)
 	addHunkText(getFullHunk(hunk),reverse);
 }
 
-var discardHunk = function(hunk, event)
+var discardHunkText = function(hunkText, skipConfirm)
 {
-	var hunkText = getFullHunk(hunk);
-
 	if (Controller.discardHunk_altKey_) {
-		Controller.discardHunk_altKey_(hunkText, event.altKey == true);
+		Controller.discardHunk_altKey_(hunkText, skipConfirm);
 	} else {
 		alert(hunkText);
 	}
+}
+
+var discardHunk = function(hunk, event)
+{
+	discardHunkText(getFullHunk(hunk), event.altKey == true);
 }
 
 /* Find all contiguous add/del lines. A quick way to select "just this
@@ -271,21 +274,29 @@ var findsubhunk = function(start) {
 		return element; 
         }
         return [findBound("previousSibling"), findBound("nextSibling")]; 
-} 
+}
+
+var selectionButtons = function() {
+	var selection = document.getElementById("selected");
+	if (selection) {
+		return selection.getElementsByClassName("hunkbutton");
+	} else {
+		return [];
+	}
+}
 
 /* Remove existing selection */
 var deselect = function() {
 	var selection = document.getElementById("selected");
 	if (selection) {
-		while (selection.childNodes[1])
-			selection.parentNode.insertBefore(selection.childNodes[1], selection);
+		var buttonsCount = selectionButtons().length;
+		while (selection.childNodes[buttonsCount])
+			selection.parentNode.insertBefore(selection.childNodes[buttonsCount], selection);
 		selection.parentNode.removeChild(selection);
 	}
 }
 
-/* Stage individual selected lines.  Note that for staging, unselected
- * delete lines are context, and v.v. for unstaging. */
-var stageLines = function(reverse) {
+var patchFromCurrentSelection = function(reverse) {
 	var selection = document.getElementById("selected");
 	if(!selection) return false;
 	currentSelection = false;
@@ -303,7 +314,7 @@ var stageLines = function(reverse) {
 
 	if (!hunkHeader) return false;
 
-	var sel_len = selection.children.length-1;
+	var sel_len = selection.children.length - selectionButtons().length;
 	var subhunkText = getLines(hunkHeader);
 	var lines = subhunkText.split('\n');
 	lines.shift();  // Trim old hunk header (we'll compute our own)
@@ -340,7 +351,19 @@ var stageLines = function(reverse) {
 	patch = diffHeader + '\n' + "@@ -" + start_old.toString() + "," + count[0].toString() +
 		" +" + start_new.toString() + "," + count[1].toString() + " @@\n"+patch;
 
+	return patch;
+}
+
+/* Stage individual selected lines.  Note that for staging, unselected
+ * delete lines are context, and v.v. for unstaging. */
+var stageLines = function(reverse) {
+	var patch = patchFromCurrentSelection(reverse);
 	addHunkText(patch,reverse);
+}
+
+var discardLines = function(event) {
+	var patch = patchFromCurrentSelection(true);
+	discardHunkText(patch, event.altKey == true);
 }
 
 /* Compute the selection before actually making it.  Return as object
@@ -442,22 +465,38 @@ var showSelection = function(file, from, to, trust)
 	var selection = document.createElement("div");
 	selection.setAttribute("id", "selected");
 
-	var button = document.createElement('a');
-	button.setAttribute("href","#");
-	button.appendChild(document.createTextNode(
-				   (originalCached?"Uns":"S")+"tage line"+
-				   (elementList.length > 1?"s":"")));
-	button.setAttribute("class","hunkbutton");
-	button.setAttribute("id","stagelines");
+	if (!originalCached) {
+		var discardButton = document.createElement('a');
+		discardButton.setAttribute("href","#");
+		discardButton.appendChild(document.createTextNode("Discard line"+
+				(elementList.length > 1?"s":"")));
+		discardButton.setAttribute("class","hunkbutton");
+		discardButton.setAttribute("id","discardlines");
+		
+		if (sel.good) {
+				discardButton.setAttribute('onclick','discardLines(event); return false;');
+		} else {
+				discardButton.setAttribute("class","hunkbutton disabled");
+		}
+		selection.appendChild(discardButton);
+	}
+	
+	var stageButton = document.createElement('a');
+	stageButton.setAttribute("href","#");
+	stageButton.appendChild(document.createTextNode(
+				(originalCached?"Unstage line":"Stage line")+
+				(elementList.length > 1?"s":"")));
+	stageButton.setAttribute("class","hunkbutton");
+	stageButton.setAttribute("id","stagelines");
 
 	if (sel.good) {
-		button.setAttribute('onclick','stageLines('+
+		stageButton.setAttribute('onclick','stageLines('+
 				    (originalCached?'true':'false')+
 				    '); return false;');
 	} else {
-		button.setAttribute("class","disabled");
+		stageButton.setAttribute("class","hunkbutton disabled");
 	}
-	selection.appendChild(button);
+	selection.appendChild(stageButton);
 
 	file.insertBefore(selection, from);
 	for (i = 0; i < elementList.length; i++)
