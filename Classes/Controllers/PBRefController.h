@@ -46,5 +46,7 @@
 - (NSArray *) menuItemsForCommit:(PBGitCommit *)commit;
 - (NSArray *)menuItemsForRow:(NSInteger)rowIndex;
 
+// invoked via Cocoa Bindings
+- (void)onDoubleClick:(NSArray*)selectedObjects;
 
 @end

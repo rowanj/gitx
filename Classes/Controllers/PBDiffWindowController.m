@@ -25,16 +25,9 @@
 	return self;
 }
 
-
-+ (void) showDiffWindowWithFiles:(NSArray *)filePaths fromCommit:(PBGitCommit *)startCommit diffCommit:(PBGitCommit *)diffCommit
++ (void) showDiffWindowWithFiles:(NSArray *)filePaths fromCommit:(NSString *)startCommit diffCommit:(NSString *)diffCommit repository:(PBGitRepository*) repository
 {
-	if (!startCommit)
-		return;
-
-	if (!diffCommit)
-		diffCommit = [startCommit.repository headCommit];
-
-	NSString *commitSelector = [NSString stringWithFormat:@"%@..%@", [startCommit realSha], [diffCommit realSha]];
+	NSString *commitSelector = [NSString stringWithFormat:@"%@..%@", startCommit, diffCommit];
 	NSMutableArray *arguments = [NSMutableArray arrayWithObjects:@"diff", @"--no-ext-diff", commitSelector, nil];
 
 	if (![PBGitDefaults showWhitespaceDifferences])
@@ -46,7 +39,7 @@
 	}
 
 	int retValue;
-	NSString *diff = [startCommit.repository outputInWorkdirForArguments:arguments retValue:&retValue];
+	NSString *diff = [repository outputInWorkdirForArguments:arguments retValue:&retValue];
 	if (retValue) {
 		NSLog(@"diff failed with retValue: %d   for command: '%@'    output: '%@'", retValue, [arguments componentsJoinedByString:@" "], diff);
 		return;
@@ -54,6 +47,17 @@
 
 	PBDiffWindowController *diffController = [[PBDiffWindowController alloc] initWithDiff:[diff copy]];
 	[diffController showWindow:nil];
+}
+
++ (void) showDiffWindowWithFiles:(NSArray *)filePaths fromCommit:(PBGitCommit *)startCommit diffCommit:(PBGitCommit *)diffCommit
+{
+	if (!startCommit)
+		return;
+
+	if (!diffCommit)
+		diffCommit = [startCommit.repository headCommit];
+
+	[PBDiffWindowController showDiffWindowWithFiles:filePaths fromCommit:[startCommit realSHA] diffCommit:[diffCommit realSHA] repository:[startCommit repository]];
 }
 
 

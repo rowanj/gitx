@@ -468,4 +468,12 @@
     historyController = nil;
 }
 
+- (void)onDoubleClick:(NSArray*)selectedObjects
+{
+	//NSLog(@"PBRefController %@", selectedObjects);
+	for (PBGitCommit* commit in selectedObjects) {
+		[PBDiffWindowController showDiffWindowWithFiles:nil fromCommit:[[[commit parents] firstObject] SHA] diffCommit:[commit realSha] repository:[commit repository]];
+	}
+}
+
 @end

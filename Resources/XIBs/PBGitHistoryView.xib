@@ -1621,6 +1621,47 @@
 					<int key="connectionID">445</int>
 				</object>
 				<object class="IBConnectionRecord">
+					<object class="IBBindingConnection" key="connection">
+						<string key="label">doubleClickArgument: selectedObjects</string>
+						<reference key="source" ref="254268962"/>
+						<reference key="destination" ref="391209158"/>
+						<object class="NSNibBindingConnector" key="connector" id="838846806">
+							<reference key="NSSource" ref="254268962"/>
+							<reference key="NSDestination" ref="391209158"/>
+							<string key="NSLabel">doubleClickArgument: selectedObjects</string>
+							<string key="NSBinding">doubleClickArgument</string>
+							<string key="NSKeyPath">selectedObjects</string>
+							<object class="NSDictionary" key="NSOptions">
+								<string key="NS.key.0">NSSelectorName</string>
+								<string key="NS.object.0">onDoubleClick:</string>
+							</object>
+							<int key="NSNibBindingConnectorVersion">2</int>
+						</object>
+					</object>
+					<int key="connectionID">521</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBBindingConnection" key="connection">
+						<string key="label">doubleClickTarget: self</string>
+						<reference key="source" ref="254268962"/>
+						<reference key="destination" ref="892732705"/>
+						<object class="NSNibBindingConnector" key="connector">
+							<reference key="NSSource" ref="254268962"/>
+							<reference key="NSDestination" ref="892732705"/>
+							<string key="NSLabel">doubleClickTarget: self</string>
+							<string key="NSBinding">doubleClickTarget</string>
+							<string key="NSKeyPath">self</string>
+							<object class="NSDictionary" key="NSOptions">
+								<string key="NS.key.0">NSSelectorName</string>
+								<string key="NS.object.0">onDoubleClick:</string>
+							</object>
+							<reference key="NSPreviousConnector" ref="838846806"/>
+							<int key="NSNibBindingConnectorVersion">2</int>
+						</object>
+					</object>
+					<int key="connectionID">524</int>
+				</object>
+				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
 						<string key="label">controller</string>
 						<reference key="source" ref="942510576"/>
