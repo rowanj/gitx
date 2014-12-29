@@ -71,7 +71,7 @@
 	// but this caused some funny behaviour because NSTask's and NSThread's don't really
 	// like each other. Instead, just do it async.
 
-	NSMutableArray *taskArguments = [NSMutableArray arrayWithObjects:@"show", @"--numstat", @"-M", @"--summary", @"--pretty=raw", [currentSha SHA], nil];
+	NSMutableArray *taskArguments = [NSMutableArray arrayWithObjects:@"show", @"--numstat", @"-C", @"-C", @"--summary", @"--pretty=raw", [currentSha SHA], nil];
 	if (![PBGitDefaults showWhitespaceDifferences])
 		[taskArguments insertObject:@"-w" atIndex:1];
 
@@ -101,7 +101,7 @@
 	[[view windowScriptObject] callWebScriptMethod:@"loadCommitSummary" withArguments:[NSArray arrayWithObject:summary]];
 
     // Now load the full diff
-	NSMutableArray *taskArguments = [NSMutableArray arrayWithObjects:@"show", @"--pretty=raw", @"-M", @"--no-color", [currentSha SHA], nil];
+	NSMutableArray *taskArguments = [NSMutableArray arrayWithObjects:@"show", @"--pretty=raw", @"-C", @"-C", @"--no-color", [currentSha SHA], nil];
 	if (![PBGitDefaults showWhitespaceDifferences])
 		[taskArguments insertObject:@"-w" atIndex:1];
 
