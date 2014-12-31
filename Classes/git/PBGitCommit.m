@@ -21,6 +21,7 @@ NSString * const kGitXCommitType = @"commit";
 @property (nonatomic, strong) NSArray *parents;
 
 @property (nonatomic, strong) NSString *patch;
+@property (nonatomic, strong) NSString *fullpatch;
 @property (nonatomic, strong) GTOID *sha;
 
 @end
@@ -173,6 +174,18 @@ NSString * const kGitXCommitType = @"commit";
 	// Add a GitX identifier to the patch ;)
 	self.patch = [[p substringToIndex:[p length] -1] stringByAppendingString:@"+GitX"];
 	return self->_patch;
+}
+
+// same as above, but also uses --full-index --binary
+- (NSString *) fullpatch
+{
+	if (self->_fullpatch != nil)
+		return _fullpatch;
+
+	NSString *p = [self.repository outputForArguments:[NSArray arrayWithObjects:@"format-patch",  @"-1", @"--stdout", @"--full-index", @"--binary", [self realSha], nil]];
+	// Add a GitX identifier to the patch ;)
+	self.fullpatch = [[p substringToIndex:[p length] -1] stringByAppendingString:@"+GitX"];
+	return self->_fullpatch;
 }
 
 - (PBGitTree*) tree
