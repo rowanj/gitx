@@ -333,6 +333,26 @@
 
 # pragma mark Tableview delegate methods
 
+- (BOOL)tryToDragPatch:(PBGitCommit*)commitref
+         fromPoint:(NSPoint)dragPosition 
+           inTable:(PBCommitList *)tv 
+      toPasteboard:(NSPasteboard*)pboard
+{
+    NSRect imageLocation;
+ 
+    dragPosition.x -= 16;
+    dragPosition.y -= 16;
+    imageLocation.origin = dragPosition;
+    imageLocation.size = NSMakeSize(32,32);
+
+    [pboard declareTypes:[NSArray arrayWithObjects:@"PBGitCommit", NSFilesPromisePboardType, nil] owner:self];
+    [pboard setPropertyList:[NSArray arrayWithObject:@"patch"] forType:NSFilesPromisePboardType];
+
+	NSData* data=[NSKeyedArchiver archivedDataWithRootObject:[commitref realSHA]];
+	[pboard setData:data forType:@"PBGitCommit"];
+	return YES;
+}
+
 - (BOOL)tableView:(NSTableView *)tv writeRowsWithIndexes:(NSIndexSet *)rowIndexes toPasteboard:(NSPasteboard*)pboard
 {
     
@@ -341,7 +361,7 @@
 	int column = [tv columnAtPoint:location];
 	int subjectColumn = [tv columnWithIdentifier:@"SubjectColumn"];
 	if (column != subjectColumn)
-		return NO;
+		return [self tryToDragPatch:[[commitController arrangedObjects] objectAtIndex:row] fromPoint:location inTable:(PBCommitList*)tv toPasteboard:pboard];
 	
 	PBGitRevisionCell *cell = (PBGitRevisionCell *)[tv preparedCellAtColumn:column row:row];
 	NSRect cellFrame = [tv frameOfCellAtColumn:column row:row];
@@ -349,14 +369,14 @@
 	int index = [cell indexAtX:(location.x - cellFrame.origin.x)];
 	
 	if (index == -1)
-		return NO;
+		return [self tryToDragPatch:[[commitController arrangedObjects] objectAtIndex:row] fromPoint:location inTable:(PBCommitList*)tv toPasteboard:pboard];
 
 	PBGitRef *ref = [[[cell objectValue] refs] objectAtIndex:index];
 	if ([ref isTag] || [ref isRemoteBranch])
-		return NO;
+		return [self tryToDragPatch:[[commitController arrangedObjects] objectAtIndex:row] fromPoint:location inTable:(PBCommitList*)tv toPasteboard:pboard];
 
 	if ([[[historyController.repository headRef] ref] isEqualToRef:ref])
-		return NO;
+		return [self tryToDragPatch:[[commitController arrangedObjects] objectAtIndex:row] fromPoint:location inTable:(PBCommitList*)tv toPasteboard:pboard];
 	
 	NSData *data = [NSKeyedArchiver archivedDataWithRootObject:[NSArray arrayWithObjects:[NSNumber numberWithInt:row], [NSNumber numberWithInt:index], NULL]];
 	[pboard declareTypes:[NSArray arrayWithObject:@"PBGitRef"] owner:self];
@@ -378,6 +398,31 @@
 		return NSDragOperationMove;
 	
 	return NSDragOperationNone;
+}
+
+- (NSArray *)                  tableView:(NSTableView *)aTableView 
+namesOfPromisedFilesDroppedAtDestination:(NSURL *)destination 
+               forDraggedRowsWithIndexes:(NSIndexSet *)indexSet
+{
+    NSMutableArray *ret=[NSMutableArray arrayWithCapacity:1];
+    
+    NSInteger idx = [indexSet firstIndex];
+    while (idx != NSNotFound) {
+        PBGitCommit* aCommit=[[commitController arrangedObjects] objectAtIndex:idx];
+        
+        // name the patch file based on the commit subject line (similar to what git format-patch does)
+        NSString* filename=[NSString stringWithFormat:@"%@.patch", [[aCommit subject] stringByReplacingOccurrencesOfString:@" " withString:@"-"]];
+        
+        // xxx maybe bad if this is a big patch; however, doing this inside draggedImage:endedAt:operation: did not work
+        NSData *data = [[aCommit fullpatch] dataUsingEncoding:NSUTF8StringEncoding];
+        NSString *fullname=[NSString stringWithFormat:@"%@/%@", [destination path], filename];
+        [data writeToFile:fullname atomically:YES];
+        
+        [ret addObject:filename];
+        idx = [indexSet indexGreaterThanIndex: idx];
+    }
+    
+    return ret;
 }
 
 - (void) dropRef:(NSDictionary *)dropInfo
