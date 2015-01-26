@@ -362,7 +362,15 @@
 		[pboard setData:data forType:@"PBGitRef"];
 	} else {
 		[pboard declareTypes:[NSArray arrayWithObject:NSStringPboardType] owner:self];
-		[pboard setString:[commit shortName] forType:NSStringPboardType];
+
+		NSString *info = nil;
+		if (column == [tv columnWithIdentifier:@"ShortSHAColumn"]) {
+			info = [commit shortName];
+		} else {
+			info = [NSString stringWithFormat:@"%@ (%@)", [[commit realSha] substringToIndex:10], [commit subject]];
+		}
+
+		[pboard setString:info forType:NSStringPboardType];
 	}
 
 	return YES;
