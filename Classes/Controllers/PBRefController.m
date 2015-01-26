@@ -339,29 +339,32 @@
 	NSPoint location = [(PBCommitList *)tv mouseDownPoint];
 	int row = [tv rowAtPoint:location];
 	int column = [tv columnAtPoint:location];
-	int subjectColumn = [tv columnWithIdentifier:@"SubjectColumn"];
-	if (column != subjectColumn)
-		return NO;
 	
 	PBGitRevisionCell *cell = (PBGitRevisionCell *)[tv preparedCellAtColumn:column row:row];
-	NSRect cellFrame = [tv frameOfCellAtColumn:column row:row];
-	
-	int index = [cell indexAtX:(location.x - cellFrame.origin.x)];
-	
-	if (index == -1)
-		return NO;
+	PBGitCommit *commit = [[commitController arrangedObjects] objectAtIndex:row];
 
-	PBGitRef *ref = [[[cell objectValue] refs] objectAtIndex:index];
-	if ([ref isTag] || [ref isRemoteBranch])
-		return NO;
+	int index = -1;
+	if ([cell respondsToSelector:@selector(indexAtX:)]) {
+		NSRect cellFrame = [tv frameOfCellAtColumn:column row:row];
+		index = [cell indexAtX:(location.x - cellFrame.origin.x)];
+	}
+	
+	if (index != -1) {
+		PBGitRef *ref = [[commit refs] objectAtIndex:index];
+		if ([ref isTag] || [ref isRemoteBranch])
+			return NO;
 
-	if ([[[historyController.repository headRef] ref] isEqualToRef:ref])
-		return NO;
-	
-	NSData *data = [NSKeyedArchiver archivedDataWithRootObject:[NSArray arrayWithObjects:[NSNumber numberWithInt:row], [NSNumber numberWithInt:index], NULL]];
-	[pboard declareTypes:[NSArray arrayWithObject:@"PBGitRef"] owner:self];
-	[pboard setData:data forType:@"PBGitRef"];
-	
+		if ([[[historyController.repository headRef] ref] isEqualToRef:ref])
+			return NO;
+
+		NSData *data = [NSKeyedArchiver archivedDataWithRootObject:[NSArray arrayWithObjects:[NSNumber numberWithInt:row], [NSNumber numberWithInt:index], NULL]];
+		[pboard declareTypes:[NSArray arrayWithObject:@"PBGitRef"] owner:self];
+		[pboard setData:data forType:@"PBGitRef"];
+	} else {
+		[pboard declareTypes:[NSArray arrayWithObject:NSStringPboardType] owner:self];
+		[pboard setString:[commit shortName] forType:NSStringPboardType];
+	}
+
 	return YES;
 }
 
