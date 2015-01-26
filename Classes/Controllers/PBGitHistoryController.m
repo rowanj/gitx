@@ -395,7 +395,7 @@
 	PBGitCommit *commit = [[commitController selectedObjects] objectAtIndex:0];
 	if (!commit)
 		return;
-	NSString *info = [[commit realSha] substringWithRange:NSMakeRange(0, 7)];
+	NSString *info = [commit shortName];
 
 	NSPasteboard *a =[NSPasteboard generalPasteboard];
 	[a declareTypes:[NSArray arrayWithObject:NSStringPboardType] owner:self];
