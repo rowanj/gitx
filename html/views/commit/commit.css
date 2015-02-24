@@ -1,7 +1,13 @@
 body {
 	padding: 0px;
 	margin: 0px;
-	margin-top: 30px;
+    overflow: hidden;
+}
+
+#diff {
+    margin-top: 20px;
+    height: calc(100% - 20px);
+    overflow: scroll;
 }
 
 #title {
