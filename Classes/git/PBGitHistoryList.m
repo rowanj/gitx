@@ -92,6 +92,7 @@
 	if (currentRevList) {
 		[currentRevList removeObserver:self forKeyPath:@"commits"];
 		[currentRevList cancel];
+		currentRevList = nil;
 	}
 	[graphQueue cancelAllOperations];
 

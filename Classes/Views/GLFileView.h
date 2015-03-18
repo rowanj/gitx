@@ -14,12 +14,12 @@
 @class PBGitHistoryController;
 
 @interface GLFileView : PBWebController <MGScopeBarDelegate> {
-	IBOutlet PBGitHistoryController* historyController;
-	IBOutlet MGScopeBar *typeBar;
+	__weak IBOutlet PBGitHistoryController* historyController;
+	__weak IBOutlet MGScopeBar *typeBar;
 	NSMutableArray *groups;
 	NSString *logFormat;
-	IBOutlet NSView *accessoryView;
-	IBOutlet NSSplitView *fileListSplitView;
+	__weak IBOutlet NSView *accessoryView;
+	__weak IBOutlet NSSplitView *fileListSplitView;
 }
 
 - (void)showFile;

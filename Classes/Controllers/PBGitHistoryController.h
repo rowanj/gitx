@@ -24,33 +24,31 @@
 @class PBHistorySearchController;
 
 @interface PBGitHistoryController : PBViewController {
-	IBOutlet PBRefController *refController;
-	IBOutlet NSSearchField *searchField;
-	IBOutlet NSArrayController* commitController;
-	IBOutlet NSTreeController* treeController;
-	IBOutlet NSOutlineView* fileBrowser;
-	NSArray *currentFileBrowserSelectionPath;
-	IBOutlet PBCommitList* commitList;
-	IBOutlet PBCollapsibleSplitView *historySplitView;
+	IBOutlet NSArrayController *commitController;
+	IBOutlet NSTreeController *treeController;
 	IBOutlet PBWebHistoryController *webHistoryController;
-    QLPreviewPanel* previewPanel;
-	IBOutlet PBHistorySearchController *searchController;
 	IBOutlet GLFileView *fileView;
+	IBOutlet PBRefController *refController;
+	IBOutlet PBHistorySearchController *searchController;
 
-	IBOutlet PBGitGradientBarView *upperToolbarView;
-	IBOutlet NSButton *mergeButton;
-	IBOutlet NSButton *cherryPickButton;
-	IBOutlet NSButton *rebaseButton;
+	__weak IBOutlet NSSearchField *searchField;
+	__weak IBOutlet NSOutlineView *fileBrowser;
+	__weak IBOutlet PBCommitList *commitList;
+	__weak IBOutlet PBCollapsibleSplitView *historySplitView;
+	__weak IBOutlet PBGitGradientBarView *upperToolbarView;
+	__weak IBOutlet NSButton *mergeButton;
+	__weak IBOutlet NSButton *cherryPickButton;
+	__weak IBOutlet NSButton *rebaseButton;
+	__weak IBOutlet PBGitGradientBarView *scopeBarView;
+	__weak IBOutlet NSButton *allBranchesFilterItem;
+	__weak IBOutlet NSButton *localRemoteBranchesFilterItem;
+	__weak IBOutlet NSButton *selectedBranchFilterItem;
+	__weak IBOutlet id webView;
 
-	IBOutlet PBGitGradientBarView *scopeBarView;
-	IBOutlet NSButton *allBranchesFilterItem;
-	IBOutlet NSButton *localRemoteBranchesFilterItem;
-	IBOutlet NSButton *selectedBranchFilterItem;
-
-	IBOutlet id webView;
+	NSArray *currentFileBrowserSelectionPath;
+    QLPreviewPanel* previewPanel;
 	int selectedCommitDetailsIndex;
 	BOOL forceSelectionUpdate;
-	
 	PBGitTree *gitTree;
 	PBGitCommit *webCommit;
 	PBGitCommit *selectedCommit;

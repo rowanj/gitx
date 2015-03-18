@@ -16,11 +16,9 @@
 @class PBRefMenuItem;
 
 @interface PBRefController : NSObject <PBRefContextDelegate> {
-	IBOutlet PBGitHistoryController *historyController;
-	IBOutlet NSArrayController *commitController;
-	IBOutlet PBCommitList *commitList;
-
-	IBOutlet NSPopUpButton *branchPopUp;
+	__weak IBOutlet PBGitHistoryController *historyController;
+	__weak IBOutlet NSArrayController *commitController;
+	__weak IBOutlet PBCommitList *commitList;
 }
 
 - (void) fetchRemote:(PBRefMenuItem *)sender;
