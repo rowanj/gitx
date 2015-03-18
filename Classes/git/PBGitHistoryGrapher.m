@@ -30,7 +30,8 @@
 - (void)sendCommits:(NSArray *)commits
 {
 	NSDictionary *commitData = [NSDictionary dictionaryWithObjectsAndKeys:currentQueue, kCurrentQueueKey, commits, kNewCommitsKey, nil];
-	[delegate performSelectorOnMainThread:@selector(updateCommitsFromGrapher:) withObject:commitData waitUntilDone:NO];
+	id strongDelegate = delegate;
+	[strongDelegate performSelectorOnMainThread:@selector(updateCommitsFromGrapher:) withObject:commitData waitUntilDone:NO];
 }
 
 
@@ -39,6 +40,7 @@
 	if (!revList || [revList count] == 0)
 		return;
 
+	id strongDelegate = delegate;
 	//NSDate *start = [NSDate date];
 	NSThread *currentThread = [NSThread currentThread];
 	NSDate *lastUpdate = [NSDate date];
@@ -69,7 +71,7 @@
 	//NSLog(@"Graphed %i commits in %f seconds (%f/sec)", counter, duration, counter/duration);
 
 	[self sendCommits:commits];
-	[delegate performSelectorOnMainThread:@selector(finishedGraphing) withObject:nil waitUntilDone:NO];
+	[strongDelegate performSelectorOnMainThread:@selector(finishedGraphing) withObject:nil waitUntilDone:NO];
 }
 
 
