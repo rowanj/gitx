@@ -10,7 +10,7 @@
 #import <WebKit/WebKit.h>
 
 @interface PBWebController : NSObject {
-	IBOutlet WebView* view;
+	__weak IBOutlet WebView* view;
 	NSString *startFile;
 	BOOL finishedLoading;
 
@@ -18,11 +18,11 @@
 	NSMapTable *callbacks;
 
 	// For the repository access
-	IBOutlet id repository;
+	__weak IBOutlet id repository;
 }
 
 @property  NSString *startFile;
-@property  id repository;
+@property (weak) id repository;
 
 - (WebScriptObject *) script;
 - (void) closeView;

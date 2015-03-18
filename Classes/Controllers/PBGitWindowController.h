@@ -15,18 +15,15 @@
 	PBViewController *contentController;
 
 	PBGitSidebarController *sidebarController;
-	IBOutlet NSView *sourceListControlsView;
-	IBOutlet NSSplitView *splitView;
-	IBOutlet NSView *sourceSplitView;
-	IBOutlet NSView *contentSplitView;
+	__weak IBOutlet NSView *sourceListControlsView;
+	__weak IBOutlet NSSplitView *splitView;
+	__weak IBOutlet NSView *sourceSplitView;
+	__weak IBOutlet NSView *contentSplitView;
 
-	IBOutlet NSTextField *statusField;
-	IBOutlet NSProgressIndicator *progressIndicator;
+	__weak IBOutlet NSTextField *statusField;
+	__weak IBOutlet NSProgressIndicator *progressIndicator;
 
 	PBViewController* viewController;
-
-	IBOutlet NSToolbarItem *terminalItem;
-	IBOutlet NSToolbarItem *finderItem;
 }
 
 @property (nonatomic, weak)  PBGitRepository *repository;
