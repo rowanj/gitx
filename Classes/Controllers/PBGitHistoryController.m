@@ -6,6 +6,12 @@
 //  Copyright 2008 __MyCompanyName__. All rights reserved.
 //
 
+#import "PBGitCommit.h"
+#import "PBGitTree.h"
+#import "PBGitRef.h"
+#import "PBGitHistoryList.h"
+#import "PBGitRevSpecifier.h"
+#import "PBCollapsibleSplitView.h"
 #import "PBGitHistoryController.h"
 #import "PBWebHistoryController.h"
 #import "CWQuickLook.h"
@@ -97,16 +103,12 @@
 				  bottomColor:[NSColor colorWithCalibratedHue:0.579 saturation:0.119 brightness:0.765 alpha:1.000]];
 	[self updateBranchFilterMatrix];
 
-  // listen for updates
-  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_repositoryUpdatedNotification:) name:PBGitRepositoryEventNotification object:repository];
+	// listen for updates
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_repositoryUpdatedNotification:) name:PBGitRepositoryEventNotification object:repository];
 
-	__weak PBGitHistoryController *weakSelf = self;
-	commitList.findPanelActionBlock = ^(id sender){
-		PBGitHistoryController *controller = weakSelf;
-		if (!controller) {
-			return;
-		}
-		[controller.view.window makeFirstResponder:controller->searchField];
+	__unsafe_unretained PBGitHistoryController *weakSelf = self;
+	commitList.findPanelActionBlock = ^(id sender) {
+		[weakSelf.view.window makeFirstResponder:weakSelf->searchField];
 	};
 
 	[super awakeFromNib];
@@ -485,7 +487,7 @@
     commitList.useAdjustScroll = NO;
 }
 
-- (NSArray *) selectedObjectsForSHA:(PBGitSHA *)commitSHA
+- (NSArray *) selectedObjectsForSHA:(GTOID *)commitSHA
 {
 	NSPredicate *selection = [NSPredicate predicateWithFormat:@"sha == %@", commitSHA];
 	NSArray *selectedCommits = [[commitController content] filteredArrayUsingPredicate:selection];
@@ -496,7 +498,7 @@
 	return selectedCommits;
 }
 
-- (void)selectCommit:(PBGitSHA *)commitSHA
+- (void)selectCommit:(GTOID *)commitSHA
 {
 	if (!forceSelectionUpdate && [[[[commitController selectedObjects] lastObject] sha] isEqual:commitSHA])
 		return;

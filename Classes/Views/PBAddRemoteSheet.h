@@ -24,7 +24,7 @@
 @property (readwrite, weak) IBOutlet NSTextField *remoteURL;
 @property (readwrite, weak) IBOutlet NSTextField *errorMessage;
 
-@property (readwrite, strong)          NSOpenPanel *browseSheet;
-@property (readwrite, weak) IBOutlet NSView      *browseAccessoryView;
+@property (readwrite, strong) NSOpenPanel *browseSheet;
+@property (readwrite, strong) IBOutlet NSView *browseAccessoryView;
 
 @end

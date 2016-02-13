@@ -623,7 +623,7 @@
 						<object class="NSButtonCell" key="NSCell" id="973971251">
 							<int key="NSCellFlags">-2080374784</int>
 							<int key="NSCellFlags2">0</int>
-							<string key="NSContents">Enable 'Gist it'</string>
+							<string key="NSContents">Enable ‘Gist it’</string>
 							<reference key="NSSupport" ref="734450335"/>
 							<reference key="NSControlView" ref="237556568"/>
 							<int key="NSButtonFlags">1211912448</int>

@@ -14,7 +14,7 @@
 @class PBGitRef;
 @class PBGitRevList;
 @class PBGitHistoryGrapher;
-@class PBGitSHA;
+@class GTOID;
 
 @interface PBGitHistoryList : NSObject {
 	__weak PBGitRepository *repository;
@@ -22,7 +22,7 @@
 	PBGitRevList *projectRevList;
 	PBGitRevList *currentRevList;
 
-	PBGitSHA *lastSHA;
+	GTOID *lastSHA;
 	NSSet *lastRefSHAs;
 	NSInteger lastBranchFilter;
 	PBGitRef *lastRemoteRef;

@@ -7,7 +7,7 @@
 //
 
 #import <Cocoa/Cocoa.h>
-#import "PBGitRepository.h"
+@class PBGitRepository;
 
 @interface PBGitXProtocol : NSURLProtocol {
 	NSFileHandle *handle;

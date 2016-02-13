@@ -7,10 +7,11 @@
 //
 
 #import <Cocoa/Cocoa.h>
-#import "PBGitHistoryList.h"
-#import "PBGitRevSpecifier.h"
-#import "PBGitRefish.h"
 
+@class PBGitHistoryList;
+@class PBGitRevSpecifier;
+@protocol PBGitRefish;
+@class PBGitRef;
 @class GTRepository;
 @class GTConfiguration;
 
@@ -42,13 +43,13 @@ static NSString * PBStringFromBranchFilterType(PBGitXBranchFilterType type) {
 
 @class PBGitWindowController;
 @class PBGitCommit;
-@class PBGitSHA;
+@class GTOID;
 @class PBGitRepositoryWatcher;
 
 @interface PBGitRepository : NSDocument {
 	__strong PBGitRepositoryWatcher *watcher;
 	__strong PBGitRevSpecifier *_headRef; // Caching
-	__strong PBGitSHA* _headSha;
+	__strong GTOID* _headSha;
 	__strong GTRepository* _gtRepo;
 }
 
@@ -85,21 +86,21 @@ static NSString * PBStringFromBranchFilterType(PBGitXBranchFilterType type) {
 
 - (NSURL *) gitURL ;
 
-- (NSFileHandle*) handleForCommand:(NSString*) cmd DEPRECATED;
-- (NSFileHandle*) handleForArguments:(NSArray*) args DEPRECATED;
-- (NSFileHandle *) handleInWorkDirForArguments:(NSArray *)args DEPRECATED;
-- (NSString*) outputForCommand:(NSString*) cmd DEPRECATED;
-- (NSString *)outputForCommand:(NSString *)str retValue:(int *)ret DEPRECATED;
-- (NSString *)outputForArguments:(NSArray *)arguments inputString:(NSString *)input retValue:(int *)ret DEPRECATED;
-- (NSString *)outputForArguments:(NSArray *)arguments inputString:(NSString *)input byExtendingEnvironment:(NSDictionary *)dict retValue:(int *)ret DEPRECATED;
+- (NSFileHandle*) handleForCommand:(NSString*) cmd GITX_DEPRECATED;
+- (NSFileHandle*) handleForArguments:(NSArray*) args GITX_DEPRECATED;
+- (NSFileHandle *) handleInWorkDirForArguments:(NSArray *)args GITX_DEPRECATED;
+- (NSString*) outputForCommand:(NSString*) cmd GITX_DEPRECATED;
+- (NSString *)outputForCommand:(NSString *)str retValue:(int *)ret GITX_DEPRECATED;
+- (NSString *)outputForArguments:(NSArray *)arguments inputString:(NSString *)input retValue:(int *)ret GITX_DEPRECATED;
+- (NSString *)outputForArguments:(NSArray *)arguments inputString:(NSString *)input byExtendingEnvironment:(NSDictionary *)dict retValue:(int *)ret GITX_DEPRECATED;
 
 
-- (NSString*) outputForArguments:(NSArray*) args DEPRECATED;
-- (NSString*) outputForArguments:(NSArray*) args retValue:(int *)ret DEPRECATED;
-- (NSString *)outputInWorkdirForArguments:(NSArray*) arguments DEPRECATED;
-- (NSString *)outputInWorkdirForArguments:(NSArray*) arguments retValue:(int *)ret DEPRECATED;
-- (BOOL)executeHook:(NSString *)name output:(NSString **)output DEPRECATED;
-- (BOOL)executeHook:(NSString *)name withArgs:(NSArray*) arguments output:(NSString **)output DEPRECATED;
+- (NSString*) outputForArguments:(NSArray*) args GITX_DEPRECATED;
+- (NSString*) outputForArguments:(NSArray*) args retValue:(int *)ret GITX_DEPRECATED;
+- (NSString *)outputInWorkdirForArguments:(NSArray*) arguments GITX_DEPRECATED;
+- (NSString *)outputInWorkdirForArguments:(NSArray*) arguments retValue:(int *)ret GITX_DEPRECATED;
+- (BOOL)executeHook:(NSString *)name output:(NSString **)output GITX_DEPRECATED;
+- (BOOL)executeHook:(NSString *)name withArgs:(NSArray*) arguments output:(NSString **)output GITX_DEPRECATED;
 
 - (NSString *)workingDirectory;
 - (NSString *) projectName;
@@ -111,13 +112,13 @@ static NSString * PBStringFromBranchFilterType(PBGitXBranchFilterType type) {
 - (void) reloadRefs;
 - (void) lazyReload;
 - (PBGitRevSpecifier*)headRef;
-- (PBGitSHA *)headSHA;
+- (GTOID *)headSHA;
 - (PBGitCommit *)headCommit;
-- (PBGitSHA *)shaForRef:(PBGitRef *)ref;
+- (GTOID *)shaForRef:(PBGitRef *)ref;
 - (PBGitCommit *)commitForRef:(PBGitRef *)ref;
-- (PBGitCommit *)commitForSHA:(PBGitSHA *)sha;
-- (BOOL)isOnSameBranch:(PBGitSHA *)baseSHA asSHA:(PBGitSHA *)testSHA;
-- (BOOL)isSHAOnHeadBranch:(PBGitSHA *)testSHA;
+- (PBGitCommit *)commitForSHA:(GTOID *)sha;
+- (BOOL)isOnSameBranch:(GTOID *)baseSHA asSHA:(GTOID *)testSHA;
+- (BOOL)isSHAOnHeadBranch:(GTOID *)testSHA;
 - (BOOL)isRefOnHeadBranch:(PBGitRef *)testRef;
 - (BOOL)checkRefFormat:(NSString *)refName;
 - (BOOL)refExists:(PBGitRef *)ref;

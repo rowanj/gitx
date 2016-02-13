@@ -8,8 +8,10 @@
 
 #import <Foundation/Foundation.h>
 #import "PBSourceViewItem.h"
-#import "PBGitSubmodule.h"
+
+
 @interface PBGitSVSubmoduleItem : PBSourceViewItem
-+ (id) itemWithSubmodule:(PBGitSubmodule*)submodule;
-@property (nonatomic, strong) PBGitSubmodule* submodule;
++ (id) itemWithSubmodule:(GTSubmodule*)submodule;
+@property (nonatomic, strong) GTSubmodule* submodule;
+@property (nonatomic, readonly) NSURL *path;
 @end

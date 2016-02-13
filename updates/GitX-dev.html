@@ -12,6 +12,65 @@
 <p>Recent changes made to <a href="https://github.com/rowanj/gitx">GitX-dev</a></p>
 </header>
 <section>
+<h2>Changes since 0.15.1962</h2>
+<ul>
+<li>Break responder loop that crashes repository window on OS X 10.10</li>
+</ul>
+
+<h2>Changes since 0.15.1949</h2>
+<ul>
+<li>Fix crash when trying to browse for a remote (<a href="https://github.com/rowanj/gitx/issues/255">#255</a>, <a href="https://github.com/rowanj/gitx/pull/370">#370</a>)</li>
+<li>Fix changes to newly added files never showing up in the commit view.</li>
+<li>Merge <a href="https://github.com/rowanj/gitx/pull/367">pull request #367</a> (<a href="https://github.com/Debilski">Debilski</a>): Stylistic typographic changes.</li>
+<li>Make commit searches that include a lot of results exponentially faster.</li>
+</ul>
+
+<h2>Changes since 0.15.1899</h2>
+<ul>
+<li>Merge <a href="https://github.com/rowanj/gitx/pull/332">pull request #332</a> (<a href="https://github.com/ksuther">ksuther</a>): Fix empty history view after update due to threading glitch.</li>
+<li>Merge <a href="https://github.com/rowanj/gitx/pull/280">pull request #280</a> (<a href="https://github.com/nanoant">nanoant</a>): New sidebar icons.</li>
+<li>Merge <a href="https://github.com/rowanj/gitx/pull/333">pull request #333</a> (<a href="https://github.com/muhqu">muhqu</a>): Another fix for <a href="https://github.com/rowanj/gitx/issues/310">#310</a> - diff highlighter breaks on some strings.</li>
+<li>Merge <a href="https://github.com/rowanj/gitx/pull/295">pull request #295</a> (<a href="https://github.com/tiennou">tiennou</a>): Fix crash when cancelling the new repository dialog. (<a href="https://github.com/rowanj/gitx/issues/220">#220</a>, <a href="https://github.com/rowanj/gitx/issues/255">#255</a>, <a href="https://github.com/rowanj/gitx/issues/275">#275</a>) Also thanks to (<a href="https://github.com/jdelStrother">jdelStrother</a>) and (<a href="https://github.com/ksuther">ksuther</a>) for their fixes.</li>
+<li>Always show <em>HEAD</em> commit in the all-branches and local history views.</li>
+<li>Merge <a href="https://github.com/rowanj/gitx/pull/362">pull request #362</a> (<a href="https://github.com/opinxit">opinxit</a>): Add links to 'top' of History view after each diff.</li>
+</ul>
+
+<h2>Changes since 0.15.1884</h2>
+<ul>
+<li>Fix
+<a href="https://github.com/rowanj/gitx/issues/303">#303</a>,
+<a href="https://github.com/rowanj/gitx/issues/313">#313</a>,
+<a href="https://github.com/rowanj/gitx/issues/324">#324</a>
+: Graph corruption due to out-of-order commits.</li>
+<li>Merge <a href="https://github.com/rowanj/gitx/pull/320">pull request #320</a> (<a href="https://github.com/dgreensp">dgreensp</a>): Fix <a href="https://github.com/rowanj/gitx/issues/310">#310</a> - diff highlighter breaks on some strings.</li>
+<li>Fix <a href="https://github.com/rowanj/gitx/issues/311">#311</a>: Fix a crash on OS X Lion.</li>
+<li>Fix <a href="https://github.com/rowanj/gitx/issues/315">#315</a>: Better font for ref labels and reduce 'bevel' appearance.</li>
+<li>Fix <a href="https://github.com/rowanj/gitx/issues/315">#315</a> (<a href="https://github.com/pipelineoptika">pipelineoptika</a>): Fix ref label sub-pixel alignment on non-retina screens.</li>
+<li>Fix <a href="https://github.com/rowanj/gitx/issues/329">#329</a>: Potential fix for sometimes-missing 'dots' in history view.</li>
+<li>Fix <a href="https://github.com/rowanj/gitx/issues/312">#312</a>: Don't show remote symbolic references (i.e. <em>origin/HEAD</em>).</li>
+<li>Merge <a href="https://github.com/rowanj/gitx/pull/325">pull request #325</a> (<a href="https://github.com/muhqu">muhqu</a>) - Fixed some changes in word highlighting.</li>
+<li>Insert files dragged into the commit message as relative paths.</li>
+</ul>
+
+<h2>Changes since 0.15.1869</h2>
+<ul>
+<li>Fix <a href="https://github.com/rowanj/gitx/issues/315">#315</a>: Generally lighter theme for ref labels, much more saturated colours for history lanes.</li>
+<li>Fix <a href="https://github.com/rowanj/gitx/issues/317">#317</a>: Context menu to delete remote refs was disabled.</li>
+<li>Fix <a href="https://github.com/rowanj/gitx/issues/318">#318</a>: Context menus for remote-tracking branches broken (push/pull shortcuts).</li>
+<li>Merge <a href="https://github.com/rowanj/gitx/pull/325">pull request #325</a> (<a href="https://github.com/muhqu">muhqu</a>) - Fixed some changes in word highlighting.</li>
+</ul>
+
+<h2>Changes since 0.14.95</h2>
+<ul>
+<li>As part of ongoing work for <a href="https://github.com/rowanj/gitx/issues/2">issue #2</a>, repository loading now uses <a href="https://github.com/libgit2/objective-git">objective-git</a> to read directly from disk instead of parsing command-line output.<br />
+This has resulted in substantial performance and reliability improvements for larger repositories, as well as a new, better sorting of the commit tree.</li>
+<li>Tweaked several icon graphics for better contrast, along with some style updates to the commit tree.</li>
+<li>Improved the "Find" and "Find next" keyboard shortcuts in the history view.</li>
+<li>Merge <a href="https://github.com/rowanj/gitx/pull/243">pull request #243</a> (<a href="https://github.com/muhqu">muhqu</a>) - Add changed-word highlighting to diffs.</li>
+<li>Merge <a href="https://github.com/rowanj/gitx/pull/281">pull request #281</a> (<a href="https://github.com/codiophile">codiophile</a>) - Add Xcode git path (/usr/bin/git) to the search paths.</li>
+<li>Fixed a crash when a pre-commit hook failed and the "Force Commit" button was pressed</li>
+</ul>
+
 <h2>Changes since 0.14.92</h2>
 <ul>
 <li>Fix <a href="https://github.com/rowanj/gitx/issues/207">#207</a>, <a href="https://github.com/rowanj/gitx/issues/210">#210</a> <em>dyld: Library not loaded</em> errors in GitX and command-line tools</li>

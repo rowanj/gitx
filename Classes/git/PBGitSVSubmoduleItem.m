@@ -10,11 +10,22 @@
 
 @implementation PBGitSVSubmoduleItem
 
-+ (id) itemWithSubmodule:(PBGitSubmodule*)submodule
++ (id) itemWithSubmodule:(GTSubmodule*)submodule
 {
     PBGitSVSubmoduleItem* item = [[self alloc] init];
-    [item setSubmodule:submodule];
-    [item setTitle:submodule.name];
+	item.submodule = submodule;
     return item;
+}
+
+- (NSString *)title
+{
+	return self.submodule.name;
+}
+
+- (NSURL *)path
+{
+	NSURL *parentURL = self.submodule.parentRepository.fileURL;
+	NSURL *result = [parentURL URLByAppendingPathComponent:self.submodule.path];
+	return result;
 }
 @end

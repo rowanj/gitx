@@ -19,7 +19,7 @@
 @implementation PBSourceViewItem
 
 @synthesize parent, isGroupItem, revSpecifier, isUncollapsible, isExpanded;
-@dynamic icon, highlightedIcon;
+@dynamic icon;
 
 - (id)init
 {
@@ -133,11 +133,6 @@
 - (NSImage *) icon
 {
     return [self iconNamed:[self iconName]];
-}
-
-- (NSImage *) highlightedIcon
-{
-    return [self iconNamed:[[self iconName] stringByAppendingString:@"Highlighted"]];
 }
 
 - (NSImage *)iconNamed:(NSString*)name

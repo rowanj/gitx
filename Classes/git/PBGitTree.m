@@ -6,6 +6,7 @@
 //  Copyright 2008 __MyCompanyName__. All rights reserved.
 //
 
+#import "PBGitRepository.h"
 #import "PBGitTree.h"
 #import "PBGitCommit.h"
 #import "NSFileHandleExt.h"

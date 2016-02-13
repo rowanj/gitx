@@ -23,7 +23,7 @@
 
 - (NSString*) iconName
 {
-    return @"Branch";
+    return @"BranchTemplate";
 }
 
 @end

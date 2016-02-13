@@ -7,7 +7,7 @@
 //
 
 #import "PBGitXProtocol.h"
-
+#import "PBGitRepository.h"
 
 @implementation PBGitXProtocol
 

@@ -13,6 +13,7 @@
 #import "PBGitIndex.h"
 #import "PBNiceSplitView.h"
 #import "PBGitRepositoryWatcher.h"
+#import "PBCommitMessageView.h"
 
 #import <ObjectiveGit/GTRepository.h>
 #import <ObjectiveGit/GTConfiguration.h>
@@ -59,6 +60,8 @@
 - (void)awakeFromNib
 {
 	[super awakeFromNib];
+
+	commitMessageView.repository = self.repository;
 
 	[commitMessageView setTypingAttributes:[NSDictionary dictionaryWithObject:[NSFont fontWithName:@"Monaco" size:12.0] forKey:NSFontAttributeName]];
 	
@@ -190,7 +193,7 @@
 {
 	[commitMessageView setEditable:YES];
 	[commitMessageView setString:@""];
-	[webController setStateMessage:[NSString stringWithFormat:[[notification userInfo] objectForKey:@"description"]]];
+	[webController setStateMessage:notification.userInfo[@"description"]];
 }	
 
 - (void)commitFailed:(NSNotification *)notification

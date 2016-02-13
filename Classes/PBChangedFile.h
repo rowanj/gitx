@@ -7,7 +7,6 @@
 //
 
 #import <Cocoa/Cocoa.h>
-#import "PBGitRepository.h"
 
 typedef enum {
 	NEW,

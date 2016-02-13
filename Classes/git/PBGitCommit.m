@@ -6,11 +6,11 @@
 //  Copyright 2008 __MyCompanyName__. All rights reserved.
 //
 
+#import "PBGitRepository.h"
 #import "PBGitCommit.h"
-#import "PBGitSHA.h"
+#import "PBGitTree.h"
+#import "PBGitRef.h"
 #import "PBGitDefaults.h"
-
-#import <ObjectiveGit/ObjectiveGit.h>
 
 NSString * const kGitXCommitType = @"commit";
 
@@ -21,7 +21,7 @@ NSString * const kGitXCommitType = @"commit";
 @property (nonatomic, strong) NSArray *parents;
 
 @property (nonatomic, strong) NSString *patch;
-@property (nonatomic, strong) PBGitSHA *sha;
+@property (nonatomic, strong) GTOID *sha;
 
 @end
 
@@ -31,6 +31,7 @@ NSString * const kGitXCommitType = @"commit";
 - (NSDate *) date
 {
 	return self.gtCommit.commitDate;
+	// previous behaviour was equiv. to:  return self.gtCommit.author.time;
 }
 
 - (NSString *) dateString
@@ -63,7 +64,7 @@ NSString * const kGitXCommitType = @"commit";
 		NSArray *gtParents = self.gtCommit.parents;
 		NSMutableArray *parents = [NSMutableArray arrayWithCapacity:gtParents.count];
 		for (GTCommit *parent in gtParents) {
-			[parents addObject:[PBGitSHA shaWithString:parent.SHA]];
+			[parents addObject:parent.OID];
 		}
 		self.parents = parents;
 	}
@@ -112,16 +113,15 @@ NSString * const kGitXCommitType = @"commit";
 	return result;
 }
 
-- (PBGitSHA *)sha
+- (GTOID *)sha
 {
-	if (!self->_sha) {
-		const git_oid *oid = self.gtCommit.OID.git_oid;
-		if (oid) {
-			PBGitSHA *newSha = [PBGitSHA shaWithOID:oid];
-			self.sha = newSha;
-		}
+	GTOID *result = _sha;
+	if (result) {
+		return result;
 	}
-	return self->_sha;
+    result = self.gtCommit.OID;
+	_sha = result;
+	return result;
 }
 
 - (NSString *)realSha

@@ -50,6 +50,18 @@
 .diff .file .diffcontent .lines .whitespace {
 	background-color: rgba(255,0,0,0.5);
 }
+.diff .file .diffcontent .lines del,
+.diff .file .diffcontent .lines ins {
+	text-decoration: none; border-radius: 0.3em;
+}
+.diff .file .diffcontent .lines .delline del {
+	background-color: #febfbf;
+	color: #A00;
+}
+.diff .file .diffcontent .lines .addline ins {
+	background-color: #b2ffaf;
+	color: #070;
+}
 
 #CurrentHunk {
 	border-left: 5px solid black;

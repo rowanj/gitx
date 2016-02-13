@@ -7,7 +7,8 @@
 //
 
 #import <Cocoa/Cocoa.h>
-#import "PBGitRepository.h"
+
+@class PBGitRepository;
 
 @interface PBGitTree : NSObject {
 	long long _fileSize;

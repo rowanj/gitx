@@ -44,6 +44,5 @@
 @property (assign)PBSourceViewItem *parent;
 @property(readonly) NSString *iconName;
 @property(readonly) NSImage *icon;
-@property(readonly) NSImage *highlightedIcon;
 
 @end

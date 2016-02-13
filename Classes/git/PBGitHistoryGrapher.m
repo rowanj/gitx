@@ -8,9 +8,7 @@
 
 #import "PBGitHistoryGrapher.h"
 #import "PBGitGrapher.h"
-#import "PBGitSHA.h"
 #import "PBGitCommit.h"
-
 
 @implementation PBGitHistoryGrapher
 
@@ -50,7 +48,7 @@
 	for (PBGitCommit *commit in revList) {
 		if ([currentThread isCancelled])
 			return;
-		PBGitSHA *commitSHA = [commit sha];
+		GTOID *commitSHA = [commit sha];
 		if (viewAllBranches || [searchSHAs containsObject:commitSHA]) {
 			[grapher decorateCommit:commit];
 			[commits addObject:commit];

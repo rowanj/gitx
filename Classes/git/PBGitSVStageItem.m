@@ -22,7 +22,7 @@
 
 - (NSString*) iconName
 {
-    return @"StageView";
+    return @"StageTemplate";
 }
 
 @end

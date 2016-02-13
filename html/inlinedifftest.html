@@ -1,0 +1,132 @@
+<html>
+    <head>
+        
+        <link rel="stylesheet" href="css/GitX.css" type="text/css" media="screen" title="no title" charset="utf-8">
+        <link rel="stylesheet" href="css/diff.css" type="text/css" media="screen" title="no title" charset="utf-8">
+        <script src="lib/jquery-2.0.2.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="lib/GitX.js" type="text/javascript" charset="utf-8"></script>
+        <script src="lib/diffHighlighter.js" type="text/javascript" charset="utf-8"></script>
+    </head>
+    <body>
+        <div id="results"></div>
+        <textarea id="test-data">
+-the red fox jumped into the leaf
++the brown fox dashed into the leaf
+---------------------------------------
+-Deploying from branch BRANCH to stage STAGE Awesome!
++Deploying to stage STAGE from branch BRANCH Awesome!
+---------------------------------------
+-foo bar baz barf
++foo baz bar barf
+---------------------------------------
+-foo bar moo baz barf
++foo bar baz barf
+---------------------------------------
+-foo bar baz barf
++foo bar moo baz barf
+---------------------------------------
+-       return {bounds:[from,to],good:good};
++       var ret =  {bounds:[from,to],good:good};
++       Controller.log_("computeSelection: from: "+from.outerHTML);
++       Controller.log_("computeSelection: {bounds:["+from+","+to+"],good: "+good+" }");
++       return ret;
+---------------------------------------
+-whitespace
++whitespace   
+---------------------------------------
+-	tab indent to spaces
++        tab indent to spaces
+---------------------------------------
+-   a = "hello";
+-   b = "world";
+-   c = a + " " + b;
++   if (true) {
++     a = "hello";
++     b = "world";
++     c = a + " " + b;
++   }
+---------------------------------------
+-      n = n.replace(/&lt;/g, "&amp;lt;");
+-      n = n.replace(/&gt;/g, "&amp;gt;");
++      if (true) {
++        n = n.replace(/&lt;/g, "&amp;lt;");
++        n = n.replace(/&gt;/g, "&amp;gt;");
++      }
+---------------------------------------
+-   NSString* installationPath = @"/usr/local/bin/gitx";
++   NSString* installationPath = @"/usr/local/bin/";
++   NSString* installationName = @"gitx";
+---------------------------------------
+-           char const* arguments[] = { "-f", "-s", [toolPath UTF8String], [installationPath UTF8String], NULL };
++           char const* mkdir_arg[] = { "-p", [installationPath UTF8String], NULL};       
++           char const* mkdir   = "/bin/mkdir";
++           AuthorizationExecuteWithPrivileges(auth, mkdir, kAuthorizationFlagDefaults, (char**)mkdir_arg, NULL);
++           char const* arguments[] = { "-f", "-s", [toolPath UTF8String], [[installationPath stringByAppendingString: installationName] UTF8String],  NULL };
+</textarea>
+<script type="text/javascript" charset="utf-8">
+
+jQuery(function($){
+    update();
+    return;
+    
+    function getData() {
+        return $('#test-data').val();
+    }
+
+    function parseData(rawData) {
+        var blocks = rawData.split(/\n?-{10,}\n?/);
+        return $.map(blocks, function(block) {
+            var l = block.split(/\n/),
+                o = [], n = [];
+            for (var i = 0; i < l.length; i++) {
+                (l[i][0] == "-" ? o : n).push(l[i].substring(1));
+            }
+            return [[o.join("\n"), n.join("\n")]];
+        });
+    }
+
+    function update() {
+        var testData = parseData(getData());
+        $('#results').text('');
+        for (var i = 0; i < testData.length; i++) {
+            var o = testData[i][0], n = testData[i][1];
+            $('#results').append(resultForTestData(o, n));
+        };
+    }
+
+    function stripTags(h) {
+        return h.replace(/<\/?\w+\/?>/g,'');
+    }
+
+    function resultForTestData(o,n) {
+        var diff = inlinediff.diffString3(o,n);
+        var eo = inlinediff.escape(o);
+        var en = inlinediff.escape(n);
+        var oldOk = eo == stripTags(diff[1]);
+        var newOk = en == stripTags(diff[2]);
+        var ok = oldOk && newOk;
+        return $("<div/>")
+            .addClass("test")
+            .addClass(ok ? "ok" : "fail")
+            .append([oldOk, newOk].join(", "))
+            //.append($("<pre/>").addClass("comb").html(diff[0]))
+            .append($("<pre/>").addClass("old").html(diff[1]))
+            .append($("<pre/>").addClass("new").html(diff[2]));
+    }
+});
+
+</script>
+<style type="text/css">
+    .test {
+        margin: 1em; border: 1px solid #eee; padding: 0.5em; border-radius: 0.5em;
+    }
+    .test.fail {border: 2px solid #a60004;}
+    .test pre { margin:0 }
+    .test .old { background: #feccce}
+    .test .new { background: #c4ffc1}
+    .test ins, .test del { background-color: rgba(0,0,0,0.15); text-decoration: none; border-radius: 0.25em;}
+    .test .comb del { background-color: rgba(255,0,0,0.15); text-decoration: line-through; }
+    .test .comb ins { background-color: rgba(0,255,0,0.15); }
+</style>
+    </body>
+</html>

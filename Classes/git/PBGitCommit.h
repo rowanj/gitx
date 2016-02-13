@@ -7,23 +7,21 @@
 //
 
 #import <Cocoa/Cocoa.h>
-#import "PBGitRepository.h"
-#import "PBGitTree.h"
-#import "PBGitRefish.h"
-#import "PBGitSHA.h"
+#import "PBGitRefish.h" // for @protocol PBGitRefish
 
-#import <ObjectiveGit/git2/oid.h>
+@class PBGitRepository;
+@class PBGitTree;
+@class PBGitRef;
+@class PBGraphCellInfo;
 
 extern NSString * const kGitXCommitType;
 
-@class PBGraphCellInfo;
-@class GTCommit;
 
 @interface PBGitCommit : NSObject <PBGitRefish>
 
 @property (nonatomic, weak, readonly) PBGitRepository* repository;
 
-@property (nonatomic, strong, readonly) PBGitSHA *sha;
+@property (nonatomic, strong, readonly) GTOID *sha;
 
 @property (nonatomic, strong, readonly) NSDate *date;
 @property (nonatomic, strong, readonly) NSString *subject;
@@ -43,8 +41,6 @@ extern NSString * const kGitXCommitType;
 @property (nonatomic, readonly) PBGitTree* tree;
 @property (readonly) NSArray* treeContents;
 
-
-//+ (PBGitCommit *)commitWithRepository:(PBGitRepository*)repo andSha:(PBGitSHA *)newSha;
 
 - (id)initWithRepository:(PBGitRepository *)repo andCommit:(GTCommit *)gtCommit;
 

@@ -34,10 +34,14 @@
 	[op setAllowsMultipleSelection:NO];
 	[op setMessage:@"Initialize a repository here:"];
 	[op setTitle:@"New Repository"];
-	if ([op runModal] != NSFileHandlingPanelOKButton)
+	if ([op runModal] != NSFileHandlingPanelOKButton) {
+		if (outError) {
+			*outError = [NSError errorWithDomain:NSCocoaErrorDomain code:NSUserCancelledError userInfo:nil];
+		}
         return nil;
+    }
 
-    BOOL success = [GTRepository initializeEmptyRepositoryAtURL:[op URL] error:outError];
+    BOOL success = [GTRepository initializeEmptyRepositoryAtFileURL:[op URL] error:outError];
     if (!success)
         return nil; // Repo creation failed
 

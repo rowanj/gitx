@@ -8,8 +8,9 @@
 
 #import "PBWebHistoryController.h"
 #import "PBGitDefaults.h"
-#import "PBGitSHA.h"
 #import <ObjectiveGit/GTConfiguration.h>
+#import "PBGitRef.h"
+#import "PBGitRevSpecifier.h"
 
 @implementation PBWebHistoryController
 
@@ -70,7 +71,7 @@
 	// but this caused some funny behaviour because NSTask's and NSThread's don't really
 	// like each other. Instead, just do it async.
 
-	NSMutableArray *taskArguments = [NSMutableArray arrayWithObjects:@"show", @"--pretty=raw", @"-M", @"--no-color", [currentSha string], nil];
+	NSMutableArray *taskArguments = [NSMutableArray arrayWithObjects:@"show", @"--pretty=raw", @"-M", @"--no-color", [currentSha SHA], nil];
 	if (![PBGitDefaults showWhitespaceDifferences])
 		[taskArguments insertObject:@"-w" atIndex:1];
 
@@ -102,7 +103,7 @@
 
 - (void)selectCommit:(NSString *)sha
 {
-	[historyController selectCommit:[PBGitSHA shaWithString:sha]];
+	[historyController selectCommit: [GTOID oidWithSHA: sha]];
 }
 
 - (void) sendKey: (NSString*) key

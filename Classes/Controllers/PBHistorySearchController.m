@@ -6,6 +6,8 @@
 //  Copyright 2010 Nathan Kinsinger. All rights reserved.
 //
 
+#import <QuartzCore/CoreAnimation.h>
+
 #import "PBHistorySearchController.h"
 #import "PBGitHistoryController.h"
 #import "PBGitRepository.h"
@@ -13,9 +15,7 @@
 #import "PBCommitList.h"
 #import "PBEasyPipe.h"
 #import "PBGitBinary.h"
-
-#import <QuartzCore/CoreAnimation.h>
-
+#import "PBGitCommit.h"
 
 @interface PBHistorySearchController ()
 
@@ -438,22 +438,24 @@
 	[[NSNotificationCenter defaultCenter] removeObserver:self name:NSFileHandleReadToEndOfFileCompletionNotification object:[notification object]];
 	backgroundSearchTask = nil;
 
-	NSMutableIndexSet *indexes = [NSMutableIndexSet indexSet];
 	NSData *data = [[notification userInfo] valueForKey:NSFileHandleNotificationDataItem];
 
 	NSString *resultsString = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
 	NSArray *resultsArray = [resultsString componentsSeparatedByString:@"\n"];
 
+	NSMutableSet *matches = [NSMutableSet new];
 	for (NSString *resultSHA in resultsArray) {
-		NSUInteger index = 0;
-		for (PBGitCommit *commit in [commitController arrangedObjects]) {
-			if ([resultSHA isEqualToString:commit.sha.string]) {
-				[indexes addIndex:index];
-				break;
-			}
-			index++;
+		GTOID *resultOID = [GTOID oidWithSHA:resultSHA];
+		if (resultOID) {
+			[matches addObject:resultOID];
 		}
 	}
+
+	NSArray *arrangedObjects = [commitController arrangedObjects];
+	NSIndexSet *indexes = [arrangedObjects indexesOfObjectsPassingTest:^BOOL(id obj, NSUInteger idx, BOOL *stop) {
+		PBGitCommit *commit = obj;
+		return [matches containsObject:commit.sha];
+	}];
 
 	results = indexes;
 	[self clearProgressIndicator];

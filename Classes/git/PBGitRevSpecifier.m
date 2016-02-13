@@ -7,7 +7,7 @@
 //
 
 #import "PBGitRevSpecifier.h"
-
+#import "PBGitRef.h"
 
 @implementation PBGitRevSpecifier
 
@@ -19,6 +19,7 @@
 - (id) initWithParameters:(NSArray *)params description:(NSString *)descrip
 {
     self = [super init];
+    if (!self) return nil;
 	parameters = params;
 	description = descrip;
 
@@ -39,34 +40,28 @@
 
 - (id) initWithParameters:(NSArray *)params
 {
-    self = [super init];
-	self = [self initWithParameters:params description:nil];
-	return self;
+	return [self initWithParameters:params description:nil];
 }
 
 - (id) initWithRef:(PBGitRef *)ref
 {
-    self = [super init];
-	self = [self initWithParameters:[NSArray arrayWithObject:ref.ref] description:ref.shortName];
-	return self;
+	return [self initWithParameters:[NSArray arrayWithObject:ref.ref] description:ref.shortName];
 }
 
 - (id) initWithCoder:(NSCoder *)coder
 {
-    self = [super init];
-	self = [self initWithParameters:[coder decodeObjectForKey:@"Parameters"] description:[coder decodeObjectForKey:@"Description"]];
-	return self;
+	return [self initWithParameters:[coder decodeObjectForKey:@"Parameters"] description:[coder decodeObjectForKey:@"Description"]];
 }
 
 + (PBGitRevSpecifier *)allBranchesRevSpec
 {
     // Using --all here would include refs like refs/notes/commits, which probably isn't what we want.
-	return [[PBGitRevSpecifier alloc] initWithParameters:[NSArray arrayWithObjects:@"--branches", @"--remotes", @"--tags", @"--glob=refs/stash*", nil] description:@"All branches"];
+	return [[PBGitRevSpecifier alloc] initWithParameters:@[@"--branches", @"--remotes", @"--tags", @"--glob=refs/stash*", @"HEAD"] description:@"All branches"];
 }
 
 + (PBGitRevSpecifier *)localBranchesRevSpec
 {
-	return [[PBGitRevSpecifier alloc] initWithParameters:[NSArray arrayWithObject:@"--branches"] description:@"Local branches"];
+	return [[PBGitRevSpecifier alloc] initWithParameters:@[@"--branches", @"HEAD"] description:@"Local branches"];
 }
 
 - (NSString*) simpleRef
@@ -115,7 +110,7 @@
 	else
 		title = self.description;
 	
-	return [NSString stringWithFormat:@"\"%@\"", title];
+	return [NSString stringWithFormat:@"“%@”", title];
 }
 
 - (BOOL) hasPathLimiter;

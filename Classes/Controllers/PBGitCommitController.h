@@ -9,15 +9,19 @@
 #import <Cocoa/Cocoa.h>
 #import "PBViewController.h"
 
-@class PBGitIndexController, PBIconAndTextCell, PBWebChangesController, PBGitIndex;
+@class PBGitIndexController;
+@class PBIconAndTextCell;
+@class PBWebChangesController;
+@class PBGitIndex;
 @class PBNiceSplitView;
+@class PBCommitMessageView;
 
 @interface PBGitCommitController : PBViewController {
 	// This might have to transfer over to the PBGitRepository
 	// object sometime
 	PBGitIndex *index;
-	
-	IBOutlet NSTextView *commitMessageView;
+
+	IBOutlet PBCommitMessageView *commitMessageView;
 	IBOutlet NSArrayController *unstagedFilesController;
 	IBOutlet NSArrayController *cachedFilesController;
 	IBOutlet NSButton *commitButton;

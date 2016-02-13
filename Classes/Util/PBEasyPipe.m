@@ -21,6 +21,12 @@
 	NSTask* task = [[NSTask alloc] init];
 	[task setLaunchPath:cmd];
 	[task setArguments:args];
+
+    // Prepare ourselves a nicer environment
+    NSMutableDictionary *env = [[[NSProcessInfo processInfo] environment] mutableCopy];
+    [env removeObjectsForKeys:@[@"MallocStackLogging", @"MallocStackLoggingNoCompact", @"NSZombieEnabled"]];
+    [task setEnvironment:env];
+
 	if (dir)
 		[task setCurrentDirectoryPath:dir];
 

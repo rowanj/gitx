@@ -22,7 +22,7 @@
 
 - (NSString*) iconName
 {
-    return @"Tag";
+    return @"TagTemplate";
 }
 
 @end

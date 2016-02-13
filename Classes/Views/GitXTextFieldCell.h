@@ -7,8 +7,8 @@
 //
 
 #import <Cocoa/Cocoa.h>
-#import "PBRefContextDelegate.h"
 
+@protocol PBRefContextDelegate;
 
 @interface GitXTextFieldCell : NSTextFieldCell {
 	IBOutlet id<PBRefContextDelegate> contextMenuDelegate;

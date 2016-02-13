@@ -198,7 +198,7 @@ var loadCommit = function(commitObject, currentRef) {
 		var newRow = $("commit_header").insertRow(-1);
 		newRow.innerHTML = "<td class='property_name'>Parent:</td><td>" +
 			"<a class=\"SHA\" href='' onclick='selectCommit(this.innerHTML); return false;'>" +
-			commit.parents[i].string() + "</a></td>";
+			commit.parents[i].SHA() + "</a></td>";
 	}
 
 	commit.notificationID = setTimeout(function() { 
@@ -208,6 +208,40 @@ var loadCommit = function(commitObject, currentRef) {
 	}, 500);
 
 }
+
+var commonPrefix = function(a, b) {
+    if (a === b) return a;
+    var i = 0;
+    while (a.charAt(i) == b.charAt(i))++i;
+    return a.substring(0, i);
+};
+var commonSuffix = function(a, b) {
+    if (a === b) return "";
+    var i = a.length - 1,
+        k = b.length - 1;
+    while (a.charAt(i) == b.charAt(k)) {
+        --i;
+        --k;
+    }
+    return a.substring(i + 1, a.length);
+};
+var renameDiff = function(a, b) {
+    var p = commonPrefix(a, b),
+        s = commonSuffix(a, b),
+        o = a.substring(p.length, a.length - s.length),
+        n = b.substring(p.length, b.length - s.length);
+    return [p, o, n, s];
+};
+var formatRenameDiff = function(d) {
+    var p = d[0],
+        o = d[1],
+        n = d[2],
+        s = d[3];
+    if (o === "" && n === "" && s === "") {
+        return p;
+    }
+    return [p, "{ ", o, " → ", n, " }", s].join("");
+};
 
 var showDiff = function() {
 
@@ -221,35 +255,51 @@ var showDiff = function() {
 		link.setAttribute("href", "#" + id);
 		p.appendChild(link);
 		var finalFile = "";
+		var renamed = false;
 		if (name1 == name2) {
 			finalFile = name1;
-			img.src = "../../images/modified.png";
+			img.src = "../../images/modified.svg";
 			img.title = "Modified file";
 			p.title = "Modified file";
 			if (mode_change)
-				p.appendChild(document.createTextNode(" mode " + old_mode + " -> " + new_mode));
+				p.appendChild(document.createTextNode(" mode " + old_mode + " → " + new_mode));
 		}
 		else if (name1 == "/dev/null") {
-			img.src = "../../images/added.png";
+			img.src = "../../images/added.svg";
 			img.title = "Added file";
 			p.title = "Added file";
 			finalFile = name2;
 		}
 		else if (name2 == "/dev/null") {
-			img.src = "../../images/removed.png";
+			img.src = "../../images/removed.svg";
 			img.title = "Removed file";
 			p.title = "Removed file";
 			finalFile = name1;
 		}
 		else {
-			img.src = "../../images/renamed.png";
+			renamed = true;
+		}
+		if (renamed) {
+			img.src = "../../images/renamed.svg";
 			img.title = "Renamed file";
 			p.title = "Renamed file";
 			finalFile = name2;
-			p.insertBefore(document.createTextNode(name1 + " -> "), link);
+			var rfd = renameDiff(name1.unEscapeHTML(), name2.unEscapeHTML());
+			var html = [
+					'<span class="renamed">',
+					rfd[0].escapeHTML(),
+					'<span class="meta"> { </span>',
+					'<span class="old">', rfd[1].escapeHTML(), '</span>',
+					'<span class="meta"> -&gt; </span>',
+					'<span class="new">', rfd[2].escapeHTML(), '</span>',
+					'<span class="meta"> } </span>',
+					rfd[3].escapeHTML(),
+                    '</span>'
+				].join("");
+			link.innerHTML = html;
+		} else {
+			link.appendChild(document.createTextNode(finalFile.unEscapeHTML()));
 		}
-
-		link.appendChild(document.createTextNode(finalFile.unEscapeHTML()));
 		link.setAttribute("representedFile", finalFile);
 
 		p.insertBefore(img, link);

@@ -13,6 +13,4 @@
 + (NSURL*)workDirForURL:(NSURL*)fileURL;
 + (NSURL*)gitDirForURL:(NSURL*)fileURL;
 
-+ (NSURL*)fileURLForURL:(NSURL*)inputURL;
-
 @end

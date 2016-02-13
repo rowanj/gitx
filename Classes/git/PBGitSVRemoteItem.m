@@ -22,7 +22,7 @@
 
 - (NSString*) iconName
 {
-    return @"Remote";
+    return @"RemoteTemplate";
 }
 
 - (PBGitRef *) ref
