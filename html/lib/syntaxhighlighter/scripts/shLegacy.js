@@ -6,10 +6,10 @@
  * http://alexgorbatchev.com/SyntaxHighlighter/donate.html
  *
  * @version
- * 3.0.83 (Tue, 27 Dec 2011 09:58:26 GMT)
- * 
+ * 3.0.83 (Fri, 07 Jun 2013 03:47:38 GMT)
+ *
  * @copyright
- * Copyright (C) 2004-2010 Alex Gorbatchev.
+ * Copyright (C) 2004-2013 Alex Gorbatchev.
  *
  * @license
  * Dual licensed under the MIT and GPL licenses.
@@ -30,12 +30,12 @@ dp.SyntaxHighlighter = {
 	{
 		function getValue(list, name)
 		{
-			var regex = new XRegExp('^' + name + '\\[(?<value>\\w+)\\]$', 'gi'),
+			var regex = XRegExp('^' + name + '\\[(?<value>\\w+)\\]$', 'gi'),
 				match = null
 				;
 			
 			for (var i = 0; i < list.length; i++) 
-				if ((match = regex.exec(list[i])) != null)
+				if ((match = XRegExp.exec(list[i], regex)) != null)
 					return match.value;
 			
 			return null;

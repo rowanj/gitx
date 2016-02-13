@@ -6,6 +6,12 @@
 //  Copyright 2008 __MyCompanyName__. All rights reserved.
 //
 
+#import "PBGitCommit.h"
+#import "PBGitTree.h"
+#import "PBGitRef.h"
+#import "PBGitHistoryList.h"
+#import "PBGitRevSpecifier.h"
+#import "PBCollapsibleSplitView.h"
 #import "PBGitHistoryController.h"
 #import "PBWebHistoryController.h"
 #import "CWQuickLook.h"
@@ -76,6 +82,12 @@
 	else
 		[repository lazyReload];
 
+    if (![repository hasSVNRemote])
+    {
+        // Remove the SVN revision table column for repositories with no SVN remote configured
+        [commitList removeTableColumn:[commitList tableColumnWithIdentifier:@"GitSVNRevision"]];
+    }
+
 	// Set a sort descriptor for the subject column in the history list, as
 	// It can't be sorted by default (because it's bound to a PBGitCommit)
 	[[commitList tableColumnWithIdentifier:@"SubjectColumn"] setSortDescriptorPrototype:[[NSSortDescriptor alloc] initWithKey:@"subject" ascending:YES]];
@@ -91,8 +103,13 @@
 				  bottomColor:[NSColor colorWithCalibratedHue:0.579 saturation:0.119 brightness:0.765 alpha:1.000]];
 	[self updateBranchFilterMatrix];
 
-  // listen for updates
-  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_repositoryUpdatedNotification:) name:PBGitRepositoryEventNotification object:repository];
+	// listen for updates
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_repositoryUpdatedNotification:) name:PBGitRepositoryEventNotification object:repository];
+
+	__unsafe_unretained PBGitHistoryController *weakSelf = self;
+	commitList.findPanelActionBlock = ^(id sender) {
+		[weakSelf.view.window makeFirstResponder:weakSelf->searchField];
+	};
 
 	[super awakeFromNib];
 }
@@ -195,7 +212,7 @@
 - (void) updateStatus
 {
 	self.isBusy = repository.revisionList.isUpdating;
-	self.status = [NSString stringWithFormat:@"%d commits loaded", [[commitController arrangedObjects] count]];
+	self.status = [NSString stringWithFormat:@"%lu commits loaded", [[commitController arrangedObjects] count]];
 }
 
 - (void) restoreFileBrowserSelection
@@ -470,7 +487,7 @@
     commitList.useAdjustScroll = NO;
 }
 
-- (NSArray *) selectedObjectsForSHA:(PBGitSHA *)commitSHA
+- (NSArray *) selectedObjectsForSHA:(GTOID *)commitSHA
 {
 	NSPredicate *selection = [NSPredicate predicateWithFormat:@"sha == %@", commitSHA];
 	NSArray *selectedCommits = [[commitController content] filteredArrayUsingPredicate:selection];
@@ -481,7 +498,7 @@
 	return selectedCommits;
 }
 
-- (void)selectCommit:(PBGitSHA *)commitSHA
+- (void)selectCommit:(GTOID *)commitSHA
 {
 	if (!forceSelectionUpdate && [[[[commitController selectedObjects] lastObject] sha] isEqual:commitSHA])
 		return;

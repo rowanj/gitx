@@ -27,6 +27,10 @@
 	return self;
 }
 
+- (void)dealloc {
+    superController = nil;
+}
+
 - (void)closeView
 {
 	[self unbind:@"repository"];

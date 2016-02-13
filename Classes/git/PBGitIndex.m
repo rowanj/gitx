@@ -441,7 +441,7 @@ NSString *PBGitIndexOperationFailed = @"PBGitIndexOperationFailed";
 
 - (NSString *)diffForFile:(PBChangedFile *)file staged:(BOOL)staged contextLines:(NSUInteger)context
 {
-	NSString *parameter = [NSString stringWithFormat:@"-U%u", context];
+	NSString *parameter = [NSString stringWithFormat:@"-U%lu", context];
 	if (staged) {
 		NSString *indexPath = [@":0:" stringByAppendingString:file.path];
 
@@ -502,6 +502,11 @@ NSString *PBGitIndexOperationFailed = @"PBGitIndexOperationFailed";
 	// Now that the index is refreshed, we need to read the information from the index
 	NSNotificationCenter *nc = [NSNotificationCenter defaultCenter]; 
 
+	if ([repository isBareRepository])
+	{
+		return;
+	}
+	
 	// Other files (not tracked, not ignored)
 	refreshStatus++;
 	NSFileHandle *handle = [PBEasyPipe handleForCommand:[PBGitBinary path] 

@@ -14,229 +14,267 @@
 #import "PBEasyPipe.h"
 #import "PBGitBinary.h"
 
-#include <ext/stdio_filebuf.h>
-#include <iostream>
-#include <string>
-#include <map>
+#import <ObjectiveGit/ObjectiveGit.h>
+
+#import <ext/stdio_filebuf.h>
+#import <iostream>
+#import <string>
+#import <map>
+#import <ObjectiveGit/GTOID.h>
 
 using namespace std;
 
 
 @interface PBGitRevList ()
 
-@property (assign) BOOL isParsing;
+@property (nonatomic, assign) BOOL isGraphing;
+@property (nonatomic, assign) BOOL resetCommits;
+
+@property (nonatomic, weak) PBGitRepository *repository;
+@property (nonatomic, strong) PBGitRevSpecifier *currentRev;
+
+@property (nonatomic, strong) NSMutableDictionary *commitCache;
+
+@property (nonatomic, strong) NSThread *parseThread;
 
 @end
 
 
-#define kRevListThreadKey @"thread"
 #define kRevListRevisionsKey @"revisions"
 
 
 @implementation PBGitRevList
 
-@synthesize commits;
-@synthesize isParsing;
-
-
 - (id) initWithRepository:(PBGitRepository *)repo rev:(PBGitRevSpecifier *)rev shouldGraph:(BOOL)graph
 {
-	repository = repo;
-	isGraphing = graph;
-	currentRev = [rev copy];
-
+	self = [super init];
+	if (!self) {
+		return nil;
+	}
+	self.repository = repo;
+	self.currentRev = [rev copy];
+	self.isGraphing = graph;
+	self.commitCache = [NSMutableDictionary new];
+	
 	return self;
 }
 
 
 - (void) loadRevisons
 {
-	[parseThread cancel];
-
-	parseThread = [[NSThread alloc] initWithTarget:self selector:@selector(walkRevisionListWithSpecifier:) object:currentRev];
+	[self cancel];
+	
+	self.parseThread = [[NSThread alloc] initWithTarget:self selector:@selector(beginWalkWithSpecifier:) object:self.currentRev];
 	self.isParsing = YES;
-	resetCommits = YES;
-	[parseThread start];
+	self.resetCommits = YES;
+	[self.parseThread start];
 }
 
 
 - (void)cancel
 {
-	[parseThread cancel];
+	[self.parseThread cancel];
+	self.parseThread = nil;
+	self.isParsing = NO;
 }
 
 
 - (void) finishedParsing
 {
+	self.parseThread = nil;
 	self.isParsing = NO;
 }
 
 
 - (void) updateCommits:(NSDictionary *)update
 {
-	if ([update objectForKey:kRevListThreadKey] != parseThread)
-		return;
-
 	NSArray *revisions = [update objectForKey:kRevListRevisionsKey];
 	if (!revisions || [revisions count] == 0)
 		return;
-
-	if (resetCommits) {
+	
+	if (self.resetCommits) {
 		self.commits = [NSMutableArray array];
-		resetCommits = NO;
+		self.resetCommits = NO;
 	}
-
-	NSRange range = NSMakeRange([commits count], [revisions count]);
+	
+	NSRange range = NSMakeRange([self.commits count], [revisions count]);
 	NSIndexSet *indexes = [NSIndexSet indexSetWithIndexesInRange:range];
-
+	
 	[self willChange:NSKeyValueChangeInsertion valuesAtIndexes:indexes forKey:@"commits"];
-	[commits addObjectsFromArray:revisions];
+	[self.commits addObjectsFromArray:revisions];
 	[self didChange:NSKeyValueChangeInsertion valuesAtIndexes:indexes forKey:@"commits"];
 }
 
-
-- (void) walkRevisionListWithSpecifier:(PBGitRevSpecifier*)rev
+- (void) beginWalkWithSpecifier:(PBGitRevSpecifier*)rev
 {
-	@autoreleasepool {
-		NSDate *start = [NSDate date];
-		NSDate *lastUpdate = [NSDate date];
-		NSMutableArray *revisions = [NSMutableArray array];
-		PBGitGrapher *g = [[PBGitGrapher alloc] initWithRepository:repository];
-		std::map<string, NSStringEncoding> encodingMap;
-		NSThread *currentThread = [NSThread currentThread];
-		
-		NSString *formatString = @"--pretty=format:%H\01%e\01%aN\01%cN\01%s\01%P\01%at";
-		BOOL showSign = [rev hasLeftRight];
-		
-		if (showSign)
-			formatString = [formatString stringByAppendingString:@"\01%m"];
-		
-		NSMutableArray *arguments = [NSMutableArray arrayWithObjects:@"log",
-									 @"-z",
-									 @"--topo-order",
-									 @"--children",
-									 formatString, nil];
-		
-		if (!rev)
-			[arguments addObject:@"HEAD"];
-		else
-			[arguments addObjectsFromArray:[rev parameters]];
-		
-		NSString *directory = rev.workingDirectory ? rev.workingDirectory.path : repository.fileURL.path;
-		NSTask *task = [PBEasyPipe taskForCommand:[PBGitBinary path] withArgs:arguments inDir:directory];
-		[task launch];
-		NSFileHandle *handle = [task.standardOutput fileHandleForReading];
-		
-		int fd = [handle fileDescriptor];
-		__gnu_cxx::stdio_filebuf<char> buf(fd, std::ios::in);
-		std::istream stream(&buf);
-		
-		int num = 0;
-		while (true) {
-			if ([currentThread isCancelled])
-				break;
-			
-			string sha;
-			if (!getline(stream, sha, '\1'))
-				break;
-			
-			// From now on, 1.2 seconds
-			string encoding_str;
-			getline(stream, encoding_str, '\1');
-			NSStringEncoding encoding = NSUTF8StringEncoding;
-			if (encoding_str.length())
-			{
-				if (encodingMap.find(encoding_str) != encodingMap.end()) {
-					encoding = encodingMap[encoding_str];
+	PBGitRepository *pbRepo = self.repository;
+	GTRepository *repo = pbRepo.gtRepo;
+	
+	NSError *error = nil;
+	GTEnumerator *enu = [[GTEnumerator alloc] initWithRepository:repo error:&error];
+	
+	[self setupEnumerator:enu forRevspec:rev];
+	
+	[self addCommitsFromEnumerator:enu inPBRepo:pbRepo];
+}
+
+- (void) addGitObject:(GTObject *)obj toCommitSet:(NSMutableSet *)set
+{
+	GTCommit *commit = nil;
+	if ([obj isKindOfClass:[GTCommit class]]) {
+		commit = (GTCommit *)obj;
+	} else {
+		NSError *peelError = nil;
+		commit = [obj objectByPeelingToType:GTObjectTypeCommit error:&peelError];
+	}
+
+	NSAssert(commit, @"Can't add nil commit to set");
+
+	for (GTCommit *item in set) {
+		if ([item.OID isEqual:commit.OID]) {
+			return;
+		}
+	}
+
+	[set addObject:commit];
+}
+
+- (void) addGitBranches:(NSArray *)branches fromRepo:(GTRepository *)repo toCommitSet:(NSMutableSet *)set
+{
+	for (GTBranch *branch in branches) {
+		NSError *objectLookupError = nil;
+		GTObject *gtObject = [repo lookUpObjectBySHA:branch.SHA error:&objectLookupError];
+		[self addGitObject:gtObject toCommitSet:set];
+	}
+}
+
+- (void) setupEnumerator:(GTEnumerator*)enumerator
+			  forRevspec:(PBGitRevSpecifier*)rev
+{
+	NSError *error = nil;
+	GTRepository *repo = enumerator.repository;
+	// [enumerator resetWithOptions:GTEnumeratorOptionsTimeSort];
+	[enumerator resetWithOptions:GTEnumeratorOptionsTopologicalSort];
+	NSMutableSet *enumCommits = [NSMutableSet new];
+	if (rev.isSimpleRef) {
+		GTObject *object = [repo lookUpObjectByRevParse:rev.simpleRef error:&error];
+		[self addGitObject:object toCommitSet:enumCommits];
+	} else {
+		NSArray *allRefs = [repo referenceNamesWithError:&error];
+		for (NSString *param in rev.parameters) {
+			if ([param isEqualToString:@"--branches"]) {
+				NSArray *branches = [repo localBranchesWithError:&error];
+				[self addGitBranches:branches fromRepo:repo toCommitSet:enumCommits];
+			} else if ([param isEqualToString:@"--remotes"]) {
+				NSArray *branches = [repo remoteBranchesWithError:&error];
+				[self addGitBranches:branches fromRepo:repo toCommitSet:enumCommits];
+			} else if ([param isEqualToString:@"--tags"]) {
+				for (NSString *ref in allRefs) {
+					if ([ref hasPrefix:@"refs/tags/"]) {
+						GTObject *tag = [repo lookUpObjectByRevParse:ref error:&error];
+						GTCommit *commit = nil;
+						if ([tag isKindOfClass:[GTCommit class]]) {
+							commit = (GTCommit *)tag;
+						} else if ([tag isKindOfClass:[GTTag class]]) {
+							NSError *tagError = nil;
+							commit = [(GTTag *)tag objectByPeelingTagError:&tagError];
+						}
+
+						if ([commit isKindOfClass:[GTCommit class]])
+						{
+							[self addGitObject:commit toCommitSet:enumCommits];
+						}
+					}
+				}
+			} else if ([param hasPrefix:@"--glob="]) {
+				[enumerator pushGlob:[param substringFromIndex:@"--glob=".length] error:&error];
+			} else {
+				NSError *lookupError = nil;
+				GTObject *obj = [repo lookUpObjectByRevParse:param error:&lookupError];
+				if (obj && !lookupError) {
+					[self addGitObject:obj toCommitSet:enumCommits];
 				} else {
-					encoding = CFStringConvertEncodingToNSStringEncoding(CFStringConvertIANACharSetNameToEncoding((__bridge CFStringRef)[NSString stringWithUTF8String:encoding_str.c_str()]));
-					encodingMap[encoding_str] = encoding;
+					[enumerator pushGlob:param error:&error];
 				}
 			}
-			
-			git_oid oid;
-			git_oid_fromstr(&oid, sha.c_str());
-			PBGitCommit *newCommit = [PBGitCommit commitWithRepository:repository andSha:[PBGitSHA shaWithOID:oid]];
-			
-			string author;
-			getline(stream, author, '\1');
-			
-			string committer;
-			getline(stream, committer, '\1');
-			
-			string subject;
-			getline(stream, subject, '\1');
-			
-			string parentString;
-			getline(stream, parentString, '\1');
-			if (parentString.size() != 0)
-			{
-				if (((parentString.size() + 1) % 41) != 0) {
-					NSLog(@"invalid parents: %zu", parentString.size());
-					continue;
-				}
-				int nParents = (parentString.size() + 1) / 41;
-				NSMutableArray *parents = [NSMutableArray arrayWithCapacity:nParents];
-				int parentIndex;
-				for (parentIndex = 0; parentIndex < nParents; ++parentIndex)
-					[parents addObject:[PBGitSHA shaWithCString:parentString.substr(parentIndex * 41, 40).c_str()]];
-				
-				[newCommit setParents:parents];
+		}
+	}
+
+	NSArray *sortedBranchesAndTags = [[enumCommits allObjects] sortedArrayWithOptions:NSSortStable usingComparator:^NSComparisonResult(id obj1, id obj2) {
+		GTCommit *branchCommit1 = obj1;
+		GTCommit *branchCommit2 = obj2;
+
+		return [branchCommit2.commitDate compare:branchCommit1.commitDate];
+	}];
+
+	for (GTCommit *commit in sortedBranchesAndTags) {
+		NSError *pushError = nil;
+		[enumerator pushSHA:commit.SHA error:&pushError];
+	}
+
+
+}
+
+- (void) addCommitsFromEnumerator:(GTEnumerator *)enumerator
+						 inPBRepo:(PBGitRepository*)pbRepo;
+{
+	PBGitGrapher *g = [[PBGitGrapher alloc] initWithRepository:pbRepo];
+	__block NSDate *lastUpdate = [NSDate date];
+
+	dispatch_queue_t loadQueue = dispatch_queue_create("net.phere.gitx.loadQueue", 0);
+	dispatch_queue_t decorateQueue = dispatch_queue_create("net.phere.gitx.decorateQueue", 0);
+	dispatch_group_t loadGroup = dispatch_group_create();
+	dispatch_group_t decorateGroup = dispatch_group_create();
+	
+	BOOL enumSuccess = FALSE;
+	GTCommit *commit = nil;
+	__block int num = 0;
+	__block NSMutableArray *revisions = [NSMutableArray array];
+	NSError *enumError = nil;
+	while ((commit = [enumerator nextObjectWithSuccess:&enumSuccess error:&enumError]) && enumSuccess) {
+		//GTOID *oid = [[GTOID alloc] initWithSHA:commit.sha];
+		
+		dispatch_group_async(loadGroup, loadQueue, ^{
+			PBGitCommit *newCommit = nil;
+			PBGitCommit *cachedCommit = [self.commitCache objectForKey:commit.SHA];
+			if (cachedCommit) {
+				newCommit = cachedCommit;
+			} else {
+				newCommit = [[PBGitCommit alloc] initWithRepository:pbRepo andCommit:commit];
+				[self.commitCache setObject:newCommit forKey:commit.SHA];
 			}
 			
-			int time;
-			stream >> time;
+			[revisions addObject:newCommit];
 			
-			[newCommit setSubject:[NSString stringWithCString:subject.c_str() encoding:encoding]];
-			[newCommit setAuthor:[NSString stringWithCString:author.c_str() encoding:encoding]];
-			[newCommit setCommitter:[NSString stringWithCString:committer.c_str() encoding:encoding]];
-			[newCommit setTimestamp:time];
-			
-			if (showSign)
-			{
-				char c;
-				stream >> c; // Remove separator
-				stream >> c;
-				if (c != '>' && c != '<' && c != '^' && c != '-')
-					NSLog(@"Error loading commits: sign not correct");
-				[newCommit setSign: c];
+			if (self.isGraphing) {
+				dispatch_group_async(decorateGroup, decorateQueue, ^{
+					[g decorateCommit:newCommit];
+				});
 			}
-			
-			char c;
-			stream >> c;
-			if (c != '\0')
-				cout << "Error" << endl;
-			
-			[revisions addObject: newCommit];
-			if (isGraphing)
-				[g decorateCommit:newCommit];
 			
 			if (++num % 100 == 0) {
-				if ([[NSDate date] timeIntervalSinceDate:lastUpdate] > 0.1) {
-					NSDictionary *update = [NSDictionary dictionaryWithObjectsAndKeys:currentThread, kRevListThreadKey, revisions, kRevListRevisionsKey, nil];
+				if ([[NSDate date] timeIntervalSinceDate:lastUpdate] > 0.5 && ![[NSThread currentThread] isCancelled]) {
+					dispatch_group_wait(decorateGroup, DISPATCH_TIME_FOREVER);
+					NSDictionary *update = [NSDictionary dictionaryWithObjectsAndKeys:revisions, kRevListRevisionsKey, nil];
 					[self performSelectorOnMainThread:@selector(updateCommits:) withObject:update waitUntilDone:NO];
 					revisions = [NSMutableArray array];
 					lastUpdate = [NSDate date];
 				}
 			}
-		}
+		});
+	}
+
+	NSAssert(!enumError, @"Error enumerating commits");
+	
+	dispatch_group_wait(loadGroup, DISPATCH_TIME_FOREVER);
+	dispatch_group_wait(decorateGroup, DISPATCH_TIME_FOREVER);
+	
+	// Make sure the commits are stored before exiting.
+	if (![[NSThread currentThread] isCancelled]) {
+		NSDictionary *update = [NSDictionary dictionaryWithObjectsAndKeys:revisions, kRevListRevisionsKey, nil];
+		[self performSelectorOnMainThread:@selector(updateCommits:) withObject:update waitUntilDone:YES];
 		
-		if (![currentThread isCancelled]) {
-			NSTimeInterval duration = [[NSDate date] timeIntervalSinceDate:start];
-			NSLog(@"Loaded %i commits in %f seconds (%f/sec)", num, duration, num/duration);
-			
-			// Make sure the commits are stored before exiting.
-			NSDictionary *update = [NSDictionary dictionaryWithObjectsAndKeys:currentThread, kRevListThreadKey, revisions, kRevListRevisionsKey, nil];
-			[self performSelectorOnMainThread:@selector(updateCommits:) withObject:update waitUntilDone:YES];
-			
-			[self performSelectorOnMainThread:@selector(finishedParsing) withObject:nil waitUntilDone:NO];
-		}
-		else {
-			NSLog(@"[%@ %@] thread has been canceled", [self class], NSStringFromSelector(_cmd));
-		}
-		
-		[task terminate];
-		[task waitUntilExit];
+		[self performSelectorOnMainThread:@selector(finishedParsing) withObject:nil waitUntilDone:NO];
 	}
 }
 

@@ -20,7 +20,6 @@
 + (id) panel;
 + (void)beginCloneRepository:(NSString *)repository toURL:(NSURL *)targetURL isBare:(BOOL)bare;
 
-- (void)showMessageSheet:(NSString *)messageText infoText:(NSString *)infoText;
 - (void)showErrorSheet:(NSError *)error;
 
 - (IBAction) closeCloneRepositoryPanel:(id)sender;
@@ -29,10 +28,10 @@
 - (IBAction) showHideHiddenFiles:(id)sender;
 - (IBAction) browseDestination:(id)sender;
 
-@property (nonatomic, dct_weak) IBOutlet NSTextField *repositoryURL;
-@property (nonatomic, dct_weak) IBOutlet NSTextField *destinationPath;
-@property (nonatomic, dct_weak) IBOutlet NSTextField *errorMessage;
-@property (nonatomic, dct_weak) IBOutlet NSView      *repositoryAccessoryView;
+@property (nonatomic, weak) IBOutlet NSTextField *repositoryURL;
+@property (nonatomic, weak) IBOutlet NSTextField *destinationPath;
+@property (nonatomic, weak) IBOutlet NSTextField *errorMessage;
+@property (nonatomic, weak) IBOutlet NSView      *repositoryAccessoryView;
 
 @property (assign) BOOL isBare;
 

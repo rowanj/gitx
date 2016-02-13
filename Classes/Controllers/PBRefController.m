@@ -13,7 +13,7 @@
 #import "PBCreateTagSheet.h"
 #import "PBGitDefaults.h"
 #import "PBDiffWindowController.h"
-
+#import "PBGitRevSpecifier.h"
 
 #define kDialogAcceptDroppedRef @"Accept Dropped Ref"
 #define kDialogConfirmPush @"Confirm Push"
@@ -55,7 +55,7 @@
 - (void)showConfirmPushRefSheet:(PBGitRef *)ref remote:(PBGitRef *)remoteRef
 {
 	if ((!ref && !remoteRef)
-		|| (ref && ![ref isBranch] && ![ref isRemoteBranch])
+		|| (ref && ![ref isBranch] && ![ref isRemoteBranch] && ![ref isTag])
 		|| (remoteRef && !([remoteRef refishType] == kGitXRemoteType)))
 		return;
 
@@ -192,6 +192,21 @@
 	[pasteboard setString:[commit realSha] forType:NSStringPboardType];
 }
 
+
+- (void) copyShortSHA:(PBRefMenuItem *)sender
+{
+	PBGitCommit *commit = nil;
+	if ([[sender refish] refishType] == kGitXCommitType)
+		commit = (PBGitCommit *)[sender refish];
+	else
+		commit = [historyController.repository commitForRef:[sender refish]];
+    
+	NSPasteboard *pasteboard = [NSPasteboard generalPasteboard];
+	[pasteboard declareTypes:[NSArray arrayWithObject:NSStringPboardType] owner:nil];
+	[pasteboard setString:[commit shortName] forType:NSStringPboardType];
+}
+
+
 - (void) copyPatch:(PBRefMenuItem *)sender
 {
 	PBGitCommit *commit = nil;
@@ -232,15 +247,21 @@
 	if ([[sender refish] refishType] != kGitXTagType)
 		return;
 
+	NSError *error = nil;
 	NSString *tagName = [(PBGitRef *)[sender refish] tagName];
-
-	int retValue = 1;
-	NSArray *args = [NSArray arrayWithObjects:@"tag", @"-n50", @"-l", tagName, nil];
-	NSString *info = [historyController.repository outputInWorkdirForArguments:args retValue:&retValue];
-	if (!retValue) {
-		NSString *message = [NSString stringWithFormat:@"Info for tag: %@", tagName];
-		[historyController.repository.windowController showMessageSheet:message infoText:info];
+	NSString *tagRef = [@"refs/tags/" stringByAppendingString:tagName];
+	GTObject *object = [historyController.repository.gtRepo lookUpObjectByRevParse:tagRef error:&error];
+	if (!object) {
+		NSLog(@"Couldn't look up ref %@:%@", tagRef, [error debugDescription]);
+		return;
 	}
+	NSString* title = [NSString stringWithFormat:@"Info for tag: %@", tagName];
+	NSString* info = @"";
+	if ([object isKindOfClass:[GTTag class]]) {
+		GTTag *tag = (GTTag*)object;
+		info = tag.message;
+	}
+	[historyController.repository.windowController showMessageSheet:title infoText:info];
 }
 
 
@@ -421,7 +442,7 @@
 									 defaultButton:@"Move"
 								   alternateButton:@"Cancel"
 									   otherButton:nil
-						 informativeTextWithFormat:infoText];
+						 informativeTextWithFormat:@"%@", infoText];
     [alert setShowsSuppressionButton:YES];
 
 	[alert beginSheetModalForWindow:[historyController.repository.windowController window]
@@ -441,6 +462,10 @@
 
 	if ([[alert suppressionButton] state] == NSOnState)
         [PBGitDefaults suppressDialogWarningForDialog:kDialogAcceptDroppedRef];
+}
+
+- (void)dealloc {
+    historyController = nil;
 }
 
 @end

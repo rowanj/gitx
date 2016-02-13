@@ -6,25 +6,32 @@
 //  Copyright 2008 __MyCompanyName__. All rights reserved.
 //
 
+#import "PBGitRepository.h"
 #import "PBGitCommit.h"
-#import "PBGitSHA.h"
+#import "PBGitTree.h"
+#import "PBGitRef.h"
 #import "PBGitDefaults.h"
 
-
 NSString * const kGitXCommitType = @"commit";
+
+@interface PBGitCommit ()
+
+@property (nonatomic, weak) PBGitRepository *repository;
+@property (nonatomic, strong) GTCommit *gtCommit;
+@property (nonatomic, strong) NSArray *parents;
+
+@property (nonatomic, strong) NSString *patch;
+@property (nonatomic, strong) GTOID *sha;
+
+@end
 
 
 @implementation PBGitCommit
 
-@synthesize repository, subject, timestamp, author, sign, lineInfo;
-@synthesize sha;
-@synthesize parents;
-@synthesize committer;
-
-
-- (NSDate *)date
+- (NSDate *) date
 {
-	return [NSDate dateWithTimeIntervalSince1970:timestamp];
+	return self.gtCommit.commitDate;
+	// previous behaviour was equiv. to:  return self.gtCommit.author.time;
 }
 
 - (NSString *) dateString
@@ -38,22 +45,88 @@ NSString * const kGitXCommitType = @"commit";
 	return self.tree.children;
 }
 
-+ (PBGitCommit *)commitWithRepository:(PBGitRepository*)repo andSha:(PBGitSHA *)newSha
+- (id)initWithRepository:(PBGitRepository *)repo andCommit:(GTCommit *)gtCommit
 {
-	return [[self alloc] initWithRepository:repo andSha:newSha];
+	self = [super init];
+	if (!self) {
+		return nil;
+	}
+	self.repository = repo;
+	self.gtCommit = gtCommit;
+	
+	return self;
 }
 
-- (id)initWithRepository:(PBGitRepository*) repo andSha:(PBGitSHA *)newSha
+
+- (NSArray *)parents
 {
-	details = nil;
-	repository = repo;
-	sha = newSha;
-	return self;
+	if (!self->_parents) {
+		NSArray *gtParents = self.gtCommit.parents;
+		NSMutableArray *parents = [NSMutableArray arrayWithCapacity:gtParents.count];
+		for (GTCommit *parent in gtParents) {
+			[parents addObject:parent.OID];
+		}
+		self.parents = parents;
+	}
+	return self->_parents;
+}
+
+- (NSString *)subject
+{
+	return self.gtCommit.messageSummary;
+}
+
+- (NSString *)author
+{
+	NSString *result = self.gtCommit.author.name;
+	return result;
+}
+
+- (NSString *)committer
+{
+	GTSignature *sig = self.gtCommit.committer;
+	return sig.name;
+}
+
+- (NSString *)SVNRevision
+{
+	NSString *result = nil;
+	if ([self.repository hasSVNRemote])
+	{
+		// get the git-svn-id from the message
+		NSArray *matches = nil;
+		NSString *string = self.gtCommit.message;
+		NSError *error = nil;
+		// Regular expression for pulling out the SVN revision from the git log
+        NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:@"^git-svn-id: .*@(\\d+) .*$" options:NSRegularExpressionAnchorsMatchLines error:&error];
+		
+		if (string) {
+			matches = [regex matchesInString:string options:0 range:NSMakeRange(0, [string length])];
+			for (NSTextCheckingResult *match in matches)
+			{
+				NSRange matchRange = [match rangeAtIndex:1];
+				NSString *matchString = [string substringWithRange:matchRange];
+				result = matchString;
+			}
+		}
+	}
+	return result;
+}
+
+- (GTOID *)sha
+{
+	GTOID *result = _sha;
+	if (result) {
+		return result;
+	}
+    result = self.gtCommit.OID;
+	_sha = result;
+	return result;
 }
 
 - (NSString *)realSha
 {
-	return sha.string;
+	return self.gtCommit.SHA;
 }
 
 - (BOOL) isOnSameBranchAs:(PBGitCommit *)otherCommit
@@ -64,23 +137,20 @@ NSString * const kGitXCommitType = @"commit";
 	if ([self isEqual:otherCommit])
 		return YES;
 
-	return [repository isOnSameBranch:otherCommit.sha asSHA:self.sha];
+	return [self.repository isOnSameBranch:otherCommit.sha asSHA:self.sha];
 }
 
 - (BOOL) isOnHeadBranch
 {
-	return [self isOnSameBranchAs:[repository headCommit]];
+	return [self isOnSameBranchAs:[self.repository headCommit]];
 }
 
 - (BOOL)isEqual:(id)otherCommit
 {
-	if (self == otherCommit)
+	if (self == otherCommit) {
 		return YES;
-
-	if (![otherCommit isMemberOfClass:[PBGitCommit class]])
-		return NO;
-
-	return [self.sha isEqual:[(PBGitCommit *)otherCommit sha]];
+	}
+	return NO;
 }
 
 - (NSUInteger)hash
@@ -96,13 +166,13 @@ NSString * const kGitXCommitType = @"commit";
 
 - (NSString *) patch
 {
-	if (_patch != nil)
+	if (self->_patch != nil)
 		return _patch;
 
-	NSString *p = [repository outputForArguments:[NSArray arrayWithObjects:@"format-patch",  @"-1", @"--stdout", [self realSha], nil]];
+	NSString *p = [self.repository outputForArguments:[NSArray arrayWithObjects:@"format-patch",  @"-1", @"--stdout", [self realSha], nil]];
 	// Add a GitX identifier to the patch ;)
-	_patch = [[p substringToIndex:[p length] -1] stringByAppendingString:@"+GitX"];
-	return _patch;
+	self.patch = [[p substringToIndex:[p length] -1] stringByAppendingString:@"+GitX"];
+	return self->_patch;
 }
 
 - (PBGitTree*) tree
@@ -140,12 +210,12 @@ NSString * const kGitXCommitType = @"commit";
 
 - (NSMutableArray *)refs
 {
-	return [[repository refs] objectForKey:[self sha]];
+	return self.repository.refs[self.sha];
 }
 
 - (void) setRefs:(NSMutableArray *)refs
 {
-	[[repository refs] setObject:refs forKey:[self sha]];
+	self.repository.refs[self.sha] = [NSMutableArray arrayWithArray:refs];
 }
 
 
@@ -168,7 +238,7 @@ NSString * const kGitXCommitType = @"commit";
 
 - (NSString *) shortName
 {
-	return [[self realSha] substringToIndex:10];
+	return self.gtCommit.shortSHA;
 }
 
 - (NSString *) refishType

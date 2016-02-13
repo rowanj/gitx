@@ -20,8 +20,8 @@
 @interface PBGitSidebarController ()
 
 - (void)populateList;
-- (void)addRevSpec:(PBGitRevSpecifier *)revSpec;
-- (PBSourceViewItem *) itemForRev:(PBGitRevSpecifier *)rev;
+- (PBSourceViewItem *)addRevSpec:(PBGitRevSpecifier *)revSpec;
+- (PBSourceViewItem *)itemForRev:(PBGitRevSpecifier *)rev;
 - (void) removeRevSpec:(PBGitRevSpecifier *)rev;
 - (void) updateActionMenu;
 - (void) updateRemoteControls;
@@ -54,12 +54,25 @@
 	[repository addObserver:self forKeyPath:@"currentBranch" options:0 context:@"currentBranchChange"];
 	[repository addObserver:self forKeyPath:@"branches" options:(NSKeyValueObservingOptionOld | NSKeyValueObservingOptionNew) context:@"branchesModified"];
 
+    [sourceView setTarget:self];
+    [sourceView setDoubleAction:@selector(doubleClicked:)];
+
 	[self menuNeedsUpdate:[actionButton menu]];
 
 	if ([PBGitDefaults showStageView])
 		[self selectStage];
 	else
 		[self selectCurrentBranch];
+
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(expandCollapseItem:) name:NSOutlineViewItemWillExpandNotification object:sourceView];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(expandCollapseItem:) name:NSOutlineViewItemWillCollapseNotification object:sourceView];
+
+}
+
+- (void)dealloc
+{
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:NSOutlineViewItemWillExpandNotification object:sourceView];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:NSOutlineViewItemWillCollapseNotification object:sourceView];
 }
 
 - (void)closeView
@@ -87,8 +100,7 @@
 		if (changeKind == NSKeyValueChangeInsertion) {
 			NSArray *newRevSpecs = [change objectForKey:NSKeyValueChangeNewKey];
 			for (PBGitRevSpecifier *rev in newRevSpecs) {
-				[self addRevSpec:rev];
-				PBSourceViewItem *item = [self itemForRev:rev];
+				PBSourceViewItem *item = [self addRevSpec:rev];
 				[sourceView PBExpandItem:item expandParents:YES];
 			}
 		}
@@ -125,25 +137,16 @@
 		[repository readCurrentBranch];
 		return;
 	}
+
+	PBSourceViewItem *item = [self addRevSpec:rev];
+    if (item) {
+        [sourceView reloadData];
 	
-	PBSourceViewItem *item = nil;
-	for (PBSourceViewItem *it in items)
-		if ( (item = [it findRev:rev]) != nil )
-			break;
+        [sourceView PBExpandItem:item expandParents:YES];
+        NSIndexSet *index = [NSIndexSet indexSetWithIndex:[sourceView rowForItem:item]];
 	
-	if (!item) {
-		[self addRevSpec:rev];
-		// Try to find the just added item again.
-		// TODO: refactor with above.
-		for (PBSourceViewItem *it in items)
-			if ( (item = [it findRev:rev]) != nil )
-				break;
-	}
-	
-	[sourceView PBExpandItem:item expandParents:YES];
-	NSIndexSet *index = [NSIndexSet indexSetWithIndex:[sourceView rowForItem:item]];
-	
-	[sourceView selectRowIndexes:index byExtendingSelection:NO];
+        [sourceView selectRowIndexes:index byExtendingSelection:NO];
+    }
 }
 
 - (PBSourceViewItem *) itemForRev:(PBGitRevSpecifier *)rev
@@ -155,12 +158,16 @@
 	return nil;
 }
 
-- (void)addRevSpec:(PBGitRevSpecifier *)rev
+- (PBSourceViewItem *)addRevSpec:(PBGitRevSpecifier *)rev
 {
+    PBSourceViewItem *item = nil;
+    for (PBSourceViewItem *it in items)
+        if ( (item = [it findRev:rev]) != nil )
+            return item;
+
 	if (![rev isSimpleRef]) {
 		[others addChild:[PBSourceViewItem itemWithRevSpec:rev]];
-		[sourceView reloadData];
-		return;
+		return item;
 	}
 
 	NSArray *pathComponents = [[rev simpleRef] componentsSeparatedByString:@"/"];
@@ -172,7 +179,7 @@
 		[tags addRev:rev toPath:[pathComponents subarrayWithRange:NSMakeRange(2, [pathComponents count] - 2)]];
 	else if ([[rev simpleRef] hasPrefix:@"refs/remotes/"])
 		[remotes addRev:rev toPath:[pathComponents subarrayWithRange:NSMakeRange(2, [pathComponents count] - 2)]];
-	[sourceView reloadData];
+    return item;
 }
 
 - (void) removeRevSpec:(PBGitRevSpecifier *)rev
@@ -215,6 +222,30 @@
 	[self updateRemoteControls];
 }
 
+- (void)doubleClicked:(id)object {
+    NSInteger rowNumber = [sourceView selectedRow];
+    if ([[sourceView itemAtRow:rowNumber] isKindOfClass:[PBGitSVSubmoduleItem class]]) {
+        PBGitSVSubmoduleItem *subModule = [sourceView itemAtRow:rowNumber];
+
+		NSURL *url = subModule.path;
+		[[NSDocumentController sharedDocumentController] openDocumentWithContentsOfURL:url
+																			   display:YES
+																	 completionHandler:^(NSDocument *document, BOOL documentWasAlreadyOpen, NSError *error) {
+																		 if (error) {
+																			 [self.repository.windowController showErrorSheet:error];
+																		 }
+																	 }];
+        ;
+    }
+}
+
+- (BOOL)outlineView:(NSOutlineView *)outlineView shouldEditTableColumn:(NSTableColumn *)tableColumn item:(id)item
+{
+    if ([item isKindOfClass:[PBGitSVSubmoduleItem class]]) {
+        NSLog(@"hi");
+    }
+    return NO;
+}
 #pragma mark NSOutlineView delegate methods
 - (BOOL)outlineView:(NSOutlineView *)outlineView isGroupItem:(id)item
 {
@@ -224,7 +255,6 @@
 - (void)outlineView:(NSOutlineView *)outlineView willDisplayCell:(PBSourceViewCell *)cell forTableColumn:(NSTableColumn *)tableColumn item:(PBSourceViewItem *)item
 {
 	cell.isCheckedOut = [item.revSpecifier isEqual:[repository headRef]];
-
 	[cell setImage:[item icon]];
 }
 
@@ -253,23 +283,39 @@
 	branches = [PBSourceViewItem groupItemWithTitle:@"Branches"];
 	remotes = [PBSourceViewItem groupItemWithTitle:@"Remotes"];
 	tags = [PBSourceViewItem groupItemWithTitle:@"Tags"];
+	submodules = [PBSourceViewItem groupItemWithTitle:@"Submodules"];
 	others = [PBSourceViewItem groupItemWithTitle:@"Other"];
 
-	for (PBGitRevSpecifier *rev in repository.branches)
+	for (PBGitRevSpecifier *rev in repository.branches) {
 		[self addRevSpec:rev];
-
+	}
+    
+    for (GTSubmodule *sub in repository.submodules) {
+        [submodules addChild: [PBGitSVSubmoduleItem itemWithSubmodule:sub]];
+	}
+    
 	[items addObject:project];
 	[items addObject:branches];
 	[items addObject:remotes];
 	[items addObject:tags];
+	[items addObject:submodules];
 	[items addObject:others];
 
 	[sourceView reloadData];
 	[sourceView expandItem:project];
 	[sourceView expandItem:branches expandChildren:YES];
 	[sourceView expandItem:remotes];
+    [sourceView expandItem:submodules];
 
 	[sourceView reloadItem:nil reloadChildren:YES];
+}
+
+- (void)expandCollapseItem:(NSNotification*)aNotification
+{
+    NSObject* child = [[aNotification userInfo] valueForKey:@"NSObject"];
+    if ([child isKindOfClass:[PBSourceViewItem class]]) {
+        ((PBSourceViewItem*)child).isExpanded = [aNotification.name isEqualToString:NSOutlineViewItemWillExpandNotification];
+    }
 }
 
 #pragma mark NSOutlineView Datasource methods
@@ -279,12 +325,12 @@
 	if (!item)
 		return [items objectAtIndex:index];
 
-	return [[(PBSourceViewItem *)item children] objectAtIndex:index];
+	return [[(PBSourceViewItem *)item sortedChildren] objectAtIndex:index];
 }
 
 - (BOOL)outlineView:(NSOutlineView *)outlineView isItemExpandable:(id)item
 {
-	return [[(PBSourceViewItem *)item children] count];
+	return [[(PBSourceViewItem *)item sortedChildren] count];
 }
 
 - (NSInteger)outlineView:(NSOutlineView *)outlineView numberOfChildrenOfItem:(id)item
@@ -292,7 +338,7 @@
 	if (!item)
 		return [items count];
 
-	return [[(PBSourceViewItem *)item children] count];
+	return [[(PBSourceViewItem *)item sortedChildren] count];
 }
 
 - (id)outlineView:(NSOutlineView *)outlineView objectValueForTableColumn:(NSTableColumn *)tableColumn byItem:(id)item

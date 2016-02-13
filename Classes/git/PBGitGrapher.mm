@@ -6,23 +6,43 @@
 //  Copyright 2008 __MyCompanyName__. All rights reserved.
 //
 
+#include <vector>
+#include <algorithm>
+
+#import "PBGraphCellInfo.h"
 #import "PBGitGrapher.h"
 #import "PBGitCommit.h"
 #import "PBGitLane.h"
 #import "PBGitGraphLine.h"
-#import <list>
+
+#import <vector>
 #import <git2/oid.h>
 #include <algorithm>
+#import <ObjectiveGit/GTOID.h>
 
 using namespace std;
+typedef std::vector<PBGitLane *> LaneCollection;
+
+@interface PBGitGrapher ()
+
+@property (nonatomic, strong) PBGraphCellInfo *previous;
+@property (nonatomic, assign) LaneCollection *pl;
+@property (nonatomic, assign) int curLane;
+@property (nonatomic, assign) int laneIndex;
+
+@end
 
 @implementation PBGitGrapher
 
 - (id) initWithRepository: (PBGitRepository*) repo
 {
-	pl = new std::list<PBGitLane *>;
-
-	PBGitLane::resetColors();
+	self = [super init];
+	if (!self) {
+		return nil;
+	}
+	
+	self.pl = new LaneCollection;
+	
 	return self;
 }
 
@@ -36,8 +56,8 @@ void add_line(struct PBGitGraphLine *lines, int *nLines, int upper, int from, in
 - (void) decorateCommit: (PBGitCommit *) commit
 {
 	int i = 0, newPos = -1;
-	std::list<PBGitLane *> *currentLanes = new std::list<PBGitLane *>;
-	std::list<PBGitLane *> *previousLanes = (std::list<PBGitLane *> *)pl;
+	LaneCollection *currentLanes = new LaneCollection;
+	LaneCollection *previousLanes = self.pl;
 	NSArray *parents = [commit parents];
 	int nParents = [parents count];
 
@@ -47,12 +67,12 @@ void add_line(struct PBGitGraphLine *lines, int *nLines, int upper, int from, in
 
 	PBGitLane *currentLane = NULL;
 	BOOL didFirst = NO;
-	git_oid commit_oid = [[commit sha] oid];
+	const git_oid *commit_oid = [[commit sha] git_oid];
 	
 	// First, iterate over earlier columns and pass through any that don't want this commit
-	if (previous != nil) {
+	if (self.previous != nil) {
 		// We can't count until numColumns here, as it's only used for the width of the cell.
-		std::list<PBGitLane *>::iterator it = previousLanes->begin();
+		LaneCollection::iterator it = previousLanes->begin();
 		for (; it != previousLanes->end(); ++it) {
 			i++;
 			if (!*it) // This is an empty lane, created when the lane previously had a parentless(root) commit
@@ -90,8 +110,8 @@ void add_line(struct PBGitGraphLine *lines, int *nLines, int upper, int from, in
 
 	// If we already did the first parent, don't do so again
 	if (!didFirst && nParents) {
-		git_oid parentOID = [(PBGitSHA*)[parents objectAtIndex:0] oid];
-		PBGitLane *newLane = new PBGitLane(&parentOID);
+		const git_oid *parentOID = [(GTOID*)[parents objectAtIndex:0] git_oid];
+		PBGitLane *newLane = new PBGitLane(_laneIndex++, parentOID);
 		currentLanes->push_back(newLane);
 		newPos = currentLanes->size();
 		add_line(lines, &currentLine, 0, newPos, newPos, newLane->index());
@@ -105,10 +125,10 @@ void add_line(struct PBGitGraphLine *lines, int *nLines, int upper, int from, in
 
 	int parentIndex = 0;
 	for (parentIndex = 1; parentIndex < nParents; ++parentIndex) {
-		git_oid parentOID = [(PBGitSHA*)[parents objectAtIndex:parentIndex] oid];
+		const git_oid *parentOID = [(GTOID*)[parents objectAtIndex:parentIndex] git_oid];
 		int i = 0;
 		BOOL was_displayed = NO;
-		std::list<PBGitLane *>::iterator it = currentLanes->begin();
+		LaneCollection::iterator it = currentLanes->begin();
 		for (; it != currentLanes->end(); ++it) {
 			i++;
 			if ((*it)->isCommit(parentOID)) {
@@ -122,35 +142,35 @@ void add_line(struct PBGitGraphLine *lines, int *nLines, int upper, int from, in
 		
 		// Really add this parent
 		addedParent = YES;
-		PBGitLane *newLane = new PBGitLane(&parentOID);
+		PBGitLane *newLane = new PBGitLane(_laneIndex++, parentOID);
 		currentLanes->push_back(newLane);
 		add_line(lines, &currentLine, 0, currentLanes->size(), newPos, newLane->index());
 	}
 
 	if (commit.lineInfo) {
-		previous = commit.lineInfo;
-		previous.position = newPos;
-		previous.lines = lines;
+		self.previous = commit.lineInfo;
+		self.previous.position = newPos;
+		self.previous.lines = lines;
 	}
 	else
-		previous = [[PBGraphCellInfo alloc] initWithPosition:newPos andLines:lines];
+		self.previous = [[PBGraphCellInfo alloc] initWithPosition:newPos andLines:lines];
 
 	if (currentLine > maxLines)
 		NSLog(@"Number of lines: %i vs allocated: %i", currentLine, maxLines);
 
-	previous.nLines = currentLine;
-	previous.sign = commit.sign;
+	self.previous.nLines = currentLine;
+	self.previous.sign = commit.sign;
 
 	// If a parent was added, we have room to not indent.
 	if (addedParent)
-		previous.numColumns = currentLanes->size() - 1;
+		self.previous.numColumns = currentLanes->size() - 1;
 	else
-		previous.numColumns = currentLanes->size();
+		self.previous.numColumns = currentLanes->size();
 
 	// Update the current lane to point to the new parent
 	if (currentLane) {
 		if (nParents > 0)
-			currentLane->setSha([(PBGitSHA*)[parents objectAtIndex:0] oid]);
+			currentLane->setSha( [(GTOID*)[parents objectAtIndex:0] git_oid]);
 		else {
 			// The current lane's commit does not have any parents
 			// AKA, this is a first commit
@@ -165,18 +185,17 @@ void add_line(struct PBGitGraphLine *lines, int *nLines, int upper, int from, in
 
 	delete previousLanes;
 
-	pl = currentLanes;
-	commit.lineInfo = previous;
+	self.pl = currentLanes;
+	commit.lineInfo = self.previous;
 }
 
 - (void) dealloc
 {
-	std::list<PBGitLane *> *lanes = (std::list<PBGitLane *> *)pl;
-	std::list<PBGitLane *>::iterator it = lanes->begin();
+	LaneCollection *lanes = self.pl;
+	LaneCollection::iterator it = lanes->begin();
 	for (; it != lanes->end(); ++it)
 		delete *it;
 
 	delete lanes;
-
 }
 @end

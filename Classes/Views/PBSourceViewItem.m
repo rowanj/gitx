@@ -10,8 +10,15 @@
 #import "PBSourceViewItems.h"
 #import "PBGitRef.h"
 
+@interface PBSourceViewItem ()
+
+@property (nonatomic, strong) NSArray *sortedChildren;
+
+@end
+
 @implementation PBSourceViewItem
-@synthesize parent, isGroupItem, children, revSpecifier, isUncollapsible;
+
+@synthesize parent, isGroupItem, revSpecifier, isUncollapsible, isExpanded;
 @dynamic icon;
 
 - (id)init
@@ -19,7 +26,7 @@
 	if (!(self = [super init]))
 		return nil;
 
-	children = [NSMutableArray array];
+	childrenSet = [[NSMutableOrderedSet alloc] init];
 	return self;
 }
 
@@ -51,14 +58,25 @@
 	return [PBGitSVOtherRevItem otherItemWithRevSpec:revSpecifier];
 }
 
+- (NSArray *)sortedChildren
+{
+    if (!self->_sortedChildren) {
+        NSArray *newArray = [childrenSet sortedArrayUsingComparator:^NSComparisonResult(PBSourceViewItem *obj1, PBSourceViewItem *obj2) {
+            return [obj1.title localizedStandardCompare:obj2.title];
+        }];
+		self.sortedChildren = newArray;
+    }
+    return [NSArray arrayWithArray:self->_sortedChildren];
+}
+
 - (void)addChild:(PBSourceViewItem *)child
 {
 	if (!child)
 		return;
-
-	[self.children addObject:child];
+    
+	[childrenSet addObject:child];
+    self.sortedChildren = nil;
 	child.parent = self;
-	[self.children sortUsingDescriptors:[NSArray arrayWithObject:[[NSSortDescriptor alloc] initWithKey:@"title" ascending:YES selector:@selector(localizedCaseInsensitiveCompare:)]]];
 }
 
 - (void)removeChild:(PBSourceViewItem *)child
@@ -66,8 +84,9 @@
 	if (!child)
 		return;
 
-	[self.children removeObject:child];
-	if (!self.isGroupItem && ([self.children count] == 0))
+	[childrenSet removeObject:child];
+    self.sortedChildren = nil;
+	if (!self.isGroupItem && ([childrenSet count] == 0))
 		[self.parent removeChild:self];
 }
 
@@ -81,15 +100,17 @@
 
 	NSString *firstTitle = [path objectAtIndex:0];
 	PBSourceViewItem *node = nil;
-	for (PBSourceViewItem *child in [self children])
+	for (PBSourceViewItem *child in childrenSet)
 		if ([child.title isEqualToString:firstTitle])
 			node = child;
 
 	if (!node) {
 		if ([firstTitle isEqualToString:[[theRevSpecifier ref] remoteName]])
 			node = [PBGitSVRemoteItem remoteItemWithTitle:firstTitle];
-		else
+		else {
 			node = [PBGitSVFolderItem folderItemWithTitle:firstTitle];
+            node.isExpanded = [[self title] isEqualToString:@"BRANCHES"];
+        }
 		[self addChild:node];
 	}
 
@@ -98,11 +119,11 @@
 
 - (PBSourceViewItem *)findRev:(PBGitRevSpecifier *)rev
 {
-	if (rev == revSpecifier)
+	if ([rev isEqual:revSpecifier])
 		return self;
 
 	PBSourceViewItem *item = nil;
-	for (PBSourceViewItem *child in children)
+	for (PBSourceViewItem *child in childrenSet)
 		if ( (item = [child findRev:rev]) != nil )
 			return item;
 
@@ -111,7 +132,15 @@
 
 - (NSImage *) icon
 {
-	return nil;
+    return [self iconNamed:[self iconName]];
+}
+
+- (NSImage *)iconNamed:(NSString*)name
+{
+    NSImage* iconImage = [NSImage imageNamed:name];
+    [iconImage setSize:NSMakeSize(16,16)];
+    [iconImage setCacheMode:NSImageCacheAlways];
+    return iconImage;
 }
 
 - (NSString *)title

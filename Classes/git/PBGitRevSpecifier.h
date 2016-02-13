@@ -7,7 +7,7 @@
 //
 
 #import <Cocoa/Cocoa.h>
-#import "PBGitRef.h"
+@class PBGitRef;
 
 @interface PBGitRevSpecifier : NSObject  <NSCopying> {
 	NSString *description;
@@ -23,7 +23,6 @@
 - (NSString*) simpleRef;
 - (PBGitRef *) ref;
 - (BOOL) hasPathLimiter;
-- (BOOL) hasLeftRight;
 - (NSString *) title;
 
 - (BOOL) isEqual: (PBGitRevSpecifier*) other;

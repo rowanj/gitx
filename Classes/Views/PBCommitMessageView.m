@@ -7,7 +7,9 @@
 //
 
 #import "PBCommitMessageView.h"
+
 #import "PBGitDefaults.h"
+#import "PBGitRepository.h"
 
 @implementation PBCommitMessageView
 
@@ -59,7 +61,7 @@
         NSRectFill(line);
 
         // and one for the body of the commit message
-        lineWidth = lineWidth = characterWidth * [PBGitDefaults commitMessageViewVerticalBodyLineLength];
+        lineWidth = characterWidth * [PBGitDefaults commitMessageViewVerticalBodyLineLength];
         [[NSColor darkGrayColor] set];
         padding = [[self textContainer] lineFragmentPadding];
         line.origin.x = padding + lineWidth;
@@ -68,6 +70,32 @@
         line.size.height = textViewHeight;
         NSRectFill(line);
     }
+}
+
+- (BOOL)performDragOperation:(id <NSDraggingInfo>)sender
+{
+    NSPasteboard *pboard = [sender draggingPasteboard];
+
+    if ( [[pboard types] containsObject:NSFilenamesPboardType] ) {
+		NSArray *filenames = [pboard propertyListForType:NSFilenamesPboardType];
+		NSString *baseDir = [self.repository.workingDirectory stringByAppendingString:@"/"];
+		if (baseDir) {
+			NSMutableArray *relativeNames = [NSMutableArray new];
+			for (NSString *filename in filenames) {
+				if ([filename hasPrefix:baseDir]) {
+					NSString *relativeName = [filename substringFromIndex:(baseDir.length)];
+					if (relativeName.length) {
+						[relativeNames addObject:relativeName];
+						continue;
+					}
+				}
+				[relativeNames addObject:filename];
+			}
+			[pboard clearContents];
+			[pboard writeObjects:relativeNames];
+		}
+    }
+	return [super performDragOperation:sender];
 }
 
 @end

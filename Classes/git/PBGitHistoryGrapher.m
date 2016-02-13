@@ -8,8 +8,7 @@
 
 #import "PBGitHistoryGrapher.h"
 #import "PBGitGrapher.h"
-#import "PBGitSHA.h"
-
+#import "PBGitCommit.h"
 
 @implementation PBGitHistoryGrapher
 
@@ -49,7 +48,7 @@
 	for (PBGitCommit *commit in revList) {
 		if ([currentThread isCancelled])
 			return;
-		PBGitSHA *commitSHA = [commit sha];
+		GTOID *commitSHA = [commit sha];
 		if (viewAllBranches || [searchSHAs containsObject:commitSHA]) {
 			[grapher decorateCommit:commit];
 			[commits addObject:commit];
@@ -59,7 +58,7 @@
 			}
 		}
 		if (++counter % 100 == 0) {
-			if ([[NSDate date] timeIntervalSinceDate:lastUpdate] > 0.1) {
+			if ([[NSDate date] timeIntervalSinceDate:lastUpdate] > 0.5) {
 				[self sendCommits:commits];
 				commits = [NSMutableArray array];
 				lastUpdate = [NSDate date];

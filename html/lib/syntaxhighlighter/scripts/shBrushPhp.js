@@ -6,10 +6,10 @@
  * http://alexgorbatchev.com/SyntaxHighlighter/donate.html
  *
  * @version
- * 3.0.83 (Tue, 27 Dec 2011 09:58:26 GMT)
- * 
+ * 3.0.83 (Fri, 07 Jun 2013 03:47:38 GMT)
+ *
  * @copyright
- * Copyright (C) 2004-2010 Alex Gorbatchev.
+ * Copyright (C) 2004-2013 Alex Gorbatchev.
  *
  * @license
  * Dual licensed under the MIT and GPL licenses.
@@ -58,9 +58,9 @@
 
 		var keywords =	'abstract and array as break case catch cfunction class clone const continue declare default die do ' +
 						'else elseif enddeclare endfor endforeach endif endswitch endwhile extends final for foreach ' +
-						'function include include_once global goto if implements interface instanceof namespace new ' +
+						'function global goto if implements include include_once interface instanceof insteadof namespace new ' +
 						'old_function or private protected public return require require_once static switch ' +
-						'throw try use var while xor ';
+						'trait throw try use var while xor ';
 		
 		var constants	= '__FILE__ __LINE__ __METHOD__ __FUNCTION__ __CLASS__';
 

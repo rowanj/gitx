@@ -11,11 +11,10 @@
 
 @interface PBIconAndTextCell : NSTextFieldCell
 {
-    NSImage *image;
     BOOL mouseDownInButton;
     BOOL mouseHoveredInButton;
 }
-@property  NSImage *image;
+@property NSImage *image;
 
 - (void)drawWithFrame:(NSRect)cellFrame inView:(NSView *)controlView;
 - (NSSize)cellSize;

@@ -24,6 +24,11 @@ p{
 	white-space: nowrap;
 }
 
+pre{
+  font-size: 1em;
+  font-family: Menlo, Consolas, 'Bitstream Vera Sans Mono', 'Courier New', Courier, monospace;
+}
+
 tr.block.l3 p.summary,
 tr.block.l2 p.summary,
 tr.block.l1 p.summary{
@@ -50,8 +55,14 @@ table.blocks{
 	width: 100% !important;
 }
 
+table.blocks tr td:nth-of-type(1) {
+  background-color: #ececec !important;
+	border-right: 1px solid #c9c9c9 !important;
+}
+
 table.blocks tr td:nth-of-type(2) {
 	width: 100% !important;
+  padding-left: 1em !important;
 }
 
 table.blocks tr.block td:nth-of-type(1){

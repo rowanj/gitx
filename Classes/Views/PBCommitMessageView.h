@@ -8,8 +8,10 @@
 
 #import <Cocoa/Cocoa.h>
 
-@interface PBCommitMessageView : NSTextView {
+@class PBGitRepository;
 
-}
+@interface PBCommitMessageView : NSTextView
+
+@property (nonatomic, strong) PBGitRepository *repository;
 
 @end

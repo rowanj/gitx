@@ -9,7 +9,7 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "PBGitRepository.h"
+@class PBGitRepository;
 
 typedef UInt32 PBGitRepositoryWatcherEventType;
 enum {
@@ -23,16 +23,24 @@ extern NSString *PBGitRepositoryEventNotification;
 extern NSString *kPBGitRepositoryEventTypeUserInfoKey;
 extern NSString *kPBGitRepositoryEventPathsUserInfoKey;
 
+typedef void(^PBGitRepositoryWatcherCallbackBlock)(NSArray *changedFiles);
+
 @interface PBGitRepositoryWatcher : NSObject {
-    FSEventStreamRef eventStream;
+    FSEventStreamRef gitDirEventStream;
+	FSEventStreamRef workDirEventStream;
+	PBGitRepositoryWatcherCallbackBlock gitDirChangedBlock;
+	PBGitRepositoryWatcherCallbackBlock workDirChangedBlock;
 	NSDate *gitDirTouchDate;
 	NSDate *indexTouchDate;
+
+	NSString *gitDir;
+	NSString *workDir;
+
 	__strong PBGitRepositoryWatcher* ownRef;
     BOOL _running;
-	NSDictionary* lastStatus;
 }
 
-@property (readonly, dct_weak) PBGitRepository *repository;
+@property (readonly, weak) PBGitRepository *repository;
 
 - (id) initWithRepository:(PBGitRepository *)repository;
 - (void) start;

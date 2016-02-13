@@ -7,14 +7,17 @@
 //
 
 #import <Cocoa/Cocoa.h>
-#import "PBGitHistoryList.h"
-#import "PBGitRevSpecifier.h"
-#import "PBGitRefish.h"
 
+@class PBGitHistoryList;
+@class PBGitRevSpecifier;
+@protocol PBGitRefish;
+@class PBGitRef;
 @class GTRepository;
 @class GTConfiguration;
 
 extern NSString* PBGitRepositoryErrorDomain;
+extern NSString *PBGitRepositoryDocumentType;
+
 typedef enum branchFilterTypes {
 	kGitXAllBranchesFilter = 0,
 	kGitXLocalRemoteBranchesFilter,
@@ -40,13 +43,13 @@ static NSString * PBStringFromBranchFilterType(PBGitXBranchFilterType type) {
 
 @class PBGitWindowController;
 @class PBGitCommit;
-@class PBGitSHA;
+@class GTOID;
 @class PBGitRepositoryWatcher;
 
 @interface PBGitRepository : NSDocument {
 	__strong PBGitRepositoryWatcher *watcher;
 	__strong PBGitRevSpecifier *_headRef; // Caching
-	__strong PBGitSHA* _headSha;
+	__strong GTOID* _headSha;
 	__strong GTRepository* _gtRepo;
 }
 
@@ -56,13 +59,15 @@ static NSString * PBStringFromBranchFilterType(PBGitXBranchFilterType type) {
 
 @property (readonly, strong) PBGitWindowController *windowController;
 @property (readonly, getter = getIndexURL) NSURL* indexURL;
-@property (readonly, nonatomic) GTConfiguration* configuration;
 
 @property (nonatomic, strong) PBGitHistoryList *revisionList;
-@property (nonatomic, strong) NSMutableArray* branches;
-@property (nonatomic, strong) PBGitRevSpecifier *currentBranch;
+@property (nonatomic, readonly, strong) NSArray* branches;
+@property (nonatomic, strong) NSMutableOrderedSet* branchesSet;
+@property (nonatomic, strong) PBGitRevSpecifier* currentBranch;
 @property (nonatomic, strong) NSMutableDictionary* refs;
 @property (readonly, strong) GTRepository* gtRepo;
+
+@property (nonatomic, strong) NSMutableArray* submodules;
 
 - (void) cloneRepositoryToPath:(NSString *)path bare:(BOOL)isBare;
 - (void) beginAddRemote:(NSString *)remoteName forURL:(NSString *)remoteURL;
@@ -81,39 +86,39 @@ static NSString * PBStringFromBranchFilterType(PBGitXBranchFilterType type) {
 
 - (NSURL *) gitURL ;
 
-- (NSFileHandle*) handleForCommand:(NSString*) cmd DEPRECATED;
-- (NSFileHandle*) handleForArguments:(NSArray*) args DEPRECATED;
-- (NSFileHandle *) handleInWorkDirForArguments:(NSArray *)args DEPRECATED;
-- (NSString*) outputForCommand:(NSString*) cmd DEPRECATED;
-- (NSString *)outputForCommand:(NSString *)str retValue:(int *)ret DEPRECATED;
-- (NSString *)outputForArguments:(NSArray *)arguments inputString:(NSString *)input retValue:(int *)ret DEPRECATED;
-- (NSString *)outputForArguments:(NSArray *)arguments inputString:(NSString *)input byExtendingEnvironment:(NSDictionary *)dict retValue:(int *)ret DEPRECATED;
+- (NSFileHandle*) handleForCommand:(NSString*) cmd GITX_DEPRECATED;
+- (NSFileHandle*) handleForArguments:(NSArray*) args GITX_DEPRECATED;
+- (NSFileHandle *) handleInWorkDirForArguments:(NSArray *)args GITX_DEPRECATED;
+- (NSString*) outputForCommand:(NSString*) cmd GITX_DEPRECATED;
+- (NSString *)outputForCommand:(NSString *)str retValue:(int *)ret GITX_DEPRECATED;
+- (NSString *)outputForArguments:(NSArray *)arguments inputString:(NSString *)input retValue:(int *)ret GITX_DEPRECATED;
+- (NSString *)outputForArguments:(NSArray *)arguments inputString:(NSString *)input byExtendingEnvironment:(NSDictionary *)dict retValue:(int *)ret GITX_DEPRECATED;
 
 
-- (NSString*) outputForArguments:(NSArray*) args DEPRECATED;
-- (NSString*) outputForArguments:(NSArray*) args retValue:(int *)ret DEPRECATED;
-- (NSString *)outputInWorkdirForArguments:(NSArray*) arguments DEPRECATED;
-- (NSString *)outputInWorkdirForArguments:(NSArray*) arguments retValue:(int *)ret DEPRECATED;
-- (BOOL)executeHook:(NSString *)name output:(NSString **)output DEPRECATED;
-- (BOOL)executeHook:(NSString *)name withArgs:(NSArray*) arguments output:(NSString **)output DEPRECATED;
+- (NSString*) outputForArguments:(NSArray*) args GITX_DEPRECATED;
+- (NSString*) outputForArguments:(NSArray*) args retValue:(int *)ret GITX_DEPRECATED;
+- (NSString *)outputInWorkdirForArguments:(NSArray*) arguments GITX_DEPRECATED;
+- (NSString *)outputInWorkdirForArguments:(NSArray*) arguments retValue:(int *)ret GITX_DEPRECATED;
+- (BOOL)executeHook:(NSString *)name output:(NSString **)output GITX_DEPRECATED;
+- (BOOL)executeHook:(NSString *)name withArgs:(NSArray*) arguments output:(NSString **)output GITX_DEPRECATED;
 
 - (NSString *)workingDirectory;
 - (NSString *) projectName;
 - (NSString *)gitIgnoreFilename;
 - (BOOL)isBareRepository;
-+ (BOOL)isBareRepository:(NSURL*)repositoryURL;
 
+- (BOOL)hasSVNRemote;
 
 - (void) reloadRefs;
 - (void) lazyReload;
 - (PBGitRevSpecifier*)headRef;
-- (PBGitSHA *)headSHA;
+- (GTOID *)headSHA;
 - (PBGitCommit *)headCommit;
-- (PBGitSHA *)shaForRef:(PBGitRef *)ref;
+- (GTOID *)shaForRef:(PBGitRef *)ref;
 - (PBGitCommit *)commitForRef:(PBGitRef *)ref;
-- (PBGitCommit *)commitForSHA:(PBGitSHA *)sha;
-- (BOOL)isOnSameBranch:(PBGitSHA *)baseSHA asSHA:(PBGitSHA *)testSHA;
-- (BOOL)isSHAOnHeadBranch:(PBGitSHA *)testSHA;
+- (PBGitCommit *)commitForSHA:(GTOID *)sha;
+- (BOOL)isOnSameBranch:(GTOID *)baseSHA asSHA:(GTOID *)testSHA;
+- (BOOL)isSHAOnHeadBranch:(GTOID *)testSHA;
 - (BOOL)isRefOnHeadBranch:(PBGitRef *)testRef;
 - (BOOL)checkRefFormat:(NSString *)refName;
 - (BOOL)refExists:(PBGitRef *)ref;
@@ -131,11 +136,6 @@ static NSString * PBStringFromBranchFilterType(PBGitXBranchFilterType type) {
 - (NSString*) parseSymbolicReference:(NSString*) ref;
 - (NSString*) parseReference:(NSString*) ref;
 
-+ (NSURL*)gitDirForURL:(NSURL*)repositoryURL;
-+ (NSURL*)baseDirForURL:(NSURL*)repositoryURL;
-
-- (id) initWithURL: (NSURL*) path;
-- (void) setup;
 - (void) forceUpdateRevisions;
 - (NSURL*) getIndexURL;
 

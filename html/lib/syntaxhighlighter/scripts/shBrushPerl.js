@@ -6,10 +6,10 @@
  * http://alexgorbatchev.com/SyntaxHighlighter/donate.html
  *
  * @version
- * 3.0.83 (Tue, 27 Dec 2011 09:58:26 GMT)
- * 
+ * 3.0.83 (Fri, 07 Jun 2013 03:47:38 GMT)
+ *
  * @copyright
- * Copyright (C) 2004-2010 Alex Gorbatchev.
+ * Copyright (C) 2004-2013 Alex Gorbatchev.
  *
  * @license
  * Dual licensed under the MIT and GPL licenses.
@@ -64,18 +64,21 @@
 			{ regex: /-?\w+(?=\s*=(>|&gt;))/g,	css: 'string' }, // fat comma
 
 			// is this too much?
-			{ regex: /\bq[qwxr]?\([\s\S]+?\)/g,	css: 'string' }, // quote-like operators ()
-			{ regex: /\bq[qwxr]?\{[\s\S]+?\}/g,	css: 'string' }, // quote-like operators {}
-			{ regex: /\bq[qwxr]?\[[\s\S]+?\]/g,	css: 'string' }, // quote-like operators []
-			{ regex: /\bq[qwxr]?(<|&lt;)[\s\S]+?(>|&gt;)/g,	css: 'string' }, // quote-like operators <>
-			{ regex: /\bq[qwxr]?([^\w({<[])[\s\S]+?\1/g,	css: 'string' }, // quote-like operators non-paired
+			{ regex: /\bq[qwxr]?\([\s\S]*?\)/g,	css: 'string' }, // quote-like operators ()
+			{ regex: /\bq[qwxr]?\{[\s\S]*?\}/g,	css: 'string' }, // quote-like operators {}
+			{ regex: /\bq[qwxr]?\[[\s\S]*?\]/g,	css: 'string' }, // quote-like operators []
+			{ regex: /\bq[qwxr]?(<|&lt;)[\s\S]*?(>|&gt;)/g,	css: 'string' }, // quote-like operators <>
+			{ regex: /\bq[qwxr]?([^\w({<[])[\s\S]*?\1/g,	css: 'string' }, // quote-like operators non-paired
 
 			{ regex: SyntaxHighlighter.regexLib.doubleQuotedString,	css: 'string' },
 			{ regex: SyntaxHighlighter.regexLib.singleQuotedString,	css: 'string' },
 			// currently ignoring single quote package separator and utf8 names
-			{ regex: /(?:&amp;|[$@%*]|\$#)[a-zA-Z_](\w+|::)*/g,   		css: 'variable' },
+			{ regex: /(?:&amp;|[$@%*]|\$#)\$?[a-zA-Z_](\w+|::)*/g,   		css: 'variable' },
 			{ regex: /\b__(?:END|DATA)__\b[\s\S]*$/g,				css: 'comments' },
-			{ regex: /(^|\n)=\w[\s\S]*?(\n=cut\s*\n|$)/g,				css: 'comments' },		// pod
+
+			// don't capture the newline after =cut so that =cut\n\n=head1 will start a new pod section
+			{ regex: /(^|\n)=\w[\s\S]*?(\n=cut\s*(?=\n)|$)/g,		css: 'comments' },		// pod
+
 			{ regex: new RegExp(this.getKeywords(funcs), 'gm'),		css: 'functions' },
 			{ regex: new RegExp(this.getKeywords(keywords), 'gm'),	css: 'keyword' }
 		];

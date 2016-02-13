@@ -7,7 +7,8 @@
 //
 
 #import <Cocoa/Cocoa.h>
-#import "PBGitRepository.h"
+
+@class PBGitRepository;
 
 @interface PBGitTree : NSObject {
 	long long _fileSize;
@@ -34,8 +35,8 @@
 @property(copy) NSString* sha;
 @property(copy) NSString* path;
 @property(assign) BOOL leaf;
-@property(nonatomic, dct_weak) PBGitRepository* repository;
-@property(nonatomic, dct_weak) PBGitTree* parent;
+@property(nonatomic, weak) PBGitRepository* repository;
+@property(nonatomic, weak) PBGitTree* parent;
 
 @property(readonly) NSArray* children;
 @property(readonly) NSString* fullPath;

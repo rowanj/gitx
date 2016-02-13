@@ -13,7 +13,9 @@
 #import "PBGitIndex.h"
 #import "PBNiceSplitView.h"
 #import "PBGitRepositoryWatcher.h"
+#import "PBCommitMessageView.h"
 
+#import <ObjectiveGit/GTRepository.h>
 #import <ObjectiveGit/GTConfiguration.h>
 
 #define kCommitSplitViewPositionDefault @"Commit SplitView Position"
@@ -59,6 +61,8 @@
 {
 	[super awakeFromNib];
 
+	commitMessageView.repository = self.repository;
+
 	[commitMessageView setTypingAttributes:[NSDictionary dictionaryWithObject:[NSFont fontWithName:@"Monaco" size:12.0] forKey:NSFontAttributeName]];
 	
 	[unstagedFilesController setFilterPredicate:[NSPredicate predicateWithFormat:@"hasUnstagedChanges == 1"]];
@@ -102,8 +106,10 @@
 
 - (IBAction)signOff:(id)sender
 {
-	NSString* userName = [repository.configuration stringForKey:@"user.name"];
-	NSString* userEmail = [repository.configuration stringForKey:@"user.email"];
+	NSError *error = nil;
+	GTConfiguration *config = [repository.gtRepo configurationWithError:&error];
+	NSString* userName = [config stringForKey:@"user.name"];
+	NSString* userEmail = [config stringForKey:@"user.email"];
 	if (!(userName && userEmail))
 		return [[repository windowController] showMessageSheet:@"User's name not set" infoText:@"Signing off a commit requires setting user.name and user.email in your git config"];
 	NSString *SOBline = [NSString stringWithFormat:@"Signed-off-by: %@ <%@>",
@@ -187,7 +193,7 @@
 {
 	[commitMessageView setEditable:YES];
 	[commitMessageView setString:@""];
-	[webController setStateMessage:[NSString stringWithFormat:[[notification userInfo] objectForKey:@"description"]]];
+	[webController setStateMessage:notification.userInfo[@"description"]];
 }	
 
 - (void)commitFailed:(NSNotification *)notification

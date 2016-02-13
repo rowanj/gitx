@@ -20,11 +20,11 @@
 - (IBAction) showHideHiddenFiles:(id)sender;
 - (IBAction) cancelOperation:(id)sender;
 
-@property (readwrite, dct_weak) IBOutlet NSTextField *remoteName;
-@property (readwrite, dct_weak) IBOutlet NSTextField *remoteURL;
-@property (readwrite, dct_weak) IBOutlet NSTextField *errorMessage;
+@property (readwrite, weak) IBOutlet NSTextField *remoteName;
+@property (readwrite, weak) IBOutlet NSTextField *remoteURL;
+@property (readwrite, weak) IBOutlet NSTextField *errorMessage;
 
-@property (readwrite, strong)          NSOpenPanel *browseSheet;
-@property (readwrite, dct_weak) IBOutlet NSView      *browseAccessoryView;
+@property (readwrite, strong) NSOpenPanel *browseSheet;
+@property (readwrite, strong) IBOutlet NSView *browseAccessoryView;
 
 @end

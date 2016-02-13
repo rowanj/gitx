@@ -6,6 +6,32 @@ if (typeof Controller == 'undefined') {
 	Controller.log_ = console.log;
 }
 
+var toggleDiff = function(id)
+{
+  var content = document.getElementById('content_' + id);
+  if (content) {
+    var collapsed = (content.style.display == 'none');
+	  if (collapsed) {
+		  content.style.display = 'box';
+		  jQuery(content).fadeTo('slow', 1).slideDown();
+	  } else {
+		  jQuery(content).fadeTo('fast', 0).slideUp('fast', function () {content.style.display = 'none'});
+	  }
+	
+    var title = document.getElementById('title_' + id);
+    if (title) {
+      if (collapsed) {
+        title.classList.remove('collapsed');
+        title.classList.add('expanded');
+      }
+      else {
+        title.classList.add('collapsed');
+        title.classList.remove('expanded');
+      }
+    }
+  }
+}
+
 var highlightDiff = function(diff, element, callbacks) {
 	if (!diff || diff == "")
 		return;
@@ -14,7 +40,7 @@ var highlightDiff = function(diff, element, callbacks) {
 		callbacks = {};
 	var start = new Date().getTime();
 	element.className = "diff"
-	var content = diff.escapeHTML().replace(/\t/g, "    ");;
+	var content = diff.escapeHTML();
 
 	var file_index = 0;
 
@@ -29,6 +55,7 @@ var highlightDiff = function(diff, element, callbacks) {
 	var mode_change = false;
 	var old_mode = "";
 	var new_mode = "";
+    var linkToTop = "<div class=\"top-link\"><a href=\"#\">Top</a></div>";
 
 	var hunk_start_line_1 = -1;
 	var hunk_start_line_2 = -1;
@@ -69,14 +96,14 @@ var highlightDiff = function(diff, element, callbacks) {
 
 		if (diffContent != "" || binary) {
 			finalContent += '<div class="file" id="file_index_' + (file_index - 1) + '">' +
-				'<div class="fileHeader">' + title + '</div>';
+				'<div id="title_' + title + '" class="expanded fileHeader"><a href="javascript:toggleDiff(\'' + title + '\');">' + title + '</a></div>';
 		}
 
 		if (!binary && (diffContent != ""))  {
-			finalContent +=		'<div class="diffContent">' +
+			finalContent +=		'<div id="content_' + title + '" class="diffContent">' +
 								'<div class="lineno">' + line1 + "</div>" +
 								'<div class="lineno">' + line2 + "</div>" +
-								'<div class="lines">' + diffContent + "</div>" +
+								'<div class="lines">' + postProcessDiffContents(diffContent).replace(/\t/g, "    ") + "</div>" +
 							'</div>';
 		}
 		else {
@@ -84,12 +111,12 @@ var highlightDiff = function(diff, element, callbacks) {
 				if (callbacks["binaryFile"])
 					finalContent += callbacks["binaryFile"](binaryname);
 				else
-					finalContent += "<div>Binary file differs</div>";
+					finalContent += '<div id="content_' + title + '">Binary file differs</div>';
 			}
 		}
 
 		if (diffContent != "" || binary)
-			finalContent += '</div>';
+			finalContent += '</div>' + linkToTop;
 
 		line1 = "";
 		line2 = "";
@@ -188,10 +215,6 @@ var highlightDiff = function(diff, element, callbacks) {
 
 		sindex = "index=" + lindex.toString() + " ";
 		if (firstChar == "+") {
-			// Highlight trailing whitespace
-			if (m = l.match(/\s+$/))
-				l = l.replace(/\s+$/, "<span class='whitespace'>" + m + "</span>");
-
 			line1 += "\n";
 			line2 += ++hunk_start_line_2 + "\n";
 			diffContent += "<div " + sindex + "class='addline'>" + l + "</div>";
@@ -229,3 +252,261 @@ var highlightDiff = function(diff, element, callbacks) {
 	if (false)
 		Controller.log_("Total time:" + (new Date().getTime() - start));
 }
+
+var highlightTrailingWhitespace = function (l) {
+	// Highlight trailing whitespace
+	l = l.replace(/(\s+)(<\/ins>)?$/, '<span class="whitespace">$1</span>$2');
+	return l;
+}
+
+var mergeInsDel = function (html) {
+	return html
+		.replace(/^<\/(ins|del)>|<(ins|del)>$/g,'')
+		.replace(/<\/(ins|del)><\1>/g,'');
+}
+
+var postProcessDiffContents = function(diffContent) {
+	var $ = jQuery;
+	var diffEl = $(diffContent);
+	var dumbEl = $('<div/>');
+	var newContent = "";
+	var oldEls = [];
+	var newEls = [];
+	var flushBuffer = function () {
+		if (oldEls.length || newEls.length) {
+			var buffer = "";
+			if (!oldEls.length || !newEls.length) {
+				// hunk only contains additions OR deletions, so there is no need
+				// to do any inline-diff. just keep the elements as they are
+				buffer = $.map(oldEls.length ? oldEls : newEls, function (e) {
+					var prefix = e.text().substring(0,1),
+						text = inlinediff.escape(e.text().substring(1)),
+						tag = prefix=='+' ? 'ins' : 'del',
+						html = prefix+'<'+tag+'>'+(prefix == "+" ? highlightTrailingWhitespace(text) : text)+'</'+tag+'>';
+					e.html(html);
+					return dumbEl.html(e).html();
+				}).join("");
+			}
+			else {
+				// hunk contains additions AND deletions. so we create an inline diff
+				// of all the old and new lines together and merge the result back to buffer
+				var mapFn = function (e) { return e.text().substring(1).replace(/\r?\n|\r/g,''); };
+				var oldText = $.map(oldEls, mapFn).join("\n");
+				var newText = $.map(newEls, mapFn).join("\n");
+				var diffResult = inlinediff.diffString3(oldText,newText);
+					diffLines = (diffResult[1] + "\n" + diffResult[2]).split(/\n/g);
+				
+				buffer = $.map(oldEls, function (e, i) {
+					var di = i;
+					e.html("-"+mergeInsDel(diffLines[di]));
+					return dumbEl.html(e).html();
+				}).join("") + $.map(newEls, function (e, i) {
+					var di = i + oldEls.length;
+					var line = mergeInsDel(highlightTrailingWhitespace(diffLines[di]));
+					e.html("+"+line);
+					return dumbEl.html(e).html();
+				}).join("");
+			}
+			newContent+= buffer;
+			oldEls = [];
+			newEls = [];
+		}
+	};
+	diffEl.each(function (i, e) {
+		e = $(e);
+		var isAdd = e.is(".addline");
+		var isDel = e.is(".delline");
+		var text = e.text();
+		var html = dumbEl.html(e).html();
+		if (isAdd) {
+			newEls.push(e);
+		}
+		else if (isDel) {
+			oldEls.push(e);
+		}
+		else {
+			flushBuffer();
+			newContent+= html;
+		}
+	});
+	flushBuffer();
+	return newContent; 
+}
+
+
+/*
+ * Javascript Diff Algorithm
+ *  By John Resig (http://ejohn.org/)
+ *  Modified by Chu Alan "sprite"
+ *  Adapted for GitX by Mathias Leppich http://github.com/muhqu
+ *
+ * Released under the MIT license.
+ *
+ * More Info:
+ *  http://ejohn.org/projects/javascript-diff-algorithm/
+ */
+
+var inlinediff = (function () {
+  return {
+    diffString: diffString,
+    diffString3: diffString3,
+    escape: escape
+  };
+
+  function escape(s) {
+      var n = s;
+      n = n.replace(/&/g, "&amp;");
+      n = n.replace(/</g, "&lt;");
+      n = n.replace(/>/g, "&gt;");
+      n = n.replace(/"/g, "&quot;");
+      return n;
+  }
+
+  function diffString( o, n ) {
+    o = o.replace(/\s+$/, '');
+    n = n.replace(/\s+$/, '');
+
+    var out = diff(o == "" ? [] : o.split(/\s+/), n == "" ? [] : n.split(/\s+/) );
+    var str = "";
+
+    var oSpace = o.match(/\s+/g);
+    if (oSpace == null) {
+      oSpace = ["\n"];
+    } else {
+      oSpace.push("\n");
+    }
+    var nSpace = n.match(/\s+/g);
+    if (nSpace == null) {
+      nSpace = ["\n"];
+    } else {
+      nSpace.push("\n");
+    }
+
+    if (out.n.length == 0) {
+        for (var i = 0; i < out.o.length; i++) {
+          str += '<del>' + escape(out.o[i]) + oSpace[i] + "</del>";
+        }
+    } else {
+      if (out.n[0].text == null) {
+        for (n = 0; n < out.o.length && out.o[n].text == null; n++) {
+          str += '<del>' + escape(out.o[n]) + oSpace[n] + "</del>";
+        }
+      }
+
+      for ( var i = 0; i < out.n.length; i++ ) {
+        if (out.n[i].text == null) {
+          str += '<ins>' + escape(out.n[i]) + nSpace[i] + "</ins>";
+        } else {
+          var pre = "";
+
+          for (n = out.n[i].row + 1; n < out.o.length && out.o[n].text == null; n++ ) {
+            pre += '<del>' + escape(out.o[n]) + oSpace[n] + "</del>";
+          }
+          str += escape(out.n[i].text) + nSpace[i] + pre;
+        }
+      }
+    }
+    
+    return str;
+  }
+
+  function whitespaceAwareTokenize(n) {
+    return n !== "" && n.match(/\n| *[\-><!=]+ *|[ \t]+|[<$&#§%]\w+|\w+|\W/g) || [];
+  }
+
+  function tag(t,c) {
+    if (t === "") return escape(c);
+    return c==="" ? '' : '<'+t+'>'+escape(c)+'</'+t+'>';
+  }
+  
+  function diffString3( o, n ) {
+    var out = diff(whitespaceAwareTokenize(o), whitespaceAwareTokenize(n));
+    var ac = [], ao = [], an = [];
+    if (out.n.length == 0) {
+        for (var i = 0; i < out.o.length; i++) {
+          ac.push(tag('del',out.o[i]));
+          ao.push(tag('del',out.o[i]));
+        }
+    } else {
+      if (out.n[0].text == null) {
+        for (n = 0; n < out.o.length && out.o[n].text == null; n++) {
+          ac.push(tag('del',out.o[n]));
+        }
+      }
+
+      var added = 0;
+      for ( var i = 0; i < out.o.length; i++ ) {
+        if (out.o[i].text == null) {
+          ao.push(tag('del',out.o[i])); added++;
+        } else {
+          var moved = (i - out.o[i].row - added);
+          ao.push(tag((moved>0) ? 'del' : '',out.o[i].text));
+        }
+      }
+
+      var removed = 0;
+      for ( var i = 0; i < out.n.length; i++ ) {
+        if (out.n[i].text == null) {
+          ac.push(tag('ins',out.n[i]));
+          an.push(tag('ins',out.n[i]));
+        } else {
+          var moved = (i - out.n[i].row + removed);
+          an.push(tag((moved<0)?'ins':'', out.n[i].text));
+          ac.push(escape(out.n[i].text));
+          for (n = out.n[i].row + 1; n < out.o.length && out.o[n].text == null; n++ ) {
+            ac.push(tag('del',out.o[n])); removed++;
+          }
+        }
+      }
+    }
+    return [
+      ac.join(""), // anotated combined additions and deletions
+      ao.join(""), // old with highlighted deletions
+      an.join("")  // new with highlighted additions
+    ];
+  }
+
+  function diff( o, n ) {
+    var ns = {}, os = {}, k = null, i = 0;
+    
+    for ( var i = 0; i < n.length; i++ ) {
+      k = '"' + n[i]; // prefix keys with a quote to not collide with Object's internal keys, e.g. '__proto__' or 'constructor'
+      if ( ns[k] === undefined )
+        ns[k] = { rows: [], o: null };
+      ns[k].rows.push( i );
+    }
+    
+    for ( var i = 0; i < o.length; i++ ) {
+      k = '"' + o[i]
+      if ( os[k] === undefined )
+        os[k] = { rows: [], n: null };
+      os[k].rows.push( i );
+    }
+    
+    for ( var k in ns ) {
+      if ( ns[k].rows.length == 1 && os[k] !== undefined && os[k].rows.length == 1 ) {
+        n[ ns[k].rows[0] ] = { text: n[ ns[k].rows[0] ], row: os[k].rows[0] };
+        o[ os[k].rows[0] ] = { text: o[ os[k].rows[0] ], row: ns[k].rows[0] };
+      }
+    }
+    
+    for ( var i = 0; i < n.length - 1; i++ ) {
+      if ( n[i].text != null && n[i+1].text == null && n[i].row + 1 < o.length && o[ n[i].row + 1 ].text == null && 
+           n[i+1] == o[ n[i].row + 1 ] ) {
+        n[i+1] = { text: n[i+1], row: n[i].row + 1 };
+        o[n[i].row+1] = { text: o[n[i].row+1], row: i + 1 };
+      }
+    }
+    
+    for ( var i = n.length - 1; i > 0; i-- ) {
+      if ( n[i].text != null && n[i-1].text == null && n[i].row > 0 && o[ n[i].row - 1 ].text == null && 
+           n[i-1] == o[ n[i].row - 1 ] ) {
+        n[i-1] = { text: n[i-1], row: n[i].row - 1 };
+        o[n[i].row-1] = { text: o[n[i].row-1], row: i - 1 };
+      }
+    }
+    
+    return { o: o, n: n };
+  }
+})();
+

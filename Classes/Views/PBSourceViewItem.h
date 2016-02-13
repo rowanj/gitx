@@ -12,7 +12,7 @@
 @class PBGitRef;
 
 @interface PBSourceViewItem : NSObject {
-	NSMutableArray *children;
+    NSMutableOrderedSet *childrenSet;
 
 	NSString *title;
 	PBGitRevSpecifier *revSpecifier;
@@ -27,6 +27,7 @@
 
 - (void)addChild:(PBSourceViewItem *)child;
 - (void)removeChild:(PBSourceViewItem *)child;
+- (NSImage*)iconNamed:(NSString*)name;
 
 // This adds the ref to the path, which should match the item's title,
 // so "refs/heads/pu/pb/sidebar" would have the path [@"pu", @"pb", @"sidebare"]
@@ -37,9 +38,11 @@
 - (PBGitRef *) ref;
 
 @property NSString *title;
-@property(readonly) NSMutableArray *children;
-@property(assign) BOOL isGroupItem, isUncollapsible;
+@property(nonatomic, readonly) NSArray *sortedChildren;
+@property(assign) BOOL isGroupItem, isUncollapsible, isExpanded;
 @property PBGitRevSpecifier *revSpecifier;
 @property (assign)PBSourceViewItem *parent;
+@property(readonly) NSString *iconName;
 @property(readonly) NSImage *icon;
+
 @end

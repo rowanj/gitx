@@ -25,8 +25,8 @@
 
 @property (nonatomic, strong) id <PBGitRefish> targetRefish;
 
-@property (nonatomic, dct_weak) IBOutlet NSTextField *tagNameField;
-@property (nonatomic, dct_weak) IBOutlet NSTextView  *tagMessageText;
-@property (nonatomic, dct_weak) IBOutlet NSTextField *errorMessageField;
+@property (nonatomic, weak) IBOutlet NSTextField *tagNameField;
+@property (nonatomic, strong) IBOutlet NSTextView  *tagMessageText;
+@property (nonatomic, weak) IBOutlet NSTextField *errorMessageField;
 
 @end

@@ -11,7 +11,7 @@
 #import "GitXScriptingConstants.h"
 #import "GitX.h"
 #import "PBHistorySearchController.h"
-
+#import "GitRepoFinder.h"
 
 
 #pragma mark Commands handled locally
@@ -240,19 +240,16 @@ PBHistorySearchMode searchModeForCommandLineArgument(NSString *argument)
 	return 0;
 }
 
-GitXDocument *documentForURL(SBElementArray *documents, NSURL *URL)
+GitXDocument *documentForURL(SBElementArray *documents, NSURL *theURL)
 {
-	NSString *path = [URL path];
-
-	for (GitXDocument *document in documents) {
-		NSString *documentPath = [[document file] path];
-		if ([[documentPath lastPathComponent] isEqualToString:@".git"])
-			documentPath = [documentPath stringByDeletingLastPathComponent];
-
-		if ([documentPath isEqualToString:path])
+	for (GitXDocument *document in documents)
+	{
+		NSURL* docURL = [document file];
+		if ([docURL isEqualTo:theURL])
+		{
 			return document;
+		}
 	}
-
 	return nil;
 }
 
@@ -320,28 +317,12 @@ NSURL *workingDirectoryURL(NSMutableArray *arguments)
 	}
 
     // otherwise, determine current working directory
-    NSString *path = [[[NSProcessInfo processInfo] environment] objectForKey:@"PWD"];
+    NSString *pwd = [[[NSProcessInfo processInfo] environment] objectForKey:@"PWD"];
 
-	NSMutableData* repoPathBuffer = [NSMutableData dataWithLength:GIT_PATH_MAX];
+	NSURL* pwdURL = [NSURL fileURLWithPath:pwd];
+	NSURL* repoURL = [GitRepoFinder workDirForURL:pwdURL];
+	return repoURL;
 
-	int result = git_repository_discover(repoPathBuffer.mutableBytes,
-										 repoPathBuffer.length,
-										 [path UTF8String],
-										 GIT_REPOSITORY_OPEN_CROSS_FS,
-										 nil);
-
-	if (result == GIT_OK)
-	{
-		NSString* repoPath = [NSString stringWithUTF8String:repoPathBuffer.bytes];
-		BOOL isDirectory;
-		if ([[NSFileManager defaultManager] fileExistsAtPath:repoPath
-												 isDirectory:&isDirectory] && isDirectory)
-		{
-			NSURL* result = [NSURL fileURLWithPath:repoPath isDirectory:isDirectory];
-			return result;
-		}
-	}
-	return nil;
 }
 
 NSMutableArray *argumentsArray()

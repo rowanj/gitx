@@ -2,7 +2,9 @@ var showFile = function(txt, fileName) {
   $("source").style.display = "";
   var suffix_map = {
     "m": "objc",
+	"mm": "objc",
     "h": "objc",
+	"pch": "objc",
 
     "rb": "ruby",
     "rbx": "ruby",
@@ -23,6 +25,10 @@ var showFile = function(txt, fileName) {
     "opml": "xml",
     "xsl": "xml",
     "xslt": "xml",
+	  
+	  "htm": "xml",
+	  "html": "xml",
+	  "plist": "xml",
     
     "js": "javascript",
     "htc": "javascript",
@@ -80,19 +86,19 @@ var showFile = function(txt, fileName) {
     "cxx": "cpp",
     "c++":"cpp",
     "C": "cpp",
-    "h": "cpp",
+//    "h": "cpp",
     "hh": "cpp",
     "hpp": "cpp",
-    "cpp": "h++",
+    "h++": "cpp",
     "c": "cpp"
   }
-  var brush = "objc";
+
   var suffix = "";
   if (fileName && fileName != '') {
     suffix = fileName.substr(fileName.lastIndexOf('.') + 1);
   }
   
-  brush = suffix_map[suffix];
+  var brush = suffix_map[suffix] ? suffix_map[suffix] : "plain";
   
   $("source").innerHTML="<pre class='first-line: 1;brush: " + brush + "'>" + txt + "</pre>";
 

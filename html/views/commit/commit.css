@@ -87,6 +87,13 @@ table.diff {
 #selected div {
     background-color: #B5D5FE;
 }
+#selected div del,
+#selected div ins {
+    background-color: #9abbea;
+}
+#selected div .whitespace {
+    background-color: #7795c7;
+}
 
 #selected #stagelines {
     padding-left: 2px;
@@ -116,4 +123,8 @@ table.diff {
 	border: 5px solid #EEE;
 	margin: -5px;
 	padding-left: 20px;
+}
+
+.top-link {
+    display: none;
 }

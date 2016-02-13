@@ -14,15 +14,15 @@
 @class PBGitRef;
 @class PBGitRevList;
 @class PBGitHistoryGrapher;
-@class PBGitSHA;
+@class GTOID;
 
 @interface PBGitHistoryList : NSObject {
-	__dct_weak PBGitRepository *repository;
+	__weak PBGitRepository *repository;
 
 	PBGitRevList *projectRevList;
 	PBGitRevList *currentRevList;
 
-	PBGitSHA *lastSHA;
+	GTOID *lastSHA;
 	NSSet *lastRefSHAs;
 	NSInteger lastBranchFilter;
 	PBGitRef *lastRemoteRef;

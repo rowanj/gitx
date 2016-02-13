@@ -44,7 +44,7 @@ extern NSString *PBGitIndexOperationFailed;
 @interface PBGitIndex : NSObject {
 	
 @private
-	__dct_weak PBGitRepository *repository;
+	__weak PBGitRepository *repository;
 	NSURL *workingDirectory;
 	NSMutableArray *files;
 

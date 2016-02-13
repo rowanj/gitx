@@ -88,7 +88,7 @@
 	<key>OSAScriptingDefinition</key>
 	<string>GitX.sdef</string>
 	<key>SUFeedURL</key>
-	<string>http://builds.phere.net/GitX/development/GitX-dev.xml</string>
+	<string>https://s3.amazonaws.com/builds.phere.net/GitX/development/GitX-dev.xml</string>
 	<key>SUPublicDSAKeyFile</key>
 	<string>UpdateKey.pem</string>
 	<key>SUEnableAutomaticChecks</key>

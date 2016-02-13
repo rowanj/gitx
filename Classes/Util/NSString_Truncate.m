@@ -55,8 +55,8 @@
                 ;
                 NSException * myException = [NSException exceptionWithName:NSInvalidArgumentException 
                                                                     reason:[NSString stringWithFormat:
-                                                                            @"[%@ %s] called with nonsensical value for 'mode' (mode = %d) ***",
-                                                                            [self class], _cmd, mode]
+                                                                            @"[%@ %@] called with nonsensical value for 'mode' (mode = %d) ***",
+                                                                            [self class], NSStringFromSelector(_cmd), mode]
                                                                   userInfo:nil];
                 @throw myException;
                 return res;

@@ -14,14 +14,14 @@
 #import "PBRefContextDelegate.h"
 
 
-@class PBGitSHA;
+@class GTOID;
 
 
 @interface PBWebHistoryController : PBWebController {
 	IBOutlet PBGitHistoryController* historyController;
 	IBOutlet id<PBRefContextDelegate> contextMenuDelegate;
 
-	PBGitSHA* currentSha;
+	GTOID* currentSha;
 	NSString* diff;
 }
 

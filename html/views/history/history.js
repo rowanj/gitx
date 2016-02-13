@@ -6,11 +6,11 @@ var Commit = function(obj) {
 	this.object = obj;
 
 	this.refs = obj.refs();
-	this.author_name = obj.author;
-	this.committer_name = obj.committer;
+	this.author_name = obj.author();
+	this.committer_name = obj.committer();
 	this.sha = obj.realSha();
-	this.parents = obj.parents;
-	this.subject = obj.subject;
+	this.parents = obj.parents();
+	this.subject = obj.subject();
 	this.notificationID = null;
 
 	// TODO:
@@ -83,46 +83,38 @@ var confirm_gist = function(confirmation_message) {
 var gistie = function() {
 	notify("Uploading code to Gistie..", 0);
 
-	parameters = {
-		"file_ext[gistfile1]":      "patch",
-		"file_name[gistfile1]":     commit.object.subject.replace(/[^a-zA-Z0-9]/g, "-") + ".patch",
-		"file_contents[gistfile1]": commit.object.patch(),
-	};
+	var parameters = {public:false, files:{}};
+	var filename = commit.object.subject.replace(/[^a-zA-Z0-9]/g, "-") + ".patch";
+	parameters.files[filename] = {content: commit.object.patch()};
 
+	var accessToken = Controller.getConfig_("github.token"); // obtain a personal access token from https://github.com/settings/applications
 	// TODO: Replace true with private preference
-	token = Controller.getConfig_("github.token");
-	login = Controller.getConfig_("github.user");
-	if (token && login) {
-		parameters.login = login;
-		parameters.token = token;
-	}
-	if (!Controller.isFeatureEnabled_("publicGist"))
-		parameters.private = true;
-
-	var params = [];
-	for (var name in parameters)
-		params.push(encodeURIComponent(name) + "=" + encodeURIComponent(parameters[name]));
-	params = params.join("&");
+	if (Controller.isFeatureEnabled_("publicGist"))
+		parameters.public = true;
 
 	var t = new XMLHttpRequest();
 	t.onreadystatechange = function() {
-		if (t.readyState == 4 && t.status >= 200 && t.status < 300) {
-			if (m = t.responseText.match(/<a href="\/gists\/([a-f0-9]+)\/edit">/))
-				notify("Code uploaded to gistie <a target='_new' href='http://gist.github.com/" + m[1] + "'>#" + m[1] + "</a>", 1);
-			else {
+		if (t.readyState == 4) {
+			var success = t.status >= 200 && t.status < 300;
+			var response = JSON.parse(t.responseText);
+			if (success && response.html_url) {
+				notify("Code uploaded to <a target='_new' href='"+response.html_url+"'>"+response.html_url+"</a>", 1);
+			} else {
 				notify("Pasting to Gistie failed :(.", -1);
 				Controller.log_(t.responseText);
 			}
 		}
 	}
 
-	t.open('POST', "https://gist.github.com/gists");
+	t.open('POST', "https://api.github.com/gists");
+	if (accessToken)
+		t.setRequestHeader('Authorization', 'token '+accessToken);
 	t.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
 	t.setRequestHeader('Accept', 'text/javascript, text/html, application/xml, text/xml, */*');
 	t.setRequestHeader('Content-type', 'application/x-www-form-urlencoded;charset=UTF-8');
 
 	try {
-		t.send(params);
+		t.send(JSON.stringify(parameters));
 	} catch(e) {
 		notify("Pasting to Gistie failed: " + e, -1);
 	}
@@ -205,8 +197,8 @@ var loadCommit = function(commitObject, currentRef) {
 	for (var i = 0; i < commit.parents.length; i++) {
 		var newRow = $("commit_header").insertRow(-1);
 		newRow.innerHTML = "<td class='property_name'>Parent:</td><td>" +
-			"<a href='' onclick='selectCommit(this.innerHTML); return false;'>" +
-			commit.parents[i].string + "</a></td>";
+			"<a class=\"SHA\" href='' onclick='selectCommit(this.innerHTML); return false;'>" +
+			commit.parents[i].SHA() + "</a></td>";
 	}
 
 	commit.notificationID = setTimeout(function() { 
@@ -216,6 +208,40 @@ var loadCommit = function(commitObject, currentRef) {
 	}, 500);
 
 }
+
+var commonPrefix = function(a, b) {
+    if (a === b) return a;
+    var i = 0;
+    while (a.charAt(i) == b.charAt(i))++i;
+    return a.substring(0, i);
+};
+var commonSuffix = function(a, b) {
+    if (a === b) return "";
+    var i = a.length - 1,
+        k = b.length - 1;
+    while (a.charAt(i) == b.charAt(k)) {
+        --i;
+        --k;
+    }
+    return a.substring(i + 1, a.length);
+};
+var renameDiff = function(a, b) {
+    var p = commonPrefix(a, b),
+        s = commonSuffix(a, b),
+        o = a.substring(p.length, a.length - s.length),
+        n = b.substring(p.length, b.length - s.length);
+    return [p, o, n, s];
+};
+var formatRenameDiff = function(d) {
+    var p = d[0],
+        o = d[1],
+        n = d[2],
+        s = d[3];
+    if (o === "" && n === "" && s === "") {
+        return p;
+    }
+    return [p, "{ ", o, " → ", n, " }", s].join("");
+};
 
 var showDiff = function() {
 
@@ -229,35 +255,51 @@ var showDiff = function() {
 		link.setAttribute("href", "#" + id);
 		p.appendChild(link);
 		var finalFile = "";
+		var renamed = false;
 		if (name1 == name2) {
 			finalFile = name1;
-			img.src = "../../images/modified.png";
+			img.src = "../../images/modified.svg";
 			img.title = "Modified file";
 			p.title = "Modified file";
 			if (mode_change)
-				p.appendChild(document.createTextNode(" mode " + old_mode + " -> " + new_mode));
+				p.appendChild(document.createTextNode(" mode " + old_mode + " → " + new_mode));
 		}
 		else if (name1 == "/dev/null") {
-			img.src = "../../images/added.png";
+			img.src = "../../images/added.svg";
 			img.title = "Added file";
 			p.title = "Added file";
 			finalFile = name2;
 		}
 		else if (name2 == "/dev/null") {
-			img.src = "../../images/removed.png";
+			img.src = "../../images/removed.svg";
 			img.title = "Removed file";
 			p.title = "Removed file";
 			finalFile = name1;
 		}
 		else {
-			img.src = "../../images/renamed.png";
+			renamed = true;
+		}
+		if (renamed) {
+			img.src = "../../images/renamed.svg";
 			img.title = "Renamed file";
 			p.title = "Renamed file";
 			finalFile = name2;
-			p.insertBefore(document.createTextNode(name1 + " -> "), link);
+			var rfd = renameDiff(name1.unEscapeHTML(), name2.unEscapeHTML());
+			var html = [
+					'<span class="renamed">',
+					rfd[0].escapeHTML(),
+					'<span class="meta"> { </span>',
+					'<span class="old">', rfd[1].escapeHTML(), '</span>',
+					'<span class="meta"> -&gt; </span>',
+					'<span class="new">', rfd[2].escapeHTML(), '</span>',
+					'<span class="meta"> } </span>',
+					rfd[3].escapeHTML(),
+                    '</span>'
+				].join("");
+			link.innerHTML = html;
+		} else {
+			link.appendChild(document.createTextNode(finalFile.unEscapeHTML()));
 		}
-
-		link.appendChild(document.createTextNode(finalFile.unEscapeHTML()));
 		link.setAttribute("representedFile", finalFile);
 
 		p.insertBefore(img, link);

@@ -8,9 +8,12 @@
 
 #import <Cocoa/Cocoa.h>
 #import <WebKit/WebView.h>
-#import "PBGitHistoryController.h"
 
+@class PBGitHistoryController;
 @class PBWebHistoryController;
+@class PBHistorySearchController;
+
+typedef void(^PBFindPanelActionBlock)(id sender);
 
 @interface PBCommitList : NSTableView {
 	IBOutlet WebView* webView;
@@ -24,4 +27,5 @@
 
 @property (readonly) NSPoint mouseDownPoint;
 @property (assign) BOOL useAdjustScroll;
+@property (copy) PBFindPanelActionBlock findPanelActionBlock;
 @end

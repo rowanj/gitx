@@ -7,34 +7,13 @@
 //
 
 #import "PBGitLane.h"
-//class PBGitLane {
-//	static int s_colorIndex;
-//	
-//	char d_sha[20];
-//	int d_index;
-//	
-//public:
-//	PBGitLane(NSString *sha);
-//	
-//	bool isCommit(NSString *sha) const;
-//	int index(); const;
-//	
-//	static resetColors();
-//};
-
-int PBGitLane::s_colorIndex = 0;
 
 int PBGitLane::index() const
 {
 	return d_index;
 }
 
-void PBGitLane::setSha(git_oid sha)
+void PBGitLane::setSha(const git_oid *sha)
 {
-	d_sha = sha;
-}
-
-void PBGitLane::resetColors()
-{
-	s_colorIndex = 0;
+	d_sha = *sha;
 }

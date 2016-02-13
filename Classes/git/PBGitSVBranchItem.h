@@ -9,7 +9,6 @@
 #import <Cocoa/Cocoa.h>
 #import "PBSourceViewItem.h"
 
-
 @interface PBGitSVBranchItem : PBSourceViewItem {
 
 }

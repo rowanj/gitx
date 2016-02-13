@@ -42,8 +42,9 @@
 
 - (IBAction)forceCommit:(id)sender
 {
-	[self closeMessageSheet:self];
-	[self.commitController forceCommit:sender];
+	PBGitCommitController *controller = self.commitController;
+	[self closeMessageSheet:sender];
+	[controller forceCommit:sender];
 }
 
 @end
