@@ -83,7 +83,8 @@ To get GitX-dev to compile locally you need to:
   1. Clone the repository locally: `git clone https://github.com/rowanj/gitx.git`
   2. After cloning it `cd gitx` and then recursively initialize all submodules: `git submodule update --init --recursive`
   3. Then prepare objective-git by running its bootstrap script: `cd objective-git && ./script/bootstrap`
-  4. Then compile objective-git `cd objective-git && ./script/update_libgit2`
+  4. Then go back to the previous directory: `cd ..`
+  5. Then compile objective-git `cd objective-git && ./script/update_libgit2`
 
 After that you should be able to open the Xcode project and build successfully.
 
