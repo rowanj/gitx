@@ -47,9 +47,9 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>0.12</string>
+	<string>????</string>
 	<key>CFBundleVersion</key>
-	<string>0.12</string>
+	<string>????</string>
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.developer-tools</string>
 	<key>NSAppleScriptEnabled</key>
@@ -87,13 +87,13 @@
 	</array>
 	<key>OSAScriptingDefinition</key>
 	<string>GitX.sdef</string>
+	<key>SUAllowsAutomaticUpdates</key>
+	<true/>
+	<key>SUEnableAutomaticChecks</key>
+	<true/>
 	<key>SUFeedURL</key>
 	<string>https://s3.amazonaws.com/builds.phere.net/GitX/development/GitX-dev.xml</string>
 	<key>SUPublicDSAKeyFile</key>
 	<string>UpdateKey.pem</string>
-	<key>SUEnableAutomaticChecks</key>
-	<true/>
-	<key>SUAllowsAutomaticUpdates</key>
-	<true/>
 </dict>
 </plist>
