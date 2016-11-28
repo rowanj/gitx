@@ -344,13 +344,20 @@ writeRowsWithIndexes:(NSIndexSet *)rowIndexes
 	// External, to drag them to for example XCode or Textmate
 	NSArrayController *controller = [tv tag] == 0 ? unstagedFilesController : stagedFilesController;
 	NSArray *files = [[controller arrangedObjects] objectsAtIndexes:rowIndexes];
-	NSString *workingDirectory = [commitController.repository workingDirectory];
 
-	NSMutableArray *filenames = [NSMutableArray arrayWithCapacity:[rowIndexes count]];
-	for (PBChangedFile *file in files)
-		[filenames addObject:[workingDirectory stringByAppendingPathComponent:[file path]]];
+    id filenames = @"";
+    NSUInteger count = [files count];
+    for (NSUInteger i = 0; i < count; i++) {
+        PBChangedFile *file = [files objectAtIndex:i];
+        if (i == 0) {
+            filenames = [NSMutableString stringWithString:[file path]];
+        } else {
+            [filenames appendFormat:@"\n%@", [file path]];
+        }
+    }
 
-	[pboard setPropertyList:filenames forType:NSFilenamesPboardType];
+	[pboard setString:filenames forType:NSStringPboardType];
+    
     return YES;
 }
 
