@@ -9,22 +9,25 @@
 #import "PBGitWindowController.h"
 #import "PBGitHistoryController.h"
 #import "PBGitCommitController.h"
-#import "Terminal.h"
+#import "PBTerminalUtil.h"
 #import "PBCommitHookFailedSheet.h"
 #import "PBGitXMessageSheet.h"
 #import "PBGitSidebarController.h"
-#import "RJModalRepoSheet.h"
-
-@interface PBGitWindowController ()
-
-@property (nonatomic, strong) RJModalRepoSheet* currentModalSheet;
-
-@end
+#import "PBAddRemoteSheet.h"
+#import "PBCreateBranchSheet.h"
+#import "PBCreateTagSheet.h"
+#import "PBGitDefaults.h"
+#import "PBSourceViewItem.h"
+#import "PBGitRevSpecifier.h"
+#import "PBGitRef.h"
+#import "PBError.h"
+#import "PBRepositoryDocumentController.h"
+#import "PBRefMenuItem.h"
+#import "PBRemoteProgressSheet.h"
 
 @implementation PBGitWindowController
 
 @synthesize repository;
-@synthesize currentModalSheet;
 
 - (id)initWithRepository:(PBGitRepository*)theRepository displayDefault:(BOOL)displayDefault
 {
@@ -40,12 +43,9 @@
 {
     [super synchronizeWindowTitleWithDocumentName];
 
-    // Point window proxy icon at project directory, not internal .git dir
-    NSString *workingDirectory = [self.repository workingDirectory];
-	if (workingDirectory)
-	{
-		[[self window] setRepresentedURL:[NSURL fileURLWithPath:workingDirectory
-													isDirectory:YES]];
+	if ([self isWindowLoaded]) {
+		// Point window proxy icon at project directory, not internal .git dir
+		[[self window] setRepresentedURL:self.repository.workingDirectoryURL];
 	}
 }
 
@@ -68,15 +68,44 @@
 	} else if ([menuItem action] == @selector(showHistoryView:)) {
 		[menuItem setState:(contentController != sidebarController.commitViewController) ? YES : NO];
 		return ![repository isBareRepository];
+	} else if (menuItem.action == @selector(fetchRemote:)) {
+		return [self validateMenuItem:menuItem remoteTitle:@"Fetch “%@”" plainTitle:@"Fetch"];
+	} else if (menuItem.action == @selector(pullRemote:)) {
+		return [self validateMenuItem:menuItem remoteTitle:@"Pull From “%@”" plainTitle:@"Pull"];
+	} else if (menuItem.action == @selector(pullRebaseRemote:)) {
+		return [self validateMenuItem:menuItem remoteTitle:@"Pull From “%@” and Rebase" plainTitle:@"Pull and Rebase"];
 	}
+	
 	return YES;
 }
 
-- (void) awakeFromNib
+- (BOOL) validateMenuItem:(NSMenuItem *)menuItem remoteTitle:(NSString *)localisationKeyWithRemote plainTitle:(NSString *)localizationKeyWithoutRemote
 {
-	[[self window] setDelegate:self];
-	[[self window] setAutorecalculatesContentBorderThickness:NO forEdge:NSMinYEdge];
-	[[self window] setContentBorderThickness:31.0f forEdge:NSMinYEdge];
+	PBSourceViewItem *item = [self selectedItem];
+	PBGitRef *ref = item.ref;
+
+	if (!ref && (item.parent == sidebarController.remotes)) {
+		ref = [PBGitRef refFromString:[kGitXRemoteRefPrefix stringByAppendingString:item.title]];
+	}
+	
+	if (ref.isRemote) {
+		menuItem.title = [NSString stringWithFormat:NSLocalizedString(localisationKeyWithRemote, @""), ref.remoteName];
+		return YES;
+	}
+
+	menuItem.title = NSLocalizedString(localizationKeyWithoutRemote, @"");
+	return NO;
+}
+
+
+- (void) windowDidLoad
+{
+	[super windowDidLoad];
+
+	// Explicitly set the frame using the autosave name
+	// Opening the first and second documents works fine, but the third and subsequent windows aren't positioned correctly
+	[[self window] setFrameUsingName:@"GitX"];
+	[[self window] setRepresentedURL:self.repository.workingDirectoryURL];
 
 	sidebarController = [[PBGitSidebarController alloc] initWithRepository:repository superController:self];
 	[[sidebarController view] setFrame:[sourceSplitView bounds]];
@@ -85,14 +114,6 @@
 
 	[[statusField cell] setBackgroundStyle:NSBackgroundStyleRaised];
 	[progressIndicator setUsesThreadedAnimation:YES];
-
-	NSImage *finderImage = [[NSWorkspace sharedWorkspace] iconForFileType:NSFileTypeForHFSTypeCode(kFinderIcon)];
-	[finderItem setImage:finderImage];
-
-	NSImage *terminalImage = [[NSWorkspace sharedWorkspace] iconForFile:@"/Applications/Utilities/Terminal.app/"];
-	[terminalItem setImage:terminalImage];
-
-	[self showWindow:nil];
 }
 
 - (void) removeAllContentSubViews
@@ -137,21 +158,24 @@
 {
 	[PBCommitHookFailedSheet beginWithMessageText:messageText
 										 infoText:infoText
-								 commitController:controller];
+								 commitController:controller
+	 completionHandler:^(id  _Nonnull sheet, NSModalResponse returnCode) {
+		 if (returnCode != NSModalResponseOK) return;
+
+		 [sidebarController.commitViewController forceCommit:self];
+	 }];
 }
 
 - (void)showMessageSheet:(NSString *)messageText infoText:(NSString *)infoText
 {
-	[PBGitXMessageSheet beginMessageSheetForRepo:self.repository
-								 withMessageText:messageText
-										infoText:infoText];
+	[PBGitXMessageSheet beginSheetWithMessage:messageText info:infoText windowController:self];
 }
 
 - (void)showErrorSheet:(NSError *)error
 {
-	if ([[error domain] isEqualToString:PBGitRepositoryErrorDomain])
+	if ([[error domain] isEqualToString:PBGitXErrorDomain])
 	{
-		[PBGitXMessageSheet beginMessageSheetForRepo:self.repository withError:error];
+		[PBGitXMessageSheet beginSheetWithError:error windowController:self];
 	}
 	else
 	{
@@ -160,38 +184,6 @@
 												  didEndSelector:nil
 													 contextInfo:nil];
 	}
-}
-
-- (void)showErrorSheetTitle:(NSString *)title message:(NSString *)message arguments:(NSArray *)arguments output:(NSString *)output
-{
-	NSString *command = [arguments componentsJoinedByString:@" "];
-	NSString *reason = [NSString stringWithFormat:@"%@\n\ncommand: git %@\n%@", message, command, output];
-	NSDictionary *userInfo = [NSDictionary dictionaryWithObjectsAndKeys:
-							  title, NSLocalizedDescriptionKey,
-							  reason, NSLocalizedRecoverySuggestionErrorKey,
-							  nil];
-	NSError *error = [NSError errorWithDomain:PBGitRepositoryErrorDomain code:0 userInfo:userInfo];
-	[self showErrorSheet:error];
-}
-
-- (IBAction) revealInFinder:(id)sender
-{
-	[[NSWorkspace sharedWorkspace] openFile:[repository workingDirectory]];
-}
-
-- (IBAction) openInTerminal:(id)sender
-{
-	TerminalApplication *term = [SBApplication applicationWithBundleIdentifier: @"com.apple.Terminal"];
-	NSString *workingDirectory = [[repository workingDirectory] stringByAppendingString:@"/"];
-	NSString *cmd = [NSString stringWithFormat: @"cd \"%@\"; clear; echo '# Opened by GitX:'; git status", workingDirectory];
-	[term doScript: cmd in: nil];
-	[NSThread sleepForTimeInterval: 0.1];
-	[term activate];
-}
-
-- (IBAction) refresh:(id)sender
-{
-	[contentController refresh:self];
 }
 
 - (void) updateStatus
@@ -226,78 +218,360 @@
 	[super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
 }
 
-- (void)setHistorySearch:(NSString *)searchString mode:(NSInteger)mode
+- (void)setHistorySearch:(NSString *)searchString mode:(PBHistorySearchMode)mode
 {
 	[sidebarController setHistorySearch:searchString mode:mode];
 }
 
-- (void)showModalSheet:(RJModalRepoSheet *)sheet
+
+
+- (void)openURLs:(NSArray <NSURL *> *)fileURLs
 {
-	if (self.currentModalSheet == nil) {
-		[NSApp beginSheet:[sheet window]
-		   modalForWindow:self.window
-			modalDelegate:sheet
-		   didEndSelector:nil
-			  contextInfo:NULL];
-		self.currentModalSheet = sheet;
+	if (fileURLs.count == 0) return;
+
+	NSMutableArray *nonSubmoduleURLs = [NSMutableArray array];
+
+	for (NSURL *fileURL in fileURLs) {
+		GTSubmodule *submodule = [self.repository submoduleAtPath:fileURL.path error:NULL];
+		if (!submodule) {
+			[nonSubmoduleURLs addObject:fileURL];
+		} else {
+			NSURL *submoduleURL = [submodule.parentRepository.fileURL URLByAppendingPathComponent:submodule.path isDirectory:YES];
+			[[NSDocumentController sharedDocumentController] openDocumentWithContentsOfURL:submoduleURL
+																				   display:YES
+																		 completionHandler:^(NSDocument * _Nullable document, BOOL documentWasAlreadyOpen, NSError * _Nullable error) {
+																			 // Do nothing on completion.
+																			 return;
+																		 }];
+		}
 	}
+
+	[[NSWorkspace sharedWorkspace] openURLs:nonSubmoduleURLs
+					withAppBundleIdentifier:nil
+									options:0
+			 additionalEventParamDescriptor:nil
+						  launchIdentifiers:NULL];
 }
 
-- (void)hideModalSheet:(RJModalRepoSheet *)sheet
+- (void)revealURLsInFinder:(NSArray <NSURL *> *)fileURLs
 {
-	if (self.currentModalSheet == sheet) {
-		[NSApp endSheet:sheet.window];
-		[sheet.window orderOut:sheet];
-		self.currentModalSheet = nil;
+	if (fileURLs.count == 0) return;
+
+	[[NSWorkspace sharedWorkspace] activateFileViewerSelectingURLs:fileURLs];
+}
+
+#pragma mark IBActions
+
+- (IBAction) showAddRemoteSheet:(id)sender
+{
+	[self addRemote:sender];
+}
+
+- (IBAction)addRemote:(id)sender
+{
+	[PBAddRemoteSheet beginSheetWithWindowController:self completionHandler:^(PBAddRemoteSheet *addSheet, NSModalResponse returnCode) {
+		if (returnCode != NSModalResponseOK) return;
+
+		NSString *remoteName = addSheet.remoteName.stringValue;
+		NSString *remoteURL = addSheet.remoteURL.stringValue;
+
+		NSString *description = [NSString stringWithFormat:@"Adding remote \"%@\"", remoteName];
+
+		PBRemoteProgressSheet *progressSheet = [PBRemoteProgressSheet progressSheetWithTitle:@"Adding remote"
+																				 description:description
+																			windowController:self];
+		[progressSheet beginProgressSheetForBlock:^{
+			NSError *error = nil;
+			BOOL success = [repository addRemote:remoteName withURL:remoteURL error:&error];
+			return success ? nil : error;
+		} completionHandler:^(NSError *error) {
+			if (error) {
+				[self showErrorSheet:error];
+				return;
+			}
+
+			// Now fetch that remote
+			PBGitRef *remoteRef = [repository refForName:remoteName];
+			[self performFetchForRef:remoteRef];
+		}];
+	}];
+}
+
+- (void)performFetchForRef:(PBGitRef *)ref
+{
+	NSString *remoteName = (ref ? ref.remoteName : @"all remotes");
+	NSString *description = [NSString stringWithFormat:@"Fetching tracking branches for %@", remoteName];
+
+	PBRemoteProgressSheet *progressSheet = [PBRemoteProgressSheet progressSheetWithTitle:@"Fetching remote…"
+																			 description:description
+																		windowController:self];
+
+	[progressSheet beginProgressSheetForBlock:^{
+		NSError *error = nil;
+		BOOL success = [repository fetchRemoteForRef:ref error:&error];
+		return (success ? nil : error);
+	} completionHandler:^(NSError *error) {
+		if (error) {
+			[self showErrorSheet:error];
+		}
+	}];
+}
+
+- (IBAction) fetchRemote:(id)sender {
+	PBGitRef *ref = [self selectedItem].ref;
+	[self performFetchForRef:ref];
+}
+
+- (IBAction) fetchAllRemotes:(id)sender {
+	[self performFetchForRef:nil];
+}
+
+- (void)performPullForBranch:(PBGitRef *)branchRef remote:(PBGitRef *)remoteRef rebase:(BOOL)rebase {
+	NSString *description = nil;
+	if (!branchRef && !remoteRef) {
+		NSAssert(NO, @"Asked to pull no branch from no remote");
+	} else if (!branchRef) {
+		description = [NSString stringWithFormat:@"Pulling all tracking branches from %@", remoteRef.remoteName];
+	} else if (!remoteRef) {
+		description = [NSString stringWithFormat:@"Pulling default remote for branch %@", branchRef.shortName];
 	} else {
-		assert(self.currentModalSheet == sheet);
+		description = [NSString stringWithFormat:@"Pulling branch %@ from remote %@", branchRef.shortName, remoteRef.remoteName];
 	}
+
+	PBRemoteProgressSheet *progressSheet = [PBRemoteProgressSheet progressSheetWithTitle:@"Pulling remote…"
+																			 description:description
+																		windowController:self];
+
+	[progressSheet beginProgressSheetForBlock:^{
+		NSError *error = nil;
+		BOOL success = [repository pullBranch:branchRef fromRemote:remoteRef rebase:rebase error:&error];
+		return success ? nil : error;
+	} completionHandler:^(NSError *error) {
+		if (error) {
+			[self showErrorSheet:error];
+		}
+	}];
 }
 
-#pragma mark -
-#pragma mark SplitView Delegates
-
-#define kGitSplitViewMinWidth 150.0f
-#define kGitSplitViewMaxWidth 300.0f
-
-#pragma mark min/max widths while moving the divider
-
-- (CGFloat)splitView:(NSSplitView *)view constrainMinCoordinate:(CGFloat)proposedMin ofSubviewAt:(NSInteger)dividerIndex
-{
-	if (proposedMin < kGitSplitViewMinWidth)
-		return kGitSplitViewMinWidth;
-
-	return proposedMin;
+- (IBAction) pullRemote:(id)sender {
+	PBGitRef *ref = [self selectedItem].revSpecifier.ref;
+	[self performPullForBranch:ref remote:nil rebase:NO];
 }
 
-- (CGFloat)splitView:(NSSplitView *)view constrainMaxCoordinate:(CGFloat)proposedMax ofSubviewAt:(NSInteger)dividerIndex
-{
-	if (dividerIndex == 0)
-		return kGitSplitViewMaxWidth;
-
-	return proposedMax;
+- (IBAction) pullRebaseRemote:(id)sender {
+	PBGitRef *ref = [self selectedItem].revSpecifier.ref;
+	[self performPullForBranch:ref remote:nil rebase:YES];
 }
 
-#pragma mark constrain sidebar width while resizing the window
+- (IBAction) pullDefaultRemote:(id)sender {
+	PBGitRef *ref = [self selectedItem].revSpecifier.ref;
+	[self performPullForBranch:ref remote:nil rebase:NO];
+}
 
-- (void)splitView:(NSSplitView *)sender resizeSubviewsWithOldSize:(NSSize)oldSize
+- (IBAction) pullRebaseDefaultRemote:(id)sender {
+	PBGitRef *ref = [self selectedItem].revSpecifier.ref;
+	[self performPullForBranch:ref remote:nil rebase:YES];
+}
+
+- (void)performPushForBranch:(PBGitRef *)branchRef toRemote:(PBGitRef *)remoteRef
 {
-	NSRect newFrame = [sender frame];
+	if ((!branchRef && !remoteRef)
+		|| (branchRef && !branchRef.isBranch && !branchRef.isRemoteBranch && !branchRef.isTag)
+		|| (remoteRef && !remoteRef.isRemote))
+		return;
 
-	float dividerThickness = [sender dividerThickness];
+	// This block is actually responsible for performing the push operation
+	void (^pushBlock)(void) = ^{
+		NSString *description = nil;
+		if (branchRef && remoteRef)
+			description = [NSString stringWithFormat:@"Pushing %@ '%@' to remote %@", branchRef.refishType, branchRef.shortName, remoteRef.remoteName];
+		else if (branchRef)
+			description = [NSString stringWithFormat:@"Pushing %@ '%@' to default remote", branchRef.refishType, branchRef.shortName];
+		else
+			description = [NSString stringWithFormat:@"Pushing updates to remote %@", remoteRef.remoteName];
 
-	NSView *sourceView = [[sender subviews] objectAtIndex:0];
-	NSRect sourceFrame = [sourceView frame];
-	sourceFrame.size.height = newFrame.size.height;
+		PBRemoteProgressSheet *progressSheet = [PBRemoteProgressSheet progressSheetWithTitle:@"Pushing remote…"
+																				 description:description
+																			windowController:self];
 
-	NSView *mainView = [[sender subviews] objectAtIndex:1];
-	NSRect mainFrame = [mainView frame];
-	mainFrame.origin.x = sourceFrame.size.width + dividerThickness;
-	mainFrame.size.width = newFrame.size.width - mainFrame.origin.x;
-	mainFrame.size.height = newFrame.size.height;
+		[progressSheet beginProgressSheetForBlock:^{
+			NSError *error = nil;
+			BOOL success = [repository pushBranch:branchRef toRemote:remoteRef error:&error];
+			return (success ? nil : error);
+		} completionHandler:^(NSError *error) {
+			if (error) {
+				[self showErrorSheet:error];
+			}
+		}];
+	};
 
-	[sourceView setFrame:sourceFrame];
-	[mainView setFrame:mainFrame];
+	if ([PBGitDefaults isDialogWarningSuppressedForDialog:kDialogConfirmPush]) {
+		pushBlock();
+		return;
+	}
+
+	NSString *description = nil;
+	if (branchRef && remoteRef)
+		description = [NSString stringWithFormat:@"Push %@ '%@' to remote %@", branchRef.refishType, branchRef.shortName, remoteRef.remoteName];
+	else if (branchRef)
+		description = [NSString stringWithFormat:@"Push %@ '%@' to default remote", branchRef.refishType, branchRef.shortName];
+	else
+		description = [NSString stringWithFormat:@"Push updates to remote %@", remoteRef.remoteName];
+
+	NSString *sdesc = [NSString stringWithFormat:@"p%@", [description substringFromIndex:1]];
+	NSAlert *alert = [[NSAlert alloc] init];
+	alert.messageText = description;
+	alert.informativeText = [NSString stringWithFormat:@"Are you sure you want to %@?", sdesc];
+	[alert addButtonWithTitle:@"Push"];
+	[alert addButtonWithTitle:@"Cancel"];
+	[alert setShowsSuppressionButton:YES];
+
+	[alert beginSheetModalForWindow:self.window completionHandler:^(NSModalResponse returnCode) {
+		if ([alert.suppressionButton state] == NSOnState)
+			[PBGitDefaults suppressDialogWarningForDialog:kDialogConfirmPush];
+
+		if (returnCode != NSAlertFirstButtonReturn) return;
+
+		pushBlock();
+	}];
+}
+
+- (PBSourceViewItem *) selectedItem {
+	NSOutlineView *sourceView = sidebarController.sourceView;
+	return [sourceView itemAtRow:sourceView.selectedRow];
+}
+
+- (IBAction) stashSave:(id) sender
+{
+	NSError *error = nil;
+	BOOL success = [repository stashSaveWithKeepIndex:NO error:&error];
+
+	if (!success) [self showErrorSheet:error];
+}
+
+- (IBAction) stashSaveWithKeepIndex:(id) sender
+{
+	NSError *error = nil;
+	BOOL success = [repository stashSaveWithKeepIndex:YES error:&error];
+
+	if (!success) [self showErrorSheet:error];
+}
+
+- (IBAction) stashPop:(id) sender
+{
+	if ([repository.stashes count] <= 0) return;
+
+	PBGitStash * latestStash = [repository.stashes objectAtIndex:0];
+	NSError *error = nil;
+	BOOL success = [repository stashPop:latestStash error:&error];
+
+	if (!success) [self showErrorSheet:error];
+}
+
+
+- (NSArray <NSURL *> *)selectedURLsFromSender:(id)sender {
+	NSArray *selectedFiles = [sender representedObject];
+	if (![selectedFiles isKindOfClass:[NSArray class]] || [selectedFiles count] == 0)
+		return nil;
+
+	NSMutableArray *URLs = [NSMutableArray array];
+	for (id file in selectedFiles) {
+		NSString *path = file;
+		// Those can be PBChangedFiles sent by PBGitIndexController. Get their path.
+		if ([file respondsToSelector:@selector(path)]) {
+			path = [file path];
+		}
+
+		if (![path isKindOfClass:[NSString class]])
+			continue;
+		[URLs addObject:[self.repository.workingDirectoryURL URLByAppendingPathComponent:path]];
+	}
+
+	return URLs;
+}
+
+- (IBAction) openFiles:(id)sender {
+	NSArray <NSURL *> *fileURLs = [self selectedURLsFromSender:sender];
+	[self openURLs:fileURLs];
+}
+
+- (IBAction) revealInFinder:(id)sender
+{
+	[self revealURLsInFinder:@[self.repository.workingDirectoryURL]];
+}
+
+- (IBAction) openInTerminal:(id)sender
+{
+	[PBTerminalUtil runCommand:@"git status" inDirectory:self.repository.workingDirectoryURL];
+}
+
+- (IBAction) refresh:(id)sender
+{
+	[contentController refresh:self];
+}
+
+- (void) createBranch:(id)sender
+{
+	PBGitRef *currentRef = [repository.currentBranch ref];
+
+	id <PBGitRefish> refish = nil;
+	if ([sender isKindOfClass:[PBRefMenuItem class]]) {
+		refish = [[(PBRefMenuItem *)sender refishs] firstObject];
+	} else {
+		PBGitCommit *selectedCommit = sidebarController.historyViewController.selectedCommits.firstObject;
+		if (!selectedCommit || [selectedCommit hasRef:currentRef]) {
+			refish = currentRef;
+		} else {
+			refish = selectedCommit;
+		}
+	}
+
+	[PBCreateBranchSheet beginSheetWithRefish:refish windowController:self completionHandler:^(PBCreateBranchSheet *sheet, NSModalResponse returnCode) {
+		if (returnCode != NSModalResponseOK) return;
+
+		NSError *error = nil;
+		BOOL success = [self.repository createBranch:[sheet.branchNameField stringValue] atRefish:sheet.startRefish error:&error];
+		if (!success) {
+			[self showErrorSheet:error];
+			return;
+		}
+
+		[PBGitDefaults setShouldCheckoutBranch:sheet.shouldCheckoutBranch];
+
+		if (sheet.shouldCheckoutBranch) {
+			success = [self.repository checkoutRefish:sheet.selectedRef error:&error];
+			if (!success) {
+				[self showErrorSheet:error];
+				return;
+			}
+		}
+	}];
+}
+
+- (void) createTag:(PBRefMenuItem *)sender
+{
+	id <PBGitRefish> refish = nil;
+	if ([sender isKindOfClass:[PBRefMenuItem class]]) {
+		refish = [sender refishs].firstObject;
+	} else {
+		PBGitCommit *selectedCommit = sidebarController.historyViewController.selectedCommits.firstObject;
+		if (selectedCommit)
+			refish = selectedCommit;
+		else
+			refish = repository.currentBranch.ref;
+	}
+
+	[PBCreateTagSheet beginSheetWithRefish:refish windowController:self completionHandler:^(PBCreateTagSheet *sheet, NSModalResponse returnCode) {
+		if (returnCode != NSModalResponseOK) return;
+
+		NSString *tagName = [sheet.tagNameField stringValue];
+		NSString *message = [sheet.tagMessageText string];
+		NSError *error = nil;
+		BOOL success = [self.repository createTag:tagName message:message atRefish:sheet.targetRefish error:&error];
+		if (!success) {
+			[self showErrorSheet:error];
+		}
+	}];
 }
 
 @end

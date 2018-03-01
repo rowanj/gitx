@@ -10,4 +10,6 @@
 
 @interface PBRepositoryDocumentController : NSDocumentController
 
+- (IBAction)cloneDocument:(id)sender;
+
 @end

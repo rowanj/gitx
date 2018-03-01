@@ -51,9 +51,6 @@
 	commits = [NSMutableArray array];
 	repository = repo;
 	lastBranchFilter = -1;
-	[repository addObserver:self forKeyPath:@"currentBranch" options:0 context:@"currentBranch"];
-	[repository addObserver:self forKeyPath:@"currentBranchFilter" options:0 context:@"currentBranch"];
-	[repository addObserver:self forKeyPath:@"hasChanged" options:0 context:@"repositoryHasChanged"];
 
 	shouldReloadProjectHistory = YES;
 	projectRevList = [[PBGitRevList alloc] initWithRepository:repository rev:[PBGitRevSpecifier allBranchesRevSpec] shouldGraph:NO];
@@ -92,12 +89,10 @@
 	if (currentRevList) {
 		[currentRevList removeObserver:self forKeyPath:@"commits"];
 		[currentRevList cancel];
+		currentRevList = nil;
 	}
 	[graphQueue cancelAllOperations];
 
-	[repository removeObserver:self forKeyPath:@"currentBranch"];
-	[repository removeObserver:self forKeyPath:@"currentBranchFilter"];
-	[repository removeObserver:self forKeyPath:@"hasChanged"];
 }
 
 
@@ -140,7 +135,7 @@
 
 - (void) finishedGraphing
 {
-	if (!currentRevList.isParsing && ([[graphQueue operations] count] == 0)) {
+	if (!currentRevList.parsing && ([[graphQueue operations] count] == 0)) {
 		self.isUpdating = NO;
 	}
 }
@@ -171,47 +166,47 @@
 
 - (NSSet *) baseCommitsForLocalRefs
 {
-	NSMutableSet *baseCommitSHAs = [NSMutableSet set];
+	NSMutableSet *baseCommitOIDs = [NSMutableSet set];
 	NSDictionary *refs = repository.refs;
 
-	for (GTOID *sha in refs)
-		for (PBGitRef *ref in [refs objectForKey:sha])
+	for (GTOID *OID in refs)
+		for (PBGitRef *ref in [refs objectForKey:OID])
 			if ([ref isBranch] || [ref isTag])
-				[baseCommitSHAs addObject:sha];
+				[baseCommitOIDs addObject:OID];
 
 	if (![[PBGitRef refFromString:[[repository headRef] simpleRef]] type])
-		[baseCommitSHAs addObject:[repository headSHA]];
+		[baseCommitOIDs addObject:repository.headOID];
 
-	return baseCommitSHAs;
+	return baseCommitOIDs;
 }
 
 
 - (NSSet *) baseCommitsForRemoteRefs
 {
-	NSMutableSet *baseCommitSHAs = [NSMutableSet set];
+	NSMutableSet *baseCommitOIDs = [NSMutableSet set];
 	NSDictionary *refs = repository.refs;
 
 	PBGitRef *remoteRef = [[repository.currentBranch ref] remoteRef];
 
-	for (GTOID *sha in refs)
-		for (PBGitRef *ref in [refs objectForKey:sha])
+	for (GTOID *OID in refs)
+		for (PBGitRef *ref in [refs objectForKey:OID])
 			if ([remoteRef isEqualToRef:[ref remoteRef]])
-				[baseCommitSHAs addObject:sha];
+				[baseCommitOIDs addObject:OID];
 
-	return baseCommitSHAs;
+	return baseCommitOIDs;
 }
 
 
 - (NSSet *) baseCommits
 {
 	if ((repository.currentBranchFilter == kGitXSelectedBranchFilter) || (repository.currentBranchFilter == kGitXAllBranchesFilter)) {
-		if (lastSHA)
-			return [NSMutableSet setWithObject:lastSHA];
+		if (lastOID)
+			return [NSMutableSet setWithObject:lastOID];
 		else if ([repository.currentBranch isSimpleRef]) {
 			PBGitRef *currentRef = [repository.currentBranch ref];
-			GTOID *sha = [repository shaForRef:currentRef];
-			if (sha)
-				return [NSMutableSet setWithObject:sha];
+			GTOID *OID = [repository OIDForRef:currentRef];
+			if (OID)
+				return [NSMutableSet setWithObject:OID];
 		}
 	}
 	else if (repository.currentBranchFilter == kGitXLocalRemoteBranchesFilter) {
@@ -274,18 +269,18 @@
 
 	if ([self isAllBranchesOnlyUpdate] || [self isLocalRemoteOnlyUpdate:rev]) {
 		lastRemoteRef = [[rev ref] remoteRef];
-		lastSHA = nil;
+		lastOID = nil;
 		self.isUpdating = NO;
 		return NO;
 	}
 
-	GTOID *revSHA = [repository shaForRef:[rev ref]];
-	if ([revSHA isEqual:lastSHA] && (lastBranchFilter == repository.currentBranchFilter))
+	GTOID *revOID = [repository OIDForRef:[rev ref]];
+	if ([revOID isEqual:lastOID] && (lastBranchFilter == repository.currentBranchFilter))
 		return NO;
 
 	lastBranchFilter = repository.currentBranchFilter;
 	lastRemoteRef = [[rev ref] remoteRef];
-	lastSHA = revSHA;
+	lastOID = revOID;
 
 	return YES;
 }
@@ -295,11 +290,11 @@
 {
 	[repository reloadRefs];
 
-	NSMutableSet *currentRefSHAs = [NSMutableSet setWithArray:[repository.refs allKeys]];
-	[currentRefSHAs minusSet:lastRefSHAs];
-	lastRefSHAs = [NSSet setWithArray:[repository.refs allKeys]];
+	NSMutableSet *currentRefOIDs = [NSMutableSet setWithArray:[repository.refs allKeys]];
+	[currentRefOIDs minusSet:lastRefOIDs];
+	lastRefOIDs = [NSSet setWithArray:[repository.refs allKeys]];
 
-	return [currentRefSHAs count] != 0;
+	return [currentRefOIDs count] != 0;
 }
 
 
@@ -321,13 +316,16 @@
 		shouldReloadProjectHistory = NO;
 		lastBranchFilter = -1;
 		lastRemoteRef = nil;
-		lastSHA = nil;
+		lastOID = nil;
 		self.commits = [NSMutableArray array];
-		[projectRevList loadRevisons];
-		return;
+		[projectRevList loadRevisonsWithCompletionBlock:^{
+			dispatch_async(dispatch_get_main_queue(), ^{
+				[self finishedGraphing];
+			});
+		}];
+	} else {
+		[graphQueue addOperation:[self operationForCommits:projectRevList.commits]];
 	}
-
-	[graphQueue addOperation:[self operationForCommits:projectRevList.commits]];
 }
 
 
@@ -339,29 +337,22 @@
 	[self resetGraphing];
 	lastBranchFilter = -1;
 	lastRemoteRef = nil;
-	lastSHA = nil;
+	lastOID = nil;
 	self.commits = [NSMutableArray array];
 
-	[otherRevListParser loadRevisons];
+	[otherRevListParser loadRevisonsWithCompletionBlock:^{
+		dispatch_async(dispatch_get_main_queue(), ^{
+			[self finishedGraphing];
+		});
+	}];
 }
 
 
 
 #pragma mark -
 #pragma mark Key Value Observing
-
 - (void) observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
 {
-	if ([@"currentBranch" isEqualToString:(__bridge NSString*)context]) {
-		[self updateHistory];
-		return;
-	}
-
-	if ([@"repositoryHasChanged" isEqualToString:(__bridge NSString*)context]) {
-		[self forceUpdate];
-		return;
-	}
-
 	if ([@"commitsUpdated" isEqualToString:(__bridge NSString*)context]) {
 		NSInteger changeKind = [(NSNumber *)[change objectForKey:NSKeyValueChangeKindKey] intValue];
 		if (changeKind == NSKeyValueChangeInsertion) {

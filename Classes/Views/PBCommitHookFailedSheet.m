@@ -20,18 +20,20 @@
 
 + (void)beginWithMessageText:(NSString *)message
 					infoText:(NSString *)info
-			commitController:(PBGitCommitController *)controller;
+			commitController:(PBGitCommitController *)controller
+		   completionHandler:(RJSheetCompletionHandler)handler;
 {
 	PBCommitHookFailedSheet* sheet = [[self alloc] initWithWindowNibName:@"PBCommitHookFailedSheet"
 														   andController:controller];
 	[sheet beginMessageSheetWithMessageText:message
-								   infoText:info];
+								   infoText:info
+						  completionHandler:handler];
 }
 
 - (id)initWithWindowNibName:(NSString*)windowNibName
 			  andController:(PBGitCommitController*)controller;
 {
-    self = [self initWithWindowNibName:windowNibName forRepo:controller.repository];
+    self = [self initWithWindowNibName:windowNibName windowController:controller.windowController];
 	if (!self)
 		return nil;
 	
@@ -42,9 +44,7 @@
 
 - (IBAction)forceCommit:(id)sender
 {
-	PBGitCommitController *controller = self.commitController;
-	[self closeMessageSheet:sender];
-	[controller forceCommit:sender];
+	[self acceptSheet:sender];
 }
 
 @end

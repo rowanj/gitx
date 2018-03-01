@@ -9,11 +9,12 @@
 #import <Cocoa/Cocoa.h>
 
 #import "RJModalRepoSheet.h"
-@class PBGitRepository;
+
+@class PBGitWindowController;
 
 @interface PBAddRemoteSheet : RJModalRepoSheet
 
-- (id) initWithRepository:(PBGitRepository*)repo;
++ (void)beginSheetWithWindowController:(PBGitWindowController *)windowController completionHandler:(RJSheetCompletionHandler)handler;
 
 - (IBAction) browseFolders:(id)sender;
 - (IBAction) addRemote:(id)sender;

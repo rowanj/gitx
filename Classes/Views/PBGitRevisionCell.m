@@ -10,13 +10,12 @@
 #import "PBGitRef.h"
 #import "PBGitCommit.h"
 #import "PBGitRevSpecifier.h"
-#import "RoundedRectangle.h"
 #import "GitXTextFieldCell.h"
 
 #import "NSColor+RGB.h"
 
 const int COLUMN_WIDTH = 10;
-const BOOL ENABLE_SHADOW = YES;
+const BOOL ENABLE_SHADOW = NO;
 const BOOL SHUFFLE_COLORS = NO;
 
 @implementation PBGitRevisionCell
@@ -36,7 +35,7 @@ const BOOL SHUFFLE_COLORS = NO;
 		float segment = 1.0f / colorCount;
 		NSMutableArray *colors = [NSMutableArray new];
 		for (size_t i = 0; i < colorCount; ++i) {
-			NSColor *newColor = [NSColor colorWithCalibratedHue:(segment * i) saturation:0.9f brightness:0.9f alpha:1.0f];
+			NSColor *newColor = [NSColor colorWithCalibratedHue:(segment * i) saturation:0.7f brightness:0.8f alpha:1.0f];
 			[colors addObject:newColor];
 		}
 		if (SHUFFLE_COLORS) {
@@ -106,17 +105,17 @@ const BOOL SHUFFLE_COLORS = NO;
 
 - (BOOL) isCurrentCommit
 {
-	GTOID *thisSha = [self.objectValue sha];
+	GTOID *thisOID = self.objectValue.OID;
 
 	PBGitRepository* repository = [self.objectValue repository];
-	GTOID *currentSha = [repository headSHA];
+	GTOID *currentOID = [repository headOID];
 
-	return [currentSha isEqual:thisSha];
+	return [currentOID isEqual:thisOID];
 }
 
 - (void) drawCircleInRect: (NSRect) r
 {
-	int c = cellInfo.position;
+	long c = cellInfo.position;
 	NSPoint origin = r.origin;
 	NSPoint columnOrigin = { origin.x + COLUMN_WIDTH * c, origin.y};
 
@@ -136,8 +135,9 @@ const BOOL SHUFFLE_COLORS = NO;
 	if (ENABLE_SHADOW && false) {
 		[NSGraphicsContext restoreGraphicsState];
 	}
-	
-	NSRect smallOval = { columnOrigin.x - 4, columnOrigin.y + r.size.height * 0.5 - 4, 8, 8};
+
+	CGFloat outlineWidth = 1.4f;
+	NSRect smallOval = CGRectInset(oval, outlineWidth, outlineWidth);
 
 	if ( [self isCurrentCommit ] ) {
 		[[NSColor colorWithCalibratedRed: 0Xfc/256.0 green:0Xa6/256.0 blue: 0X4f/256.0 alpha: 1.0] set];
@@ -152,7 +152,7 @@ const BOOL SHUFFLE_COLORS = NO;
 
 - (void) drawTriangleInRect: (NSRect) r sign: (char) sign
 {
-	int c = cellInfo.position;
+	long c = cellInfo.position;
 	int columnHeight = 10;
 	int columnWidth = 8;
 
@@ -189,7 +189,8 @@ const BOOL SHUFFLE_COLORS = NO;
 	
 	[style setAlignment:NSCenterTextAlignment];
 	[attributes setObject:style forKey:NSParagraphStyleAttributeName];
-	[attributes setObject:[NSFont fontWithName:@"LucidaGrande" size:10] forKey:NSFontAttributeName];
+	
+	[attributes setObject:[NSFont systemFontOfSize:10] forKey:NSFontAttributeName];
 
 	NSShadow *shadow = nil;
 
@@ -233,7 +234,7 @@ const BOOL SHUFFLE_COLORS = NO;
 {
 	NSMutableArray *array = [NSMutableArray array];
 	
-	static const int ref_padding = 10;
+	static const int ref_padding = 4;
 	static const int ref_spacing = 4;
 	
 	NSRect lastRect = rect;
@@ -245,7 +246,7 @@ const BOOL SHUFFLE_COLORS = NO;
 		NSSize textSize = [[ref shortName] sizeWithAttributes:attributes];
 		
 		NSRect newRect = lastRect;
-		newRect.size.width = textSize.width + ref_padding;
+		newRect.size.width = textSize.width + ref_padding * 2;
 		newRect.size.height = textSize.height;
 		newRect.origin.y = rect.origin.y + (rect.size.height - newRect.size.height) / 2;
 		
@@ -265,7 +266,7 @@ const BOOL SHUFFLE_COLORS = NO;
 	PBGitRef *ref = [refs objectAtIndex:index];
 	
 	NSMutableDictionary* attributes = [self attributesForRefLabelSelected:[self isHighlighted]];
-	NSBezierPath *border = [NSBezierPath bezierPathWithRoundedRect:rect cornerRadius: 3.0];
+	NSBezierPath *border = [NSBezierPath bezierPathWithRoundedRect:rect xRadius:2 yRadius:2];
 	[[self colorForRef:ref] set];
 	
 
@@ -287,7 +288,7 @@ const BOOL SHUFFLE_COLORS = NO;
 	[[ref shortName] drawInRect:rect withAttributes:attributes];
 }
 
-- (void) drawRefsInRect: (NSRect *)refRect
+- (void) drawRefsInRect:(NSRect *)refRect
 {
 	[[NSColor blackColor] setStroke];
 
@@ -310,7 +311,7 @@ const BOOL SHUFFLE_COLORS = NO;
     }
 }
 
-- (void) drawWithFrame: (NSRect) rect inView:(NSView *)view
+- (void) drawWithFrame:(NSRect)rect inView:(NSView *)view
 {
 	cellInfo = [self.objectValue lineInfo];
 	
@@ -324,7 +325,7 @@ const BOOL SHUFFLE_COLORS = NO;
 		struct PBGitGraphLine *lines = cellInfo.lines;
 		for (i = 0; i < cellInfo.nLines; i++) {
 			if (lines[i].upper == 0)
-				[self drawLineFromColumn: lines[i].from toColumn: lines[i].to inRect:ownRect offset: ownRect.size.height color: lines[i].colorIndex];
+				[self drawLineFromColumn: lines[i].from toColumn: lines[i].to inRect:ownRect offset: (int)ownRect.size.height color: lines[i].colorIndex];
 			else
 				[self drawLineFromColumn: lines[i].from toColumn: lines[i].to inRect:ownRect offset: 0 color:lines[i].colorIndex];
 		}
@@ -355,7 +356,7 @@ const BOOL SHUFFLE_COLORS = NO;
     return [[super objectValue] nonretainedObjectValue];
 }
 
-- (int) indexAtX:(float)x
+- (int) indexAtX:(CGFloat)x
 {
 	cellInfo = [self.objectValue lineInfo];
 	float pathWidth = 0;
@@ -393,22 +394,29 @@ const BOOL SHUFFLE_COLORS = NO;
 	if (!contextMenuDelegate)
 		return [self menu];
 
-	int i = [self indexAtX:[view convertPoint:[event locationInWindow] fromView:nil].x - rect.origin.x];
-
-	id ref = nil;
-	if (i >= 0)
-		ref = [[[self objectValue] refs] objectAtIndex:i];
-
-	NSArray *items = nil;
-	if (ref)
-		items = [contextMenuDelegate menuItemsForRef:ref];
-	else
-		items = [contextMenuDelegate menuItemsForCommit:[self objectValue]];
-
+	PBGitRef *clickedRef = [self findClickedRefFor:event rect:rect ofView:view];
+	
+	NSArray<NSMenuItem *> *items = nil;
+	if (clickedRef)
+		items = [contextMenuDelegate menuItemsForRef:clickedRef];
+	else {
+		NSArray<PBGitCommit *> *relevantCommits = [controller.selectedCommits containsObject:self.objectValue]
+			? controller.selectedCommits
+			: @[self.objectValue];
+		items = [contextMenuDelegate menuItemsForCommits:relevantCommits];
+	}
+	
 	NSMenu *menu = [[NSMenu alloc] init];
 	[menu setAutoenablesItems:NO];
 	for (NSMenuItem *item in items)
 		[menu addItem:item];
 	return menu;
 }
+
+- (PBGitRef *) findClickedRefFor:(NSEvent *)event rect:(NSRect)rect ofView:(NSView *)view
+{
+	int i = [self indexAtX:[view convertPoint:[event locationInWindow] fromView:nil].x - rect.origin.x];
+	return (i >= 0) ? [self.objectValue.refs objectAtIndex:i] : nil;
+}
+
 @end

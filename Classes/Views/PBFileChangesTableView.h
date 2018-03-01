@@ -9,7 +9,5 @@
 #import <Cocoa/Cocoa.h>
 
 
-@interface PBFileChangesTableView : NSTableView {
-}
-
+@interface PBFileChangesTableView : NSTableView
 @end

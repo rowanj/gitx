@@ -10,9 +10,7 @@
 
 #define MIN_GIT_VERSION "1.6.0"
 
-@interface PBGitBinary : NSObject {
-
-}
+@interface PBGitBinary : NSObject
 
 + (NSString *) path;
 + (NSString *) version;

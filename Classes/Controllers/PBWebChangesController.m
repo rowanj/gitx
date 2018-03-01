@@ -7,8 +7,10 @@
 //
 
 #import "PBWebChangesController.h"
-#import "PBGitIndexController.h"
 #import "PBGitIndex.h"
+
+@interface PBWebChangesController () <WebEditingDelegate, WebUIDelegate>
+@end
 
 @implementation PBWebChangesController
 
@@ -21,14 +23,17 @@
 	[super awakeFromNib];
 
 	[unstagedFilesController addObserver:self forKeyPath:@"selection" options:0 context:@"UnstagedFileSelected"];
-	[cachedFilesController addObserver:self forKeyPath:@"selection" options:0 context:@"cachedFileSelected"];
+	[stagedFilesController addObserver:self forKeyPath:@"selection" options:0 context:@"cachedFileSelected"];
+
+	self.view.editingDelegate = self;
+	self.view.UIDelegate = self;
 }
 
 - (void)closeView
 {
 	[[self script] removeWebScriptKey:@"Index"];
 	[unstagedFilesController removeObserver:self forKeyPath:@"selection"];
-	[cachedFilesController removeObserver:self forKeyPath:@"selection"];
+	[stagedFilesController removeObserver:self forKeyPath:@"selection"];
 
 	[super closeView];
 }
@@ -45,8 +50,8 @@
 					   context:(void *)context
 {
 	NSArrayController *otherController;
-	otherController = object == unstagedFilesController ? cachedFilesController : unstagedFilesController;
-	int count = [[object selectedObjects] count];
+	otherController = object == unstagedFilesController ? stagedFilesController : unstagedFilesController;
+	NSUInteger count = [object selectedObjects].count;
 	if (count == 0) {
 		if([[otherController selectedObjects] count] == 0 && selectedFile) {
 			selectedFile = nil;
@@ -65,7 +70,7 @@
 	}
 
 	selectedFile = [[object selectedObjects] objectAtIndex:0];
-	selectedFileIsCached = object == cachedFilesController;
+	selectedFileIsCached = object == stagedFilesController;
 
 	[self refresh];
 }
@@ -80,7 +85,7 @@
 	if (!finishedLoading)
 		return;
 
-	id script = [view windowScriptObject];
+	id script = self.view.windowScriptObject;
 	[script callWebScriptMethod:@"showFileChanges"
 		      withArguments:[NSArray arrayWithObjects:selectedFile ?: (id)[NSNull null],
 				     [NSNumber numberWithBool:selectedFileIsCached], nil]];
@@ -111,11 +116,11 @@
 - (void)discardHunk:(NSString *)hunk altKey:(BOOL)altKey
 {
 	if (!altKey) {
-        NSAlert *alert = [NSAlert alertWithMessageText:@"Discard hunk"
+        NSAlert *alert = [NSAlert alertWithMessageText:NSLocalizedString(@"Discard hunk", @"Title of dialogue asking whether the user really wanted to press the Discard button on a hunk in the changes view")
                                          defaultButton:nil
-                                       alternateButton:@"Cancel"
+                                       alternateButton:NSLocalizedString(@"Cancel", @"Cancel (discarding a hunk in the changes view)")
                                            otherButton:nil
-                             informativeTextWithFormat:@"Are you sure you wish to discard the changes in this hunk?\n\nYou cannot undo this operation."];
+                             informativeTextWithFormat:NSLocalizedString(@"Are you sure you wish to discard the changes in this hunk?\n\nYou cannot undo this operation.", @"Asks whether the user really wants to discard a hunk in changes view after pressing the Discard Hunk button")];
 		[alert beginSheetModalForWindow:[[controller view] window]
                           modalDelegate:self
                          didEndSelector:@selector(discardHunkAlertDidEnd:returnCode:contextInfo:)
@@ -127,8 +132,45 @@
 
 - (void) setStateMessage:(NSString *)state
 {
-	id script = [view windowScriptObject];
+	id script = self.view.windowScriptObject;
 	[script callWebScriptMethod:@"setState" withArguments: [NSArray arrayWithObject:state]];
+}
+
+-(void)copy: (NSString *)text{
+	NSArray *lines = [text componentsSeparatedByString:@"\n"];
+	NSMutableArray *processedLines = [NSMutableArray arrayWithCapacity:lines.count -1];
+	for (int i = 0; i < lines.count; i++) {
+		NSString *line = [lines objectAtIndex:i];
+		if (line.length>0) {
+			[processedLines addObject:[line substringFromIndex:1]];
+		} else {
+			[processedLines addObject:line];
+		}
+	}
+	NSString *result = [processedLines componentsJoinedByString:@"\n"];
+	[[NSPasteboard generalPasteboard] declareTypes:[NSArray arrayWithObject:NSStringPboardType] owner:nil];
+	[[NSPasteboard generalPasteboard] setString:result forType:NSStringPboardType];
+}
+
+- (BOOL)webView:(WebView *)webView
+	validateUserInterfaceItem:(id<NSValidatedUserInterfaceItem>)item
+	defaultValidation:(BOOL)defaultValidation
+{
+	if (item.action == @selector(copy:)) {
+		return YES;
+	} else {
+		return defaultValidation;
+	}
+}
+
+- (BOOL)webView:(WebView *)webView doCommandBySelector:(SEL)selector
+{
+	if (selector == @selector(copy:)) {
+		[self.script callWebScriptMethod:@"copy" withArguments:@[]];
+		return YES;
+	} else {
+		return NO;
+	}
 }
 
 @end

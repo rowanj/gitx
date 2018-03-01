@@ -6,12 +6,10 @@
 //  Copyright 2008 __MyCompanyName__. All rights reserved.
 //
 
-#import "PBGitBinary.h"
-#import "PBEasyPipe.h"
+#import "PBRepositoryFinder.h"
 #import "GitXScriptingConstants.h"
 #import "GitX.h"
 #import "PBHistorySearchController.h"
-#import "GitRepoFinder.h"
 
 
 #pragma mark Commands handled locally
@@ -87,26 +85,10 @@ void usage(char const *programName)
 
 void version_info()
 {
-	NSString *version = [[[NSBundle bundleForClass:[PBGitBinary class]] infoDictionary] valueForKey:@"CFBundleVersion"];
-	NSString *gitVersion = [[[NSBundle bundleForClass:[PBGitBinary class]] infoDictionary] valueForKey:@"CFBundleGitVersion"];
-	printf("GitX version %s (%s)\n", [version UTF8String], [gitVersion UTF8String]);
-	if ([PBGitBinary path])
-		printf("Using git found at %s, version %s\n", [[PBGitBinary path] UTF8String], [[PBGitBinary version] UTF8String]);
-	else
-		printf("GitX cannot find a git binary\n");
+    NSString *version = [[NSBundle mainBundle] objectForInfoDictionaryKey:(NSString *)kCFBundleVersionKey];
+	printf("GitX version %s\n", [version UTF8String]);
 	exit(1);
 }
-
-void git_path()
-{
-	if (![PBGitBinary path])
-		exit(101);
-
-	NSString *path = [[PBGitBinary path] stringByDeletingLastPathComponent];
-	printf("%s\n", [path UTF8String]);
-	exit(0);
-}
-
 
 #pragma mark -
 #pragma mark Commands sent to GitX
@@ -119,6 +101,7 @@ void handleSTDINDiff()
 
 	if (diff && [diff length] > 0) {
 		GitXApplication *gitXApp = [SBApplication applicationWithBundleIdentifier:kGitXBundleIdentifier];
+		[gitXApp activate];
 		[gitXApp showDiff:diff];
 		exit(0);
 	}
@@ -126,62 +109,24 @@ void handleSTDINDiff()
 
 void handleDiffWithArguments(NSURL *repositoryURL, NSArray *arguments)
 {
-	arguments = [[NSArray arrayWithObjects:@"diff", @"--no-ext-diff", nil] arrayByAddingObjectsFromArray:arguments];
-
-	int retValue = 1;
-	NSString *diffOutput = [PBEasyPipe outputForCommand:[PBGitBinary path] withArgs:arguments inDir:[repositoryURL path] retValue:&retValue];
-	if (retValue) {
-		// if there is an error diffOutput should have the error output from git
-		if (diffOutput)
-			printf("%s\n", [diffOutput UTF8String]);
-		else
-			printf("Invalid diff command [%d]\n", retValue);
-		exit(3);
-	}
-
 	GitXApplication *gitXApp = [SBApplication applicationWithBundleIdentifier:kGitXBundleIdentifier];
-	[gitXApp showDiff:diffOutput];
-
+	[gitXApp activate];
+	[gitXApp performDiffIn:repositoryURL withOptions:arguments];
 	exit(0);
 }
 
-void handleOpenRepository(NSURL *repositoryURL, NSMutableArray *arguments)
+void handleOpenRepository(NSURL *repositoryURL, NSArray *arguments)
 {
-	// if there are command line arguments send them to GitX through an Apple Event
-	// the recordDescriptor will be stored in keyAEPropData inside the openDocument or openApplication event
-	NSAppleEventDescriptor *recordDescriptor = nil;
-	if ([arguments count]) {
-		recordDescriptor = [NSAppleEventDescriptor recordDescriptor];
-
-		NSAppleEventDescriptor *listDescriptor = [NSAppleEventDescriptor listDescriptor];
-		uint listIndex = 1; // AppleEvent list descriptor's are one based
-		for (NSString *argument in arguments)
-			[listDescriptor insertDescriptor:[NSAppleEventDescriptor descriptorWithString:argument] atIndex:listIndex++];
-
-		[recordDescriptor setParamDescriptor:listDescriptor forKeyword:kGitXAEKeyArgumentsList];
-
-		// this is used as a double check in GitX
-		NSAppleEventDescriptor *url = [NSAppleEventDescriptor descriptorWithString:[repositoryURL absoluteString]];
-		[recordDescriptor setParamDescriptor:url forKeyword:typeFileURL];
-	}
-
-	// use NSWorkspace to open GitX and send the arguments
-	// this allows the repository document to modify itself before it shows it's GUI
-	BOOL didOpenURLs = [[NSWorkspace sharedWorkspace] openURLs:[NSArray arrayWithObject:repositoryURL]
-									   withAppBundleIdentifier:kGitXBundleIdentifier
-													   options:0
-								additionalEventParamDescriptor:recordDescriptor
-											 launchIdentifiers:NULL];
-	if (!didOpenURLs) {
-		printf("Unable to open GitX.app\n");
-		exit(2);
-	}
+    GitXApplication *gitXApp = [SBApplication applicationWithBundleIdentifier:kGitXBundleIdentifier];
+	[gitXApp activate];
+    [gitXApp open:repositoryURL withOptions:arguments];
+    return;
 }
 
 void handleInit(NSURL *repositoryURL)
 {
 	GitXApplication *gitXApp = [SBApplication applicationWithBundleIdentifier:kGitXBundleIdentifier];
-	[gitXApp initRepository:repositoryURL];
+	[gitXApp createRepository:repositoryURL];
 
 	exit(0);
 }
@@ -226,16 +171,16 @@ NSArray *commandLineSearchPrefixes()
 PBHistorySearchMode searchModeForCommandLineArgument(NSString *argument)
 {
 	if ([argument hasPrefix:kShortBasicSearch] || [argument hasPrefix:kBasicSearch])
-		return kGitXBasicSeachMode;
+		return PBHistorySearchModeBasic;
 
 	if ([argument hasPrefix:kShortPickaxeSearch] || [argument hasPrefix:kPickaxeSearch])
-		return kGitXPickaxeSearchMode;
+		return PBHistorySearchModePickaxe;
 
 	if ([argument hasPrefix:kShortRegexSearch] || [argument hasPrefix:kRegexSearch])
-		return kGitXRegexSearchMode;
+		return PBHistorySearchModeRegex;
 
 	if ([argument hasPrefix:kShortPathSearch] || [argument hasPrefix:kPathSearch])
-		return kGitXPathSearchMode;
+		return PBHistorySearchModePath;
 
 	return 0;
 }
@@ -283,54 +228,91 @@ void handleGitXSearch(NSURL *repositoryURL, NSMutableArray *arguments)
 #pragma mark -
 #pragma mark main
 
+#define kGitDirPrefix @"--git-dir"
 
-#define kGitDirPrefix @"--git-dir="
+NSURL *checkWorkingDirectoryPath(NSString *path)
+{
+	NSString *workingDirectory = [[[NSProcessInfo processInfo] environment] objectForKey:@"PWD"];
+
+	// We might be looking at a filesystem path, try to standardize it
+	if (!([path hasPrefix:@"/"] || [path hasPrefix:@"~"])) {
+		path = [workingDirectory stringByAppendingPathComponent:path];
+	}
+	path = [path stringByStandardizingPath];
+
+	// The path must exist and point to a directory
+	BOOL isDirectory = YES;
+	BOOL exists = [[NSFileManager defaultManager] fileExistsAtPath:path isDirectory:&isDirectory];
+	if (!exists || !isDirectory) {
+		return nil;
+	}
+
+	return [NSURL fileURLWithPath:path];
+}
 
 NSURL *workingDirectoryURL(NSMutableArray *arguments)
 {
-    // path to git repository has been explicitly passed?
-	if ([arguments count] && [[arguments objectAtIndex:0] hasPrefix:kGitDirPrefix]) {
-		NSString *path = [[[arguments objectAtIndex:0] substringFromIndex:[kGitDirPrefix length]] stringByStandardizingPath];
+	NSString *workingDirectory = [[[NSProcessInfo processInfo] environment] objectForKey:@"PWD"];
 
-		// the path must exist and point to a directory
-		BOOL isDirectory = YES;
-		if (![[NSFileManager defaultManager] fileExistsAtPath:path isDirectory:&isDirectory] || !isDirectory) {
-			if (!isDirectory)
-				printf("Fatal: --git-dir path does not point to a directory.\n");
-			else
-				printf("Fatal: --git-dir path does not exist.\n");
-			printf("Cannot open git repository at path: '%s'\n", [path UTF8String]);
+	// First check our arguments for a --git-dir option
+	for (NSUInteger i = 0; i < [arguments count]; i++) {
+		NSString *argument = [arguments objectAtIndex:i];
+		NSString *path = nil;
+
+		if (![argument hasPrefix:kGitDirPrefix]) {
+			// That's not a --git-dir argument, don't bother
+			continue;
+		}
+
+		BOOL isInlinePath = NO;
+		if ([argument hasPrefix:kGitDirPrefix @"="]) {
+			// We're looking at a --git-dir=, extract the argument
+			path = [argument substringFromIndex:[kGitDirPrefix length] + 1];
+			isInlinePath = YES;
+		} else {
+			// We're looking at a --git-dir [arg], next argument is our path
+			path = [arguments objectAtIndex:i + 1];
+		}
+
+		NSURL *url = checkWorkingDirectoryPath(path);
+
+		// Let's check that this points to a repository
+		url = [PBRepositoryFinder workDirForURL:url];
+		if (!url) {
+			NSLog(@"Fatal: --git-dir \"%@\" does not look like a valid repository.", argument);
 			exit(2);
 		}
 
-		// remove the git-dir argument
-		[arguments removeObjectAtIndex:0];
+		// Valid --git-dir found, let's drop parsed arguments
+		[arguments removeObjectAtIndex:i];
+		if (!isInlinePath) {
+			[arguments removeObjectAtIndex:i];
+		}
 
-        // create and return corresponding NSURL
-        NSURL *url = [NSURL fileURLWithPath:path isDirectory:YES];
-        if (!url) {
-            printf("Unable to create url to path: %s\n", [path UTF8String]);
-            exit(2);
-        }
-
-        return url;
+		return url;
 	}
 
-    // otherwise, determine current working directory
-    NSString *pwd = [[[NSProcessInfo processInfo] environment] objectForKey:@"PWD"];
+	// No --git-dir option, let's use the first thing that looks like a path
+	for (NSUInteger i = 0; i < [arguments count]; i++) {
+		NSString *path = [arguments objectAtIndex:i];
 
-	NSURL* pwdURL = [NSURL fileURLWithPath:pwd];
-	NSURL* repoURL = [GitRepoFinder workDirForURL:pwdURL];
-	return repoURL;
+		// Stop processing arguments willy-nilly, we'll just give the CWD a spin.
+		// The user might be trying todo a `gitx log -- path` or something.
+		if ([path isEqualToString:@"--"]) break;
 
-}
+		// Let's check that path and find the closest repository
+		NSURL *url = checkWorkingDirectoryPath(path);
+		url = [PBRepositoryFinder fileURLForURL:url];
+		if (!url) continue; // Invalid path, let's ignore it
 
-NSMutableArray *argumentsArray()
-{
-	NSMutableArray *arguments = [[[NSProcessInfo processInfo] arguments] mutableCopy];
-	[arguments removeObjectAtIndex:0]; // url to executable path is not needed
+		// Valid repository found, lets' drop parsed argument
+		[arguments removeObjectAtIndex:i];
 
-	return arguments;
+		return url;
+	}
+
+	// Still no path found, let's default to our current working directory
+	return [PBRepositoryFinder fileURLForURL:[NSURL fileURLWithPath:workingDirectory]];
 }
 
 int main(int argc, const char** argv)
@@ -340,21 +322,20 @@ int main(int argc, const char** argv)
 			usage(argv[0]);
 		if (argc >= 2 && (!strcmp(argv[1], "--version") || !strcmp(argv[1], "-v")))
 			version_info();
-		if (argc >= 2 && !strcmp(argv[1], "--git-path"))
-			git_path();
-		
-		// From here on everything needs to access git, so make sure it's installed
-		if (![PBGitBinary path]) {
-			printf("%s\n", [[PBGitBinary notFoundError] cStringUsingEncoding:NSUTF8StringEncoding]);
-			exit(2);
-		}
-		
+		if (argc >= 2 && !strcmp(argv[1], "--git-path")) {
+            printf("gitx now uses libgit2 to work.");
+            exit(1);
+        }
+
 		// gitx can be used to pipe diff output to be displayed in GitX
 		if (!isatty(STDIN_FILENO) && fdopen(STDIN_FILENO, "r"))
 			handleSTDINDiff();
-		
+
+
+		NSMutableArray *arguments = [[[NSProcessInfo processInfo] arguments] mutableCopy];
+		[arguments removeObjectAtIndex:0]; // url to executable path is not needed
+
 		// From this point, we require a working directory and the arguments
-		NSMutableArray *arguments = argumentsArray();
 		NSURL *wdURL = workingDirectoryURL(arguments);
 		if (!wdURL)
 		{

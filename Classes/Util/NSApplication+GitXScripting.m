@@ -10,9 +10,8 @@
 #import "GitXScriptingConstants.h"
 #import "PBDiffWindowController.h"
 #import "PBGitRepository.h"
-#import "PBCloneRepositoryPanel.h"
-
-#import <ObjectiveGit/GTRepository.h>
+#import "PBGitBinary.h"
+#import "PBTask.h"
 
 
 @implementation NSApplication (GitXScripting)
@@ -23,8 +22,26 @@
 	if (diffText) {
 		PBDiffWindowController *diffController = [[PBDiffWindowController alloc] initWithDiff:diffText];
 		[diffController showWindow:nil];
-		[[NSApplication sharedApplication] activateIgnoringOtherApps:YES];
 	}
+}
+
+- (void)performDiffScriptCommand:(NSScriptCommand *)command
+{
+    NSURL *repositoryURL = command.directParameter;
+    NSArray *diffOptions = command.arguments[@"diffOptions"];
+
+	diffOptions = [@[@"diff", @"--no-ext-diff"] arrayByAddingObjectsFromArray:diffOptions];
+
+	NSError *error = nil;
+	NSString *diffOutput = [PBTask outputForCommand:[PBGitBinary path] arguments:diffOptions inDirectory:repositoryURL.path error:&error];
+	if (!diffOutput) {
+		// if there is an error diffOutput should have the error output from git
+		NSLog(@"Invalid diff command: %@", error);
+        return;
+	}
+
+	PBDiffWindowController *diffController = [[PBDiffWindowController alloc] initWithDiff:diffOutput];
+	[diffController showWindow:self];
 }
 
 - (void)initRepositoryScriptCommand:(NSScriptCommand *)command
@@ -34,8 +51,8 @@
 	if (!repositoryURL)
         return;
 
-    BOOL success = [GTRepository initializeEmptyRepositoryAtFileURL:repositoryURL error:&error];
-    if (!success) {
+	GTRepository *repo = [GTRepository initializeEmptyRepositoryAtFileURL:repositoryURL options:nil error:&error];
+    if (!repo) {
         NSLog(@"Failed to create repository at %@: %@", repositoryURL, error);
         return;
     }
@@ -58,7 +75,8 @@
 		if (destinationURL) {
 			BOOL isBare = [[arguments objectForKey:kGitXCloneIsBareKey] boolValue];
 
-			[PBCloneRepositoryPanel beginCloneRepository:repository toURL:destinationURL isBare:isBare];
+			/* TODO: This should be moved to PBGitRepository then... */
+			// [PBCloneRepositoryPanel beginCloneRepository:repository toURL:destinationURL isBare:isBare];
 		}
 	}
 }

@@ -8,12 +8,22 @@
 
 #import "PBGitXProtocol.h"
 #import "PBGitRepository.h"
+#import "PBGitRepository_PBGitBinarySupport.h"
+
+@interface PBGitXProtocol () {
+	PBTask *_task;
+}
+@end
 
 @implementation PBGitXProtocol
 
 + (BOOL) canInitWithRequest:(NSURLRequest *)request
 {
-	return [[[[request URL] scheme] lowercaseString] isEqualToString:@"gitx"];
+	NSString *URLScheme = request.URL.scheme;
+	if ([[URLScheme lowercaseString] isEqualToString:@"gitx"])
+		return YES;
+
+	return NO;
 }
 
 + (NSURLRequest *)canonicalRequestForRequest:(NSURLRequest *)request
@@ -26,15 +36,22 @@
     NSURL *url = [[self request] URL];
 	PBGitRepository *repo = [[self request] repository];
 
-	if(!repo) {
+	if (!repo) {
 		[[self client] URLProtocol:self didFailWithError:[NSError errorWithDomain:NSURLErrorDomain code:0 userInfo:nil]];
 		return;
     }
 
 	NSString *specifier = [NSString stringWithFormat:@"%@:%@", [url host], [[url path] substringFromIndex:1]];
-	handle = [repo handleInWorkDirForArguments:[NSArray arrayWithObjects:@"cat-file", @"blob", specifier, nil]];
-	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didFinishFileLoad:) name:NSFileHandleReadToEndOfFileCompletionNotification object:handle];
-	[handle readToEndOfFileInBackgroundAndNotify];
+	_task = [repo taskWithArguments:@[@"cat-file", @"blob", specifier]];
+	[_task performTaskWithCompletionHandler:^(NSData *readData, NSError *error) {
+		if (error) {
+			[[self client] URLProtocol:self didFailWithError:error];
+			return;
+		}
+
+		[[self client] URLProtocol:self didLoadData:readData];
+		[[self client] URLProtocolDidFinishLoading:self];
+	}];
 
     NSURLResponse *response = [[NSURLResponse alloc] initWithURL:[[self request] URL]
 														MIMEType:nil
@@ -46,16 +63,9 @@
 			cacheStoragePolicy:NSURLCacheStorageNotAllowed];
 }
 
-- (void) didFinishFileLoad:(NSNotification *)notification
-{
-	NSData *data = [[notification userInfo] valueForKey:NSFileHandleNotificationDataItem];
-    [[self client] URLProtocol:self didLoadData:data];
-    [[self client] URLProtocolDidFinishLoading:self];
-}
-
 - (void) stopLoading
 {
-	[[NSNotificationCenter defaultCenter] removeObserver:self];
+	[_task terminate];
 }
 
 @end

@@ -11,59 +11,56 @@
 
 @class PBGitCommit;
 @class PBGitTree;
-@class PBCollapsibleSplitView;
 
 @class PBGitSidebarController;
 @class PBWebHistoryController;
 @class PBGitGradientBarView;
 @class PBRefController;
-@class QLPreviewPanel;
 @class PBCommitList;
 @class GLFileView;
 @class GTOID;
 @class PBHistorySearchController;
 
 @interface PBGitHistoryController : PBViewController {
-	IBOutlet PBRefController *refController;
-	IBOutlet NSSearchField *searchField;
-	IBOutlet NSArrayController* commitController;
-	IBOutlet NSTreeController* treeController;
-	IBOutlet NSOutlineView* fileBrowser;
-	NSArray *currentFileBrowserSelectionPath;
-	IBOutlet PBCommitList* commitList;
-	IBOutlet PBCollapsibleSplitView *historySplitView;
+	IBOutlet NSArrayController *commitController;
+	IBOutlet NSTreeController *treeController;
 	IBOutlet PBWebHistoryController *webHistoryController;
-    QLPreviewPanel* previewPanel;
-	IBOutlet PBHistorySearchController *searchController;
 	IBOutlet GLFileView *fileView;
+	IBOutlet PBRefController *refController;
+	IBOutlet PBHistorySearchController *searchController;
 
-	IBOutlet PBGitGradientBarView *upperToolbarView;
-	IBOutlet NSButton *mergeButton;
-	IBOutlet NSButton *cherryPickButton;
-	IBOutlet NSButton *rebaseButton;
+	__weak IBOutlet NSSearchField *searchField;
+	__weak IBOutlet NSOutlineView *fileBrowser;
+	__weak IBOutlet PBCommitList *commitList;
+	__weak IBOutlet NSSplitView *historySplitView;
+	__weak IBOutlet PBGitGradientBarView *upperToolbarView;
+	__weak IBOutlet PBGitGradientBarView *scopeBarView;
+	__weak IBOutlet NSButton *allBranchesFilterItem;
+	__weak IBOutlet NSButton *localRemoteBranchesFilterItem;
+	__weak IBOutlet NSButton *selectedBranchFilterItem;
+	__weak IBOutlet id webView;
 
-	IBOutlet PBGitGradientBarView *scopeBarView;
-	IBOutlet NSButton *allBranchesFilterItem;
-	IBOutlet NSButton *localRemoteBranchesFilterItem;
-	IBOutlet NSButton *selectedBranchFilterItem;
-
-	IBOutlet id webView;
-	int selectedCommitDetailsIndex;
+	NSArray *currentFileBrowserSelectionPath;
+	NSInteger selectedCommitDetailsIndex;
 	BOOL forceSelectionUpdate;
-	
 	PBGitTree *gitTree;
-	PBGitCommit *webCommit;
-	PBGitCommit *selectedCommit;
+	NSArray<PBGitCommit *> *webCommits;
+	NSArray<PBGitCommit *> *selectedCommits;
 }
 
-@property (readonly) NSTreeController* treeController;
-@property (assign) int selectedCommitDetailsIndex;
-@property  PBGitCommit *webCommit;
-@property  PBGitTree* gitTree;
 @property (readonly) NSArrayController *commitController;
+@property (readonly) NSTreeController *treeController;
 @property (readonly) PBRefController *refController;
 @property (readonly) PBHistorySearchController *searchController;
+
+@property (assign) NSInteger selectedCommitDetailsIndex;
+@property PBGitTree* gitTree;
+@property NSArray<PBGitCommit *> *webCommits;
+@property NSArray<PBGitCommit *> *selectedCommits;
+
 @property (readonly) PBCommitList *commitList;
+@property (readonly) BOOL singleCommitSelected;
+@property (readonly) BOOL singleNonHeadCommitSelected;
 
 - (IBAction) setDetailedView:(id)sender;
 - (IBAction) setTreeView:(id)sender;
@@ -79,13 +76,8 @@
 - (NSMenu *)contextMenuForTreeView;
 - (NSArray *)menuItemsForPaths:(NSArray *)paths;
 - (void)showCommitsFromTree:(id)sender;
-- (void)showInFinderAction:(id)sender;
-- (void)openFilesAction:(id)sender;
 
 // Repository Methods
-- (IBAction) createBranch:(id)sender;
-- (IBAction) createTag:(id)sender;
-- (IBAction) showAddRemoteSheet:(id)sender;
 - (IBAction) merge:(id)sender;
 - (IBAction) cherryPick:(id)sender;
 - (IBAction) rebase:(id)sender;
@@ -94,16 +86,9 @@
 - (IBAction)selectNext:(id)sender;
 - (IBAction)selectPrevious:(id)sender;
 
-- (void) copyCommitInfo;
-- (void) copyCommitSHA;
 
 - (BOOL) hasNonlinearPath;
 
 - (NSMenu *)tableColumnMenu;
-
-- (BOOL)splitView:(NSSplitView *)sender canCollapseSubview:(NSView *)subview;
-- (BOOL)splitView:(NSSplitView *)splitView shouldCollapseSubview:(NSView *)subview forDoubleClickOnDividerAtIndex:(NSInteger)dividerIndex;
-- (CGFloat)splitView:(NSSplitView *)sender constrainMinCoordinate:(CGFloat)proposedMin ofSubviewAt:(NSInteger)offset;
-- (CGFloat)splitView:(NSSplitView *)sender constrainMaxCoordinate:(CGFloat)proposedMax ofSubviewAt:(NSInteger)offset;
 
 @end

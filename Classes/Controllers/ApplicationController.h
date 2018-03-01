@@ -9,15 +9,12 @@
 #import <Cocoa/Cocoa.h>
 #import "PBGitRepository.h"
 
-@class PBCloneRepositoryPanel;
-
 @interface ApplicationController : NSObject<NSApplicationDelegate>
 {
 	IBOutlet NSWindow *window;
 	IBOutlet id firstResponder;
 
-	PBCloneRepositoryPanel *cloneRepositoryPanel;
-	bool started;
+	BOOL started;
 }
 
 - (IBAction)openPreferencesWindow:(id)sender;
@@ -28,6 +25,4 @@
 - (IBAction)showHelp:(id)sender;
 - (IBAction)showChangeLog:(id)sender;
 - (IBAction)reportAProblem:(id)sender;
-
-- (IBAction)showCloneRepository:(id)sender;
 @end

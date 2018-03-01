@@ -14,26 +14,28 @@
 @synthesize parameters, description, workingDirectory;
 @synthesize isSimpleRef;
 
+// I believe this relates loosely to parts of git-check-ref-format.
+// cf. https://www.kernel.org/pub/software/scm/git/docs/git-check-ref-format.html
+//
+NS_INLINE BOOL ContainsComplexRefCharSequence(NSString *refString)
+{
+	return ([refString hasPrefix:@"-"] ||
+			[refString rangeOfCharacterFromSet:[NSCharacterSet characterSetWithCharactersInString:@" ~^:"]].location != NSNotFound ||
+			[refString rangeOfString:@".."].location != NSNotFound ||
+			[refString rangeOfString:@"@{"].location != NSNotFound);
+}
 
 // internal designated init
 - (id) initWithParameters:(NSArray *)params description:(NSString *)descrip
 {
-    self = [super init];
-    if (!self) return nil;
+	NSParameterAssert(params != nil);
+
+	self = [super init];
+	if (!self) return nil;
+
 	parameters = params;
 	description = descrip;
-
-	if (([parameters count] > 1) || ([parameters count] == 0))
-		isSimpleRef =  NO;
-	else {
-		NSString *param = [parameters objectAtIndex:0];
-		if ([param hasPrefix:@"-"] ||
-			[param rangeOfCharacterFromSet:[NSCharacterSet characterSetWithCharactersInString:@"^@{}~:"]].location != NSNotFound ||
-			[param rangeOfString:@".."].location != NSNotFound)
-			isSimpleRef =  NO;
-		else
-			isSimpleRef =  YES;
-	}
+	isSimpleRef = (params.count == 1) && !ContainsComplexRefCharSequence(params[0]);
 
 	return self;
 }

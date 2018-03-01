@@ -11,13 +11,13 @@
 #import "PBGitCommit.h"
 
 @interface PBRefMenuItem : NSMenuItem {
-	id <PBGitRefish> refish;
+	NSArray<id<PBGitRefish>> *refishs;
 }
 
-@property  id <PBGitRefish> refish;
+@property NSArray<id<PBGitRefish>> *refishs;
 
 + (PBRefMenuItem *) separatorItem;
-+ (NSArray *) defaultMenuItemsForRef:(PBGitRef *)ref inRepository:(PBGitRepository *)repo target:(id)target;
-+ (NSArray *) defaultMenuItemsForCommit:(PBGitCommit *)commit target:(id)target;
++ (NSArray *) defaultMenuItemsForRef:(PBGitRef *)refs inRepository:(PBGitRepository *)repo target:(id)target;
++ (NSArray *) defaultMenuItemsForCommits:(NSArray<PBGitCommit *> *)commits target:(id)target;
 
 @end

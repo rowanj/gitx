@@ -79,7 +79,7 @@ static const CGFloat kIconPadding = 3;
 // ===============
 // Adopted from PhotoSearch Apple sample code
 
-- (NSUInteger)hitTestForEvent:(NSEvent *)event inRect:(NSRect)cellFrame ofView:(NSView *)controlView
+- (NSCellHitResult)hitTestForEvent:(NSEvent *)event inRect:(NSRect)cellFrame ofView:(NSView *)controlView
 {
 	NSPoint point = [controlView convertPoint:[event locationInWindow] fromView:nil];
 

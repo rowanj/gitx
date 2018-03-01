@@ -35,6 +35,10 @@
 
 @implementation GAPAppDelegate
 
+static const NSInteger kReturnCodeOK = 0;
+static const NSInteger kReturnCodeCancel = 1;
+
+
 -(NSPanel*)	passwordPanel
 {
 	if( !mPasswordPanel )
@@ -45,7 +49,7 @@
 													  backing: NSBackingStoreBuffered defer: NO];
 		[mPasswordPanel setHidesOnDeactivate: NO];
 		[mPasswordPanel setLevel: NSFloatingWindowLevel];
-		[mPasswordPanel setTitle: @"GitX SSH Remote Login"];
+		[mPasswordPanel setTitle: NSLocalizedString(@"GitX SSH Remote Login", @"Title for password panel in command line tool")];
         if (![mPasswordPanel setFrameUsingName: WINDOWAUTOSAVENAME]) {
             [mPasswordPanel center];
             [mPasswordPanel setFrameAutosaveName: WINDOWAUTOSAVENAME];
@@ -62,7 +66,7 @@
 		NSButton *okButton = [[NSButton alloc] initWithFrame: okBox];
 		[okButton setTarget: self];
 		[okButton setAction: @selector(doOKButton:)];
-		[okButton setTitle: @"OK"];			// +++ Localize.
+		[okButton setTitle: NSLocalizedString(@"OK", @"OK button for password panel in command line tool")];
 		[okButton setKeyEquivalent: @"\r"];
 		[okButton setBordered: YES];
 		[okButton setBezelStyle: NSRoundedBezelStyle];
@@ -77,7 +81,7 @@
 		NSButton *cancleButton = [[NSButton alloc] initWithFrame: cancelBox];
 		[cancleButton setTarget: self];
 		[cancleButton setAction: @selector(doCancelButton:)];
-		[cancleButton setTitle: @"Cancel"];			// +++ Localize.
+		[cancleButton setTitle: NSLocalizedString(@"Cancel", @"Cancel button for password panel in command line tool")];
 		[cancleButton setBordered: YES];
 		[cancleButton setBezelStyle: NSRoundedBezelStyle];
 		[[mPasswordPanel contentView] addSubview: cancleButton];
@@ -109,7 +113,7 @@
 		[passwordLabel setBordered: NO];
 		[passwordLabel setBezeled: NO];
 		[passwordLabel setDrawsBackground: NO];
-		[passwordLabel setStringValue: @"Please enter your password:"];	// +++ Localize.
+		[passwordLabel setStringValue: NSLocalizedString(@"Please enter your password:", @"Label for password field in password panel in command line tool")];
 		[[mPasswordPanel contentView] addSubview: passwordLabel];
 		
 		// GitX icon:
@@ -133,7 +137,7 @@
 -(IBAction)	doOKButton: (id)sender
 {
 	printf( "%s\n", [[mPasswordField stringValue] UTF8String] );
-	[[NSApplication sharedApplication] stopModalWithCode: 0];
+	[[NSApplication sharedApplication] stopModalWithCode:kReturnCodeOK];
 }
 
 
@@ -142,7 +146,7 @@
 //       many times the remote server allows failed attempts.
 -(IBAction)	doCancelButton: (id)sender
 {
-	[[NSApplication sharedApplication] stopModalWithCode: 1];
+	[[NSApplication sharedApplication] stopModalWithCode:kReturnCodeCancel];
 }
 
 @end
@@ -170,8 +174,8 @@ int	main( int argc, const char** argv )
 		NSInteger code = [app runModalForWindow: passPanel];
 		
 		[defaults synchronize];
-		
-		return code;
+
+		return code == kReturnCodeOK ? EXIT_SUCCESS : EXIT_FAILURE;
 	}
 }
 

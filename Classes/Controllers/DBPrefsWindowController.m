@@ -62,8 +62,6 @@ static DBPrefsWindowController *_sharedPrefsWindowController = nil;
 		[self setShiftSlowsAnimation:YES];
 	}
 	return self;
-
-	(void)window;  // To prevent compiler warnings.
 }
 
 
@@ -218,12 +216,9 @@ static DBPrefsWindowController *_sharedPrefsWindowController = nil;
 #pragma mark -
 #pragma mark Toolbar
 
-
 - (NSArray *)toolbarDefaultItemIdentifiers:(NSToolbar*)toolbar
 {
 	return toolbarIdentifiers;
-
-	(void)toolbar;
 }
 
 
@@ -232,8 +227,6 @@ static DBPrefsWindowController *_sharedPrefsWindowController = nil;
 - (NSArray *)toolbarAllowedItemIdentifiers:(NSToolbar*)toolbar
 {
 	return toolbarIdentifiers;
-
-	(void)toolbar;
 }
 
 
@@ -242,7 +235,6 @@ static DBPrefsWindowController *_sharedPrefsWindowController = nil;
 - (NSArray *)toolbarSelectableItemIdentifiers:(NSToolbar *)toolbar
 {
 	return toolbarIdentifiers;
-	(void)toolbar;
 }
 
 
@@ -251,8 +243,6 @@ static DBPrefsWindowController *_sharedPrefsWindowController = nil;
 - (NSToolbarItem *)toolbar:(NSToolbar *)toolbar itemForItemIdentifier:(NSString *)identifier willBeInsertedIntoToolbar:(BOOL)willBeInserted
 {
 	return [toolbarItems objectForKey:identifier];
-	(void)toolbar;
-	(void)willBeInserted;
 }
 
 
@@ -386,7 +376,7 @@ static DBPrefsWindowController *_sharedPrefsWindowController = nil;
 {
 	NSRect windowFrame = [[self window] frame];
 	NSRect contentRect = [[self window] contentRectForFrameRect:windowFrame];
-	float windowTitleAndToolbarHeight = NSHeight(windowFrame) - NSHeight(contentRect);
+	CGFloat windowTitleAndToolbarHeight = NSHeight(windowFrame) - NSHeight(contentRect);
 
 	windowFrame.size.height = NSHeight([view frame]) + windowTitleAndToolbarHeight;
 	windowFrame.size.width = NSWidth([view frame]);

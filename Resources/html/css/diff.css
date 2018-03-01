@@ -1,0 +1,80 @@
+.diff .file {
+	margin: 11px;
+	border: 1px solid #CCC;
+}
+
+.diff .file .fileHeader {
+	margin: 5px;
+	font-weight: bold;
+}
+
+.diff .file .fileHeader a {
+    color: #000;
+    text-decoration: none;
+}
+
+.diff .file .diffContent {
+	white-space: pre;
+	font-family: Menlo, Monaco, monospace;
+}
+
+.diff .file .diffcontent .lineno {
+	float: left;
+	padding-left: 3px;
+	padding-right: 3px;
+	background-color: #ECECEC;
+	color: #A9A9A9;
+	border-right: 1px solid #DDDDDD;
+	text-align: right;
+}
+
+.diff .file .diffContent .lines {
+	overflow: auto;
+}
+
+.diff .file .diffContent .lines .hunkheader {
+  background-color: #f7f7f7;
+  color: #bbb;
+}
+
+.diff .file .diffContent .lines > div {
+  padding-left: 2px;
+}
+
+.diff .file .diffcontent .lines .delline {
+  background-color: #FEE;
+  color: #B00;
+}
+
+.diff .file .diffcontent .lines .addline {
+  background-color: #DFD;
+  color: #080;
+}
+
+.diff .file .diffcontent .lines .markerline {
+    display:none;
+}
+
+.diff .file .diffcontent .lines .nonewline:after {
+	content: "  \20e0\23ce";
+	font-family: -apple-system, "Helvetica Neue", sans-serif;
+}
+.diff .file .diffcontent .lines .whitespace {
+	background-color: rgba(255,0,0,0.5);
+}
+.diff .file .diffcontent .lines del,
+.diff .file .diffcontent .lines ins {
+	text-decoration: none; border-radius: 0.2em;
+}
+.diff .file .diffcontent .lines .delline del {
+	background-color: #febfbf;
+	color: #A00;
+}
+.diff .file .diffcontent .lines .addline ins {
+	background-color: #b2ffaf;
+	color: #070;
+}
+
+#CurrentHunk {
+	border-left: 5px solid black;
+}

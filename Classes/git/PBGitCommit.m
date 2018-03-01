@@ -7,10 +7,12 @@
 //
 
 #import "PBGitRepository.h"
+#import "PBGitRepository_PBGitBinarySupport.h"
 #import "PBGitCommit.h"
 #import "PBGitTree.h"
 #import "PBGitRef.h"
 #import "PBGitDefaults.h"
+#import "ObjectiveGit+PBCategories.h"
 
 NSString * const kGitXCommitType = @"commit";
 
@@ -18,15 +20,27 @@ NSString * const kGitXCommitType = @"commit";
 
 @property (nonatomic, weak) PBGitRepository *repository;
 @property (nonatomic, strong) GTCommit *gtCommit;
-@property (nonatomic, strong) NSArray *parents;
+@property (nonatomic, copy) NSArray<GTOID *> *parents;
 
 @property (nonatomic, strong) NSString *patch;
-@property (nonatomic, strong) GTOID *sha;
+@property (nonatomic, strong) GTOID *oid;
 
 @end
 
 
 @implementation PBGitCommit
+
++ (NSDateFormatter *)longDateFormatter {
+	static NSDateFormatter *formatter = nil;
+	static dispatch_once_t token;
+	dispatch_once(&token, ^{
+		NSDateFormatter *f = [[NSDateFormatter alloc] init];
+		f.dateStyle = NSDateFormatterLongStyle;
+		f.timeStyle = NSDateFormatterLongStyle;
+		formatter = f;
+	});
+	return formatter;
+}
 
 - (NSDate *) date
 {
@@ -36,8 +50,9 @@ NSString * const kGitXCommitType = @"commit";
 
 - (NSString *) dateString
 {
-	NSDateFormatter* formatter = [[NSDateFormatter alloc] initWithDateFormat:@"%Y-%m-%d %H:%M:%S" allowNaturalLanguage:NO];
-	return [formatter stringFromDate: self.date];
+	NSDateFormatter * formatter = [[NSDateFormatter alloc] init];
+	[formatter setLocalizedDateFormatFromTemplate:@"%Y-%m-%d %H:%M:%S"];
+	return [formatter stringFromDate:self.date];
 }
 
 - (NSArray*) treeContents
@@ -58,15 +73,10 @@ NSString * const kGitXCommitType = @"commit";
 }
 
 
-- (NSArray *)parents
+- (NSArray <GTOID *>*)parents
 {
 	if (!self->_parents) {
-		NSArray *gtParents = self.gtCommit.parents;
-		NSMutableArray *parents = [NSMutableArray arrayWithCapacity:gtParents.count];
-		for (GTCommit *parent in gtParents) {
-			[parents addObject:parent.OID];
-		}
-		self.parents = parents;
+		self.parents = self.gtCommit.parentOIDs;
 	}
 	return self->_parents;
 }
@@ -76,16 +86,41 @@ NSString * const kGitXCommitType = @"commit";
 	return self.gtCommit.messageSummary;
 }
 
+- (NSString *)message
+{
+	return self.gtCommit.message;
+}
+
 - (NSString *)author
 {
 	NSString *result = self.gtCommit.author.name;
 	return result;
 }
 
+- (NSString *)authorEmail
+{
+	return self.gtCommit.author.email;
+}
+
+- (NSString *)authorDate
+{
+	return [[[self class] longDateFormatter] stringFromDate:self.gtCommit.author.time];
+}
+
 - (NSString *)committer
 {
 	GTSignature *sig = self.gtCommit.committer;
 	return sig.name;
+}
+
+- (NSString *)committerEmail
+{
+	return self.gtCommit.committer.email;
+}
+
+- (NSString *)committerDate
+{
+	return [[[self class] longDateFormatter] stringFromDate:self.gtCommit.committer.time];
 }
 
 - (NSString *)SVNRevision
@@ -113,20 +148,17 @@ NSString * const kGitXCommitType = @"commit";
 	return result;
 }
 
-- (GTOID *)sha
+- (GTOID *)OID
 {
-	GTOID *result = _sha;
-	if (result) {
-		return result;
+	if (!_oid) {
+		_oid = self.gtCommit.OID;
 	}
-    result = self.gtCommit.OID;
-	_sha = result;
-	return result;
+	return _oid;
 }
 
-- (NSString *)realSha
+- (NSString *)SHA
 {
-	return self.gtCommit.SHA;
+	return self.OID.SHA;
 }
 
 - (BOOL) isOnSameBranchAs:(PBGitCommit *)otherCommit
@@ -137,7 +169,7 @@ NSString * const kGitXCommitType = @"commit";
 	if ([self isEqual:otherCommit])
 		return YES;
 
-	return [self.repository isOnSameBranch:otherCommit.sha asSHA:self.sha];
+	return [self.repository isOIDOnSameBranch:otherCommit.OID asOID:self.OID];
 }
 
 - (BOOL) isOnHeadBranch
@@ -155,13 +187,7 @@ NSString * const kGitXCommitType = @"commit";
 
 - (NSUInteger)hash
 {
-	return [self.sha hash];
-}
-
-// FIXME: Remove this method once it's unused.
-- (NSString*) details
-{
-	return @"";
+	return self.OID.hash;
 }
 
 - (NSString *) patch
@@ -169,7 +195,13 @@ NSString * const kGitXCommitType = @"commit";
 	if (self->_patch != nil)
 		return _patch;
 
-	NSString *p = [self.repository outputForArguments:[NSArray arrayWithObjects:@"format-patch",  @"-1", @"--stdout", [self realSha], nil]];
+	NSError *error = nil;
+	NSString *p = [self.repository outputOfTaskWithArguments:@[@"format-patch",  @"-1", @"--stdout", self.SHA] error:&error];
+	if (!p) {
+		PBLogError(error);
+		return nil;
+	}
+
 	// Add a GitX identifier to the patch ;)
 	self.patch = [[p substringToIndex:[p length] -1] stringByAppendingString:@"+GitX"];
 	return self->_patch;
@@ -210,12 +242,12 @@ NSString * const kGitXCommitType = @"commit";
 
 - (NSMutableArray *)refs
 {
-	return self.repository.refs[self.sha];
+	return self.repository.refs[self.OID];
 }
 
 - (void) setRefs:(NSMutableArray *)refs
 {
-	self.repository.refs[self.sha] = [NSMutableArray arrayWithArray:refs];
+	self.repository.refs[self.OID] = [NSMutableArray arrayWithArray:refs];
 }
 
 
@@ -233,7 +265,7 @@ NSString * const kGitXCommitType = @"commit";
 
 - (NSString *) refishName
 {
-	return [self realSha];
+	return self.SHA;
 }
 
 - (NSString *) shortName

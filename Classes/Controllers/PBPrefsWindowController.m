@@ -19,7 +19,7 @@
 - (void)setupToolbar
 {
 	// GENERAL
-	[self addView:generalPrefsView label:@"General" image:[NSImage imageNamed:@"gitx"]];
+	[self addView:generalPrefsView label:@"General" image:[NSImage imageNamed:NSImageNameApplicationIcon]];
 	// INTERGRATION
 	[self addView:integrationPrefsView label:@"Integration" image:[NSImage imageNamed:NSImageNameNetwork]];
 	// UPDATES

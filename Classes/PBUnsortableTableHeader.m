@@ -14,7 +14,7 @@
 - (void)mouseDown:(NSEvent *)theEvent
 {
 	NSPoint location = [self convertPoint:[[self window] mouseLocationOutsideOfEventStream] fromView:[[self window] contentView]];
-	int aColumnIndex = [self columnAtPoint:location];
+	NSInteger aColumnIndex = [self columnAtPoint:location];
 
 	// If the user pressed on another column, reset
 	if (aColumnIndex != columnIndex)

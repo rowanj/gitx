@@ -29,7 +29,8 @@
 		[[NSException exceptionWithName:@"No memory left" reason:@"No more memory for allocating buffer" userInfo:nil] raise];
 	buffer[0] = '\0';
 	
-	int bytesReceived = 0, n = 0;
+	int bytesReceived = 0;
+	long n = 0;
 	
 	while (1) {
 		n = read(fd, buffer + bytesReceived, 1);

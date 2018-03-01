@@ -1,12 +1,12 @@
 [submodule "objective-git"]
-	path = objective-git
-	url = git://github.com/rowanj/objective-git.git
+	path = External/objective-git
+	url = https://github.com/libgit2/objective-git.git
 [submodule "Sparkle"]
-	path = Sparkle
-	url = https://github.com/rowanj/Sparkle.git
+	path = External/Sparkle
+	url = https://github.com/sparkle-project/Sparkle.git
 [submodule "SyntaxHighlighter"]
-	path = SyntaxHighlighter
-	url = git://github.com/alexgorbatchev/SyntaxHighlighter.git
+	path = External/SyntaxHighlighter
+	url = https://github.com/alexgorbatchev/SyntaxHighlighter.git
 [submodule "MGScopeBar"]
-	path = MGScopeBar
-	url = git://github.com/rowanj/MGScopeBar.git
+	path = External/MGScopeBar
+	url = https://github.com/rowanj/MGScopeBar.git

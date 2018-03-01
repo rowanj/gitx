@@ -1,0 +1,374 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="9060" systemVersion="15D21" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+    <dependencies>
+        <deployment identifier="macosx"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="9060"/>
+    </dependencies>
+    <objects>
+        <customObject id="-2" userLabel="File's Owner" customClass="PBPrefsWindowController">
+            <connections>
+                <outlet property="generalPrefsView" destination="1" id="8"/>
+                <outlet property="gitPathController" destination="45" id="59"/>
+                <outlet property="gitPathOpenAccessory" destination="62" id="65"/>
+                <outlet property="integrationPrefsView" destination="87" id="92"/>
+                <outlet property="updatesPrefsView" destination="4" id="7"/>
+            </connections>
+        </customObject>
+        <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
+        <customObject id="-3" userLabel="Application"/>
+        <customView id="1" userLabel="General">
+            <rect key="frame" x="0.0" y="0.0" width="400" height="250"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+            <userGuides>
+                <userLayoutGuide location="121" affinity="minX"/>
+            </userGuides>
+            <subviews>
+                <button id="114">
+                    <rect key="frame" x="18" y="192" width="273" height="18"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    <animations/>
+                    <buttonCell key="cell" type="check" title="Show whitespace differences" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="115">
+                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                        <font key="font" metaFont="system"/>
+                    </buttonCell>
+                    <connections>
+                        <binding destination="28" name="value" keyPath="values.PBShowWhitespaceDifferences" id="117"/>
+                    </connections>
+                </button>
+                <button id="153">
+                    <rect key="frame" x="18" y="214" width="273" height="18"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    <animations/>
+                    <buttonCell key="cell" type="check" title="Watch for changes in repositories" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="154">
+                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                        <font key="font" metaFont="system"/>
+                    </buttonCell>
+                    <connections>
+                        <binding destination="28" name="value" keyPath="values.PBUseRepositoryWatcher" id="163"/>
+                    </connections>
+                </button>
+                <button id="77">
+                    <rect key="frame" x="306" y="93" width="54" height="16"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    <animations/>
+                    <buttonCell key="cell" type="bevel" bezelStyle="regularSquare" image="NSStopProgressFreestandingTemplate" imagePosition="left" alignment="left" alternateImage="NSStopProgressFreestandingTemplate" state="on" imageScaling="proportionallyDown" inset="2" id="78">
+                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                        <font key="font" metaFont="system"/>
+                    </buttonCell>
+                    <connections>
+                        <action selector="resetGitPath:" target="-2" id="79"/>
+                        <binding destination="28" name="hidden" keyPath="values.gitExecutable" id="83">
+                            <dictionary key="options">
+                                <string key="NSValueTransformerName">NSIsNil</string>
+                            </dictionary>
+                        </binding>
+                    </connections>
+                </button>
+                <textField verticalHuggingPriority="750" id="47">
+                    <rect key="frame" x="118" y="53" width="192" height="28"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    <animations/>
+                    <textFieldCell key="cell" controlSize="small" sendsActionOnEndEditing="YES" title="Select the git executable you wish to use or drag it from the finder." id="48">
+                        <font key="font" metaFont="smallSystem"/>
+                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
+                <pathControl focusRingType="none" verticalHuggingPriority="750" allowsExpansionToolTips="YES" id="45">
+                    <rect key="frame" x="121" y="89" width="179" height="22"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    <animations/>
+                    <pathCell key="cell" controlSize="small" selectable="YES" editable="YES" focusRingType="none" alignment="left" pathStyle="popUp" id="46">
+                        <font key="font" metaFont="smallSystem"/>
+                        <connections>
+                            <outlet property="delegate" destination="-2" id="61"/>
+                        </connections>
+                    </pathCell>
+                    <connections>
+                        <action selector="checkGitValidity:" target="-2" id="58"/>
+                        <binding destination="28" name="value" keyPath="values.gitExecutable" id="86">
+                            <dictionary key="options">
+                                <integer key="NSAllowsEditingMultipleValuesSelection" value="0"/>
+                                <string key="NSNullPlaceholder">No Executable set</string>
+                                <string key="NSValueTransformerName">PBNSURLPathUserDefaultsTransfomer</string>
+                            </dictionary>
+                        </binding>
+                        <outlet property="delegate" destination="-2" id="54"/>
+                    </connections>
+                </pathControl>
+                <textField verticalHuggingPriority="750" id="43">
+                    <rect key="frame" x="17" y="93" width="99" height="17"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    <animations/>
+                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Git Executable:" id="44">
+                        <font key="font" metaFont="system"/>
+                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
+                <button id="126">
+                    <rect key="frame" x="18" y="170" width="279" height="18"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    <animations/>
+                    <buttonCell key="cell" type="check" title="Show column guides in commit message" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="127">
+                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                        <font key="font" metaFont="system"/>
+                    </buttonCell>
+                    <connections>
+                        <binding destination="28" name="value" keyPath="values.PBCommitMessageViewHasVerticalLine" id="133"/>
+                    </connections>
+                </button>
+                <textField verticalHuggingPriority="750" id="128">
+                    <rect key="frame" x="47" y="148" width="196" height="17"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    <animations/>
+                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Display body guide at column:" id="129">
+                        <font key="font" metaFont="system"/>
+                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
+                <textField verticalHuggingPriority="750" id="130">
+                    <rect key="frame" x="248" y="145" width="41" height="22"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    <animations/>
+                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="131">
+                        <font key="font" metaFont="system"/>
+                        <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                    <connections>
+                        <binding destination="28" name="value" keyPath="values.PBCommitMessageViewVerticalLineLength" id="151">
+                            <dictionary key="options">
+                                <bool key="NSContinuouslyUpdatesValue" value="YES"/>
+                            </dictionary>
+                        </binding>
+                    </connections>
+                </textField>
+                <textField verticalHuggingPriority="750" id="145">
+                    <rect key="frame" x="47" y="121" width="211" height="17"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    <animations/>
+                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Display subject guide at column:" id="148">
+                        <font key="font" metaFont="system"/>
+                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
+                <textField verticalHuggingPriority="750" id="146">
+                    <rect key="frame" x="263" y="118" width="41" height="22"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    <animations/>
+                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="147">
+                        <font key="font" metaFont="system"/>
+                        <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                    <connections>
+                        <binding destination="28" name="value" keyPath="values.PBCommitMessageViewVerticalBodyLineLength" id="152">
+                            <dictionary key="options">
+                                <bool key="NSContinuouslyUpdatesValue" value="YES"/>
+                            </dictionary>
+                        </binding>
+                    </connections>
+                </textField>
+                <button toolTip="Resets the of the &quot;Don't show this again&quot; preferences." verticalHuggingPriority="750" id="136">
+                    <rect key="frame" x="182" y="13" width="137" height="32"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    <animations/>
+                    <buttonCell key="cell" type="push" title="Reset Warnings" bezelStyle="rounded" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="139">
+                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                        <font key="font" metaFont="system"/>
+                    </buttonCell>
+                    <connections>
+                        <action selector="resetAllDialogWarnings:" target="-2" id="140"/>
+                    </connections>
+                </button>
+                <textField verticalHuggingPriority="750" id="137">
+                    <rect key="frame" x="17" y="23" width="166" height="17"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    <animations/>
+                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Reset all dialog warnings:" id="138">
+                        <font key="font" metaFont="system"/>
+                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
+            </subviews>
+            <animations/>
+        </customView>
+        <customView id="4" userLabel="Updates">
+            <rect key="frame" x="0.0" y="0.0" width="400" height="139"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+            <userGuides>
+                <userLayoutGuide location="42" affinity="minX"/>
+            </userGuides>
+            <subviews>
+                <button verticalHuggingPriority="750" id="23">
+                    <rect key="frame" x="128" y="13" width="96" height="28"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    <animations/>
+                    <buttonCell key="cell" type="push" title="Check Now" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="24">
+                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                        <font key="font" metaFont="smallSystem"/>
+                    </buttonCell>
+                    <connections>
+                        <action selector="checkForUpdates:" target="26" id="55"/>
+                    </connections>
+                </button>
+                <textField verticalHuggingPriority="750" id="21">
+                    <rect key="frame" x="130" y="45" width="251" height="14"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    <animations/>
+                    <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="DATE ..." id="22">
+                        <dateFormatter key="formatter" formatterBehavior="custom10_4" dateStyle="full" timeStyle="medium" id="42"/>
+                        <font key="font" metaFont="smallSystem"/>
+                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                    <connections>
+                        <binding destination="28" name="value" keyPath="values.SULastCheckTime" id="41"/>
+                    </connections>
+                </textField>
+                <textField verticalHuggingPriority="750" id="19">
+                    <rect key="frame" x="39" y="80" width="89" height="17"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    <animations/>
+                    <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Update interval:" id="20">
+                        <font key="font" metaFont="smallSystem"/>
+                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                    <connections>
+                        <binding destination="26" name="enabled" keyPath="automaticallyChecksForUpdates" id="36"/>
+                    </connections>
+                </textField>
+                <popUpButton verticalHuggingPriority="750" id="13">
+                    <rect key="frame" x="130" y="78" width="102" height="22"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    <animations/>
+                    <popUpButtonCell key="cell" type="push" title="Monthly" bezelStyle="rounded" alignment="left" controlSize="small" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" tag="2629800" imageScaling="proportionallyDown" inset="2" selectedItem="18" id="14">
+                        <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
+                        <font key="font" metaFont="smallSystem"/>
+                        <menu key="menu" title="OtherViews" id="15">
+                            <items>
+                                <menuItem title="Hourly" tag="3600" id="16"/>
+                                <menuItem title="Daily" tag="86400" id="17"/>
+                                <menuItem title="Weekly" tag="604800" id="25"/>
+                                <menuItem title="Monthly" state="on" tag="2629800" id="18"/>
+                            </items>
+                        </menu>
+                    </popUpButtonCell>
+                    <connections>
+                        <binding destination="26" name="enabled" keyPath="automaticallyChecksForUpdates" id="33"/>
+                        <binding destination="26" name="selectedTag" keyPath="updateCheckInterval" id="31"/>
+                    </connections>
+                </popUpButton>
+                <button id="11">
+                    <rect key="frame" x="18" y="103" width="260" height="18"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    <animations/>
+                    <buttonCell key="cell" type="check" title="Automatically check for updates" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="12">
+                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                        <font key="font" metaFont="system"/>
+                    </buttonCell>
+                    <connections>
+                        <binding destination="26" name="value" keyPath="automaticallyChecksForUpdates" id="27"/>
+                    </connections>
+                </button>
+                <textField verticalHuggingPriority="750" id="9">
+                    <rect key="frame" x="39" y="45" width="82" height="14"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    <animations/>
+                    <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Last update:" id="10">
+                        <font key="font" metaFont="smallSystem"/>
+                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
+            </subviews>
+            <animations/>
+        </customView>
+        <customView id="62" userLabel="Open Panel Accessory">
+            <rect key="frame" x="0.0" y="0.0" width="239" height="54"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+            <subviews>
+                <button id="63">
+                    <rect key="frame" x="18" y="18" width="203" height="18"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    <animations/>
+                    <buttonCell key="cell" type="check" title="Show all files and directories" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="64">
+                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                        <font key="font" metaFont="system"/>
+                    </buttonCell>
+                    <connections>
+                        <action selector="showHideAllFiles:" target="-2" id="66"/>
+                    </connections>
+                </button>
+            </subviews>
+            <animations/>
+        </customView>
+        <customObject id="26" customClass="SUUpdater"/>
+        <userDefaultsController representsSharedInstance="YES" id="28"/>
+        <customView id="87" userLabel="Integration">
+            <rect key="frame" x="0.0" y="0.0" width="400" height="116"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+            <subviews>
+                <button id="108">
+                    <rect key="frame" x="38" y="38" width="179" height="18"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    <animations/>
+                    <buttonCell key="cell" type="check" title="Make Gists public" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="109">
+                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                        <font key="font" metaFont="system"/>
+                    </buttonCell>
+                    <connections>
+                        <binding destination="28" name="enabled" keyPath="values.PBEnableGist" id="111"/>
+                        <binding destination="28" name="value" keyPath="values.PBGistPublic" id="113"/>
+                    </connections>
+                </button>
+                <button id="97">
+                    <rect key="frame" x="38" y="60" width="181" height="18"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    <animations/>
+                    <buttonCell key="cell" type="check" title="Confirm creation of Gists" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="98">
+                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                        <font key="font" metaFont="system"/>
+                    </buttonCell>
+                    <connections>
+                        <binding destination="28" name="enabled" keyPath="values.PBEnableGist" id="107"/>
+                        <binding destination="28" name="value" keyPath="values.PBConfirmPublicGists" id="104"/>
+                    </connections>
+                </button>
+                <button id="88">
+                    <rect key="frame" x="18" y="18" width="121" height="18"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    <animations/>
+                    <buttonCell key="cell" type="check" title="Enable Gravatar" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="91">
+                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                        <font key="font" metaFont="system"/>
+                    </buttonCell>
+                    <connections>
+                        <binding destination="28" name="value" keyPath="values.PBEnableGravatar" id="96"/>
+                    </connections>
+                </button>
+                <button id="89">
+                    <rect key="frame" x="18" y="80" width="111" height="18"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    <animations/>
+                    <buttonCell key="cell" type="check" title="Enable ‘Gist it’" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="90">
+                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                        <font key="font" metaFont="system"/>
+                    </buttonCell>
+                    <connections>
+                        <binding destination="28" name="value" keyPath="values.PBEnableGist" id="94"/>
+                    </connections>
+                </button>
+            </subviews>
+            <animations/>
+        </customView>
+    </objects>
+    <resources>
+        <image name="NSStopProgressFreestandingTemplate" width="14" height="14"/>
+    </resources>
+</document>

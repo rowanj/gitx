@@ -11,44 +11,29 @@
 #import "PBGitCommit.h"
 #import "PBGitRef.h"
 #import "PBGitWindowController.h"
+#import "PBGitRepositoryDocument.h"
 #import "PBGitRevSpecifier.h"
 
-@interface PBCreateTagSheet ()
-
-- (void) beginCreateTagSheetAtRefish:(id <PBGitRefish>)refish;
-
-@end
-
-
 @implementation PBCreateTagSheet
-
-@synthesize repository;
-@synthesize targetRefish;
-
-@synthesize tagNameField;
-@synthesize tagMessageText;
-@synthesize errorMessageField;
-
-
 
 #pragma mark -
 #pragma mark PBCreateTagSheet
 
-+ (void) beginCreateTagSheetAtRefish:(id <PBGitRefish>)refish inRepository:(PBGitRepository *)repo
++ (void) beginSheetWithRefish:(id <PBGitRefish>)refish windowController:(PBGitWindowController *)windowController completionHandler:(RJSheetCompletionHandler)handler
 {
-	PBCreateTagSheet *sheet = [[self alloc] initWithWindowNibName:@"PBCreateTagSheet" forRepo:repo];
-	[sheet beginCreateTagSheetAtRefish:refish];
+	PBCreateTagSheet *sheet = [[self alloc] initWithWindowNibName:@"PBCreateTagSheet" windowController:windowController];
+	[sheet beginCreateTagSheetAtRefish:refish completionHandler:handler];
 }
 
 
-- (void) beginCreateTagSheetAtRefish:(id <PBGitRefish>)refish
+- (void) beginCreateTagSheetAtRefish:(id <PBGitRefish>)refish completionHandler:(RJSheetCompletionHandler)handler
 {
-	self.targetRefish  = refish;
+	self.targetRefish = refish;
 
 	[self window];
 	[self.errorMessageField setStringValue:@""];
 
-	[self show];
+	[self beginSheetWithCompletionHandler:handler];
 }
 
 
@@ -62,7 +47,7 @@
 
 	NSString *refName = [@"refs/tags/" stringByAppendingString:tagName];
 	if (![self.repository checkRefFormat:refName]) {
-		[self.errorMessageField setStringValue:@"Invalid name"];
+		[self.errorMessageField setStringValue:NSLocalizedString(@"Invalid name", @"Error message for create tag command when the entered name cannot be used as a tag name")];
 		[self.errorMessageField setHidden:NO];
 		return;
 	}
@@ -70,23 +55,18 @@
 	for (PBGitRevSpecifier *rev in self.repository.branches) {
 		NSString *name = [[rev ref] tagName];
 		if ([tagName isEqualToString:name]) {
-			[self.errorMessageField setStringValue:@"Tag already exists"];
+			[self.errorMessageField setStringValue:NSLocalizedString(@"Tag already exists", @"Error message for create tag command when the entered tag name already exists")];
 			[self.errorMessageField setHidden:NO];
 			return;
 		}
 	}
-
-
-	NSString *message = [self.tagMessageText string];
-	[self.repository createTag:tagName message:message atRefish:self.targetRefish];
-	
-	[self closeCreateTagSheet:sender];
+	[self acceptSheet:sender];
 }
 
 
 - (IBAction) closeCreateTagSheet:(id)sender
 {
-	[self hide];
+	[self cancelSheet:sender];
 }
 
 

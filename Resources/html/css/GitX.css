@@ -1,0 +1,33 @@
+@import url("diff.css");
+@import url("notification.css");
+
+body {
+	margin: 0;
+	margin-top: 5px;
+	width: 100%;
+	font-family: -apple-system, 'Helvetica Neue', 'Lucida Grande', sans-serif;
+	font-size: 12px;
+}
+
+table {
+	font-size: 12px;
+}
+
+.fileHeader a:before {
+    margin-left: 0.3em;
+    width: 1em;
+    display: inline-block;
+}
+
+.expanded a:before {
+    content: "\25be\0020";
+}
+
+.collapsed a:before {
+    content: "\25b8\0020";
+}
+
+.SHA {
+	font-family: Menlo, Monaco, monospace;
+	text-decoration: none;
+}

@@ -19,7 +19,7 @@
 
 	delegate = theDelegate;
 	currentQueue = queue;
-	searchSHAs = [NSMutableSet setWithSet:commits];
+	searchOIDs = [NSMutableSet setWithSet:commits];
 	grapher = [[PBGitGrapher alloc] initWithRepository:nil];
 	viewAllBranches = viewAll;
 
@@ -30,7 +30,8 @@
 - (void)sendCommits:(NSArray *)commits
 {
 	NSDictionary *commitData = [NSDictionary dictionaryWithObjectsAndKeys:currentQueue, kCurrentQueueKey, commits, kNewCommitsKey, nil];
-	[delegate performSelectorOnMainThread:@selector(updateCommitsFromGrapher:) withObject:commitData waitUntilDone:NO];
+	id strongDelegate = delegate;
+	[strongDelegate performSelectorOnMainThread:@selector(updateCommitsFromGrapher:) withObject:commitData waitUntilDone:NO];
 }
 
 
@@ -39,6 +40,7 @@
 	if (!revList || [revList count] == 0)
 		return;
 
+	id strongDelegate = delegate;
 	//NSDate *start = [NSDate date];
 	NSThread *currentThread = [NSThread currentThread];
 	NSDate *lastUpdate = [NSDate date];
@@ -48,13 +50,13 @@
 	for (PBGitCommit *commit in revList) {
 		if ([currentThread isCancelled])
 			return;
-		GTOID *commitSHA = [commit sha];
-		if (viewAllBranches || [searchSHAs containsObject:commitSHA]) {
+		GTOID *commitOID = commit.OID;
+		if (viewAllBranches || [searchOIDs containsObject:commitOID]) {
 			[grapher decorateCommit:commit];
 			[commits addObject:commit];
 			if (!viewAllBranches) {
-				[searchSHAs removeObject:commitSHA];
-				[searchSHAs addObjectsFromArray:[commit parents]];
+				[searchOIDs removeObject:commitOID];
+				[searchOIDs addObjectsFromArray:[commit parents]];
 			}
 		}
 		if (++counter % 100 == 0) {
@@ -69,7 +71,7 @@
 	//NSLog(@"Graphed %i commits in %f seconds (%f/sec)", counter, duration, counter/duration);
 
 	[self sendCommits:commits];
-	[delegate performSelectorOnMainThread:@selector(finishedGraphing) withObject:nil waitUntilDone:NO];
+	[strongDelegate performSelectorOnMainThread:@selector(finishedGraphing) withObject:nil waitUntilDone:NO];
 }
 
 

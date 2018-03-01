@@ -16,13 +16,13 @@
 	PBGitCommit *objectValue;
 	PBGraphCellInfo *cellInfo;
 	NSTextFieldCell *textCell;
-	IBOutlet PBGitHistoryController *controller;
-	IBOutlet id<PBRefContextDelegate> contextMenuDelegate;
+	__weak IBOutlet PBGitHistoryController *controller;
+	__weak IBOutlet id<PBRefContextDelegate> contextMenuDelegate;
 }
 
-- (int) indexAtX:(float)x;
+- (int) indexAtX:(CGFloat)x;
 - (NSRect) rectAtIndex:(int)index;
 - (void) drawLabelAtIndex:(int)index inRect:(NSRect)rect;
 
-@property PBGitCommit* objectValue;
+@property (copy) PBGitCommit* objectValue;
 @end

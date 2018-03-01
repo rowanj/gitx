@@ -41,21 +41,12 @@ extern NSString *PBGitIndexOperationFailed;
 // As a single git repository can have multiple trees,
 // the tree has to be given explicitly, even though
 // multiple trees is not yet supported in GitX
-@interface PBGitIndex : NSObject {
-	
-@private
-	__weak PBGitRepository *repository;
-	NSURL *workingDirectory;
-	NSMutableArray *files;
-
-	NSUInteger refreshStatus;
-	NSDictionary *amendEnvironment;
-	BOOL amend;
-}
+@interface PBGitIndex : NSObject
 
 // Whether we want the changes for amending,
-// or for
-@property BOOL amend;
+// or for making a new commit.
+@property (assign, getter=isAmend) BOOL amend;
+@property (weak, readonly) PBGitRepository *repository;
 
 - (id)initWithRepository:(PBGitRepository *)repository;
 
@@ -70,9 +61,9 @@ extern NSString *PBGitIndexOperationFailed;
 - (void)commitWithMessage:(NSString *)commitMessage andVerify:(BOOL) doVerify;
 
 // Inter-file changes:
-- (BOOL)stageFiles:(NSArray *)stageFiles;
-- (BOOL)unstageFiles:(NSArray *)unstageFiles;
-- (void)discardChangesForFiles:(NSArray *)discardFiles;
+- (BOOL)stageFiles:(NSArray<PBChangedFile *> *)stageFiles;
+- (BOOL)unstageFiles:(NSArray<PBChangedFile *> *)unstageFiles;
+- (void)discardChangesForFiles:(NSArray<PBChangedFile *> *)discardFiles;
 
 // Intra-file changes
 - (BOOL)applyPatch:(NSString *)hunk stage:(BOOL)stage reverse:(BOOL)reverse;

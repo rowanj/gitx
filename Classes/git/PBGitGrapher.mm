@@ -46,28 +46,44 @@ typedef std::vector<PBGitLane *> LaneCollection;
 	return self;
 }
 
-void add_line(struct PBGitGraphLine *lines, int *nLines, int upper, int from, int to, int index)
+int long_to_integer_bound(long input, int min, int max)
+{
+	if (input < (long)min) {
+		return min;
+	} else if (input > (long)max) {
+		return max;
+	}
+	return (int)input;
+}
+
+void add_line(struct PBGitGraphLine *lines, int *nLines, int upper, long from, long to, int index)
 {
 	// TODO: put in one thing
-	struct PBGitGraphLine a = { upper, from, to, index };
+	struct PBGitGraphLine a = {
+		long_to_integer_bound(upper, 0, 1),
+		long_to_integer_bound(from, INT8_MIN, INT8_MAX),
+		long_to_integer_bound(to, INT8_MIN, INT8_MAX),
+		index
+	};
 	lines[(*nLines)++] = a;
 }
 
 - (void) decorateCommit: (PBGitCommit *) commit
 {
-	int i = 0, newPos = -1;
+	int i = 0;
+	long newPos = -1;
 	LaneCollection *currentLanes = new LaneCollection;
 	LaneCollection *previousLanes = self.pl;
-	NSArray *parents = [commit parents];
-	int nParents = [parents count];
+	NSArray <GTOID *> *parents = [commit parents];
+	NSUInteger nParents = [parents count];
 
-	int maxLines = (previousLanes->size() + nParents + 2) * 2;
-	struct PBGitGraphLine *lines = (struct PBGitGraphLine *)malloc(sizeof(struct PBGitGraphLine) * maxLines);
+	unsigned long maxLines = (previousLanes->size() + nParents + 2) * 2;
+	struct PBGitGraphLine *lines = (struct PBGitGraphLine *)calloc(maxLines, sizeof(struct PBGitGraphLine));
 	int currentLine = 0;
 
 	PBGitLane *currentLane = NULL;
 	BOOL didFirst = NO;
-	const git_oid *commit_oid = [[commit sha] git_oid];
+	const git_oid *commit_oid = commit.OID.git_oid;
 	
 	// First, iterate over earlier columns and pass through any that don't want this commit
 	if (self.previous != nil) {
@@ -86,24 +102,23 @@ void add_line(struct PBGitGraphLine *lines, int *nLines, int upper, int from, in
 					currentLanes->push_back(*it);
 					currentLane = currentLanes->back();
 					newPos = currentLanes->size();
-					add_line(lines, &currentLine, 1, i, newPos,(*it)->index());
+					add_line(lines, &currentLine, 1, i, newPos, (*it)->index());
 					if (nParents)
-						add_line(lines, &currentLine, 0, newPos, newPos,(*it)->index());
+						add_line(lines, &currentLine, 0, newPos, newPos, (*it)->index());
 				}
 				else {
-					add_line(lines, &currentLine, 1, i, newPos,(*it)->index());
+					add_line(lines, &currentLine, 1, i, newPos, (*it)->index());
 					delete *it;
 				}
 			}
 			else {
 				// We are not this commit.
 				currentLanes->push_back(*it);
-				add_line(lines, &currentLine, 1, i, currentLanes->size(),(*it)->index());
+				add_line(lines, &currentLine, 1, i, currentLanes->size(), (*it)->index());
 				add_line(lines, &currentLine, 0, currentLanes->size(), currentLanes->size(), (*it)->index());
 			}
 			// For existing columns, we always just continue straight down
 			// ^^ I don't know what that means anymore :(
-
 		}
 	}
 	//Add your own parents
@@ -156,10 +171,9 @@ void add_line(struct PBGitGraphLine *lines, int *nLines, int upper, int from, in
 		self.previous = [[PBGraphCellInfo alloc] initWithPosition:newPos andLines:lines];
 
 	if (currentLine > maxLines)
-		NSLog(@"Number of lines: %i vs allocated: %i", currentLine, maxLines);
+		NSLog(@"Number of lines: %i vs allocated: %lu", currentLine, maxLines);
 
 	self.previous.nLines = currentLine;
-	self.previous.sign = commit.sign;
 
 	// If a parent was added, we have room to not indent.
 	if (addedParent)

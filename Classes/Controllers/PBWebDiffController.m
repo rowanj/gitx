@@ -42,7 +42,7 @@
 	if (diff == nil || !finishedLoading)
 		return;
 
-	id script = [view windowScriptObject];
+	id script = self.view.windowScriptObject;
 	if ([diff length] == 0)
 		[script callWebScriptMethod:@"setMessage" withArguments:[NSArray arrayWithObject:@"There are no differences"]];
 	else

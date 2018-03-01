@@ -93,7 +93,7 @@
 		else if([startFile isEqualToString:GROUP_ID_LOG])
 			fileTxt = [file log:logFormat];
 
-		id script = [view windowScriptObject];
+		id script = self.view.windowScriptObject;
 		NSString *filePath = [file fullPath];
         [script callWebScriptMethod:@"showFile" withArguments:[NSArray arrayWithObjects:fileTxt, filePath, nil]];
 	}
@@ -158,7 +158,7 @@
 	NSString *path = [NSString stringWithFormat:@"html/views/%@", identifier];
 	NSString *html = [[NSBundle mainBundle] pathForResource:@"index" ofType:@"html" inDirectory:path];
 	NSURLRequest * request = [NSURLRequest requestWithURL:[NSURL fileURLWithPath:html]];
-	[[view mainFrame] loadRequest:request];
+	[self.view.mainFrame loadRequest:request];
 }
 
 - (NSView *)accessoryViewForScopeBar:(MGScopeBar *)scopeBar
@@ -292,7 +292,7 @@
 {
 	NSRect newFrame = [splitView frame];
 
-	float dividerThickness = [splitView dividerThickness];
+	CGFloat dividerThickness = [splitView dividerThickness];
 
 	NSView *leftView = [[splitView subviews] objectAtIndex:0];
 	NSRect leftFrame = [leftView frame];
@@ -315,15 +315,15 @@
 // NSSplitView does not save and restore the position of the SplitView correctly so do it manually
 - (void)saveSplitViewPosition
 {
-	float position = [[[fileListSplitView subviews] objectAtIndex:0] frame].size.width;
-	[[NSUserDefaults standardUserDefaults] setFloat:position forKey:kHFileListSplitViewPositionDefault];
+	CGFloat position = [[[fileListSplitView subviews] objectAtIndex:0] frame].size.width;
+	[[NSUserDefaults standardUserDefaults] setDouble:position forKey:kHFileListSplitViewPositionDefault];
 	[[NSUserDefaults standardUserDefaults] synchronize];
 }
 
 // make sure this happens after awakeFromNib
 - (void)restoreSplitViewPositiion
 {
-	float position = [[NSUserDefaults standardUserDefaults] floatForKey:kHFileListSplitViewPositionDefault];
+	CGFloat position = [[NSUserDefaults standardUserDefaults] doubleForKey:kHFileListSplitViewPositionDefault];
 	if (position < 1.0)
 		position = 200;
 

@@ -1,0 +1,7 @@
+//
+
+#ifdef __OBJC__
+    #import <Cocoa/Cocoa.h>
+    #import <ObjectiveGit/ObjectiveGit.h>
+	#import "PBMacros.h"
+#endif

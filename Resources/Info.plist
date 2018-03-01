@@ -31,15 +31,15 @@
 			<key>LSTypeIsPackage</key>
 			<true/>
 			<key>NSDocumentClass</key>
-			<string>PBGitRepository</string>
+			<string>PBGitRepositoryDocument</string>
 		</dict>
 	</array>
 	<key>CFBundleExecutable</key>
 	<string>${EXECUTABLE_NAME}</string>
 	<key>CFBundleIconFile</key>
-	<string>gitx.icns</string>
+	<string>AppIcon-gitx.icns</string>
 	<key>CFBundleIdentifier</key>
-	<string>net.phere.GitX</string>
+	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
@@ -87,13 +87,13 @@
 	</array>
 	<key>OSAScriptingDefinition</key>
 	<string>GitX.sdef</string>
+	<key>SUAllowsAutomaticUpdates</key>
+	<true/>
+	<key>SUEnableAutomaticChecks</key>
+	<true/>
 	<key>SUFeedURL</key>
 	<string>https://s3.amazonaws.com/builds.phere.net/GitX/development/GitX-dev.xml</string>
 	<key>SUPublicDSAKeyFile</key>
 	<string>UpdateKey.pem</string>
-	<key>SUEnableAutomaticChecks</key>
-	<true/>
-	<key>SUAllowsAutomaticUpdates</key>
-	<true/>
 </dict>
 </plist>

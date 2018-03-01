@@ -7,7 +7,7 @@
 //
 
 #import "PBGitBinary.h"
-#import "PBEasyPipe.h"
+#import "PBTask.h"
 
 @implementation PBGitBinary
 
@@ -21,10 +21,23 @@ static NSString* gitPath = nil;
 	if (![[NSFileManager defaultManager] fileExistsAtPath:path])
 		return nil;
 
-	NSString *version = [PBEasyPipe outputForCommand:path withArgs:[NSArray arrayWithObject:@"--version"]];
-	if ([version hasPrefix:@"git version "])
-		return [version substringFromIndex:12];
+	NSString *version = [PBTask outputForCommand:path arguments:@[@"--version"] error:NULL];
 
+	return [self extractGitVersion:version];
+}
+
++ (NSString *) extractGitVersion:(NSString *)versionString
+{
+	NSError * error;
+	NSRegularExpression * regex = [NSRegularExpression regularExpressionWithPattern:@"git version ([0-9.]+)"
+																			options:0
+																			  error:&error];
+	NSTextCheckingResult * result = [regex firstMatchInString:versionString
+													  options:0
+														range:NSMakeRange(0, versionString.length)];
+	if (result != nil && result.numberOfRanges == 2) {
+		return [versionString substringWithRange:[result rangeAtIndex:1]];
+	}
 	return nil;
 }
 
@@ -37,7 +50,7 @@ static NSString* gitPath = nil;
 	if (!version)
 		return NO;
 
-	int c = [version compare:@"" MIN_GIT_VERSION];
+	int c = [version compare:@"" MIN_GIT_VERSION options:NSNumericSearch];
 	if (c == NSOrderedSame || c == NSOrderedDescending) {
 		gitPath = path;
 		return YES;
@@ -55,13 +68,17 @@ static NSString* gitPath = nil;
 	if (gitPath.length > 0) {
 		if ([self acceptBinary:gitPath])
 			return;
-		[[NSAlert alertWithMessageText:@"Invalid git path"
-						defaultButton:@"OK"
-					  alternateButton:nil
-						  otherButton:nil
-			informativeTextWithFormat:@"You entered a custom git path in the Preferences pane, "
-		 "but this path is not a valid git v" MIN_GIT_VERSION " or higher binary. We're going to use the default "
-		 "search paths instead"] runModal];
+		[[NSAlert alertWithMessageText:NSLocalizedString(@"Invalid git path", @"Error message for NSUserDefaults configured path to git binary that does not point to a git binary")
+					  	 defaultButton:NSLocalizedString(@"OK", @"OK")
+					   alternateButton:nil
+						   otherButton:nil
+			 informativeTextWithFormat:NSLocalizedString(
+										@"The path „%@“, which is configured as a custom git path in the "
+										"preferences window, is not a valid git v" MIN_GIT_VERSION " or higher binary. "
+										"Using the default search paths instead.",
+										"Informative text for NSUserDefaults configured path to git binary that does not point to a git binary"),
+										gitPath]
+		runModal];
 	}
 
 	// Try to find the path of the Git binary
@@ -72,8 +89,7 @@ static NSString* gitPath = nil;
 	// No explicit path.
 	
 	// Try to find git with "which"
-	NSString* whichPath = [PBEasyPipe outputForCommand:@"/usr/bin/which"
-											  withArgs:[NSArray arrayWithObject:@"git"]];
+	NSString* whichPath = [PBTask outputForCommand:@"/usr/bin/which" arguments:@[@"git"] error:NULL];
 	if ([self acceptBinary:whichPath])
 		return;
 
@@ -84,8 +100,7 @@ static NSString* gitPath = nil;
 	}
 	
 	// Lastly, try `xcrun git`
-	NSString* xcrunPath = [PBEasyPipe outputForCommand:@"/usr/bin/xcrun"
-											  withArgs:[NSArray arrayWithObjects:@"-f", @"git", nil]];
+	NSString* xcrunPath = [PBTask outputForCommand:@"/usr/bin/xcrun" arguments:@[@"-f", @"git"] error:NULL];
 	if ([self acceptBinary:xcrunPath])
 	{
 		return;
@@ -121,13 +136,14 @@ static NSMutableArray *locations = nil;
 
 + (NSString *) notFoundError
 {
-	NSMutableString *error = [NSMutableString stringWithString:
-							  @"Could not find a git binary version " MIN_GIT_VERSION " or higher.\n"
-							  @"Please make sure there is a git binary in one of the following locations:\n\n"];
-	for (NSString *location in [PBGitBinary searchLocations]) {
-		[error appendFormat:@"\t%@\n", location];
-	}
-	return error;
+	NSString * searchPathsString = [[PBGitBinary searchLocations] componentsJoinedByString:@"\n\t"];
+	return [NSString stringWithFormat:
+			NSLocalizedString(
+				@"Could not find a git binary version " MIN_GIT_VERSION " or higher.\n"
+				@"Please make sure there is a git binary in one of the following locations:"
+				@"\n\n\t%s",
+				@"Error message when no git client can be found."),
+			searchPathsString];
 }
 
 
@@ -135,6 +151,5 @@ static NSMutableArray *locations = nil;
 {
 	return [self versionForPath:gitPath];
 }
-
 
 @end

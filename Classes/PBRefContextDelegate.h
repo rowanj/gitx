@@ -1,5 +1,5 @@
 //
-//  PBRefContextDelegate.m
+//  PBRefContextDelegate.h
 //  GitX
 //
 //  Created by Pieter de Bie on 01-11-08.
@@ -13,6 +13,6 @@
 
 @protocol PBRefContextDelegate
 - (NSArray *) menuItemsForRef:(PBGitRef *)ref;
-- (NSArray *) menuItemsForCommit:(PBGitCommit *)commit;
-- (NSArray *)menuItemsForRow:(NSInteger)rowIndex;
+- (NSArray *) menuItemsForCommits:(NSArray<PBGitCommit *> *)commits;
+- (NSArray *) menuItemsForRow:(NSInteger)rowIndex;
 @end

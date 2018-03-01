@@ -8,16 +8,16 @@
 
 #import "PBGitIndex.h"
 #import "PBGitRepository.h"
+#import "PBGitRepository_PBGitBinarySupport.h"
 #import "PBGitBinary.h"
-#import "PBEasyPipe.h"
-#import "NSString_RegEx.h"
+#import "PBTask.h"
 #import "PBChangedFile.h"
 
 NSString *PBGitIndexIndexRefreshStatus = @"PBGitIndexIndexRefreshStatus";
 NSString *PBGitIndexIndexRefreshFailed = @"PBGitIndexIndexRefreshFailed";
 NSString *PBGitIndexFinishedIndexRefresh = @"PBGitIndexFinishedIndexRefresh";
 
-NSString *PBGitIndexIndexUpdated = @"GBGitIndexIndexUpdated";
+NSString *PBGitIndexIndexUpdated = @"PBGitIndexIndexUpdated";
 
 NSString *PBGitIndexCommitStatus = @"PBGitIndexCommitStatus";
 NSString *PBGitIndexCommitFailed = @"PBGitIndexCommitFailed";
@@ -27,31 +27,28 @@ NSString *PBGitIndexFinishedCommit = @"PBGitIndexFinishedCommit";
 NSString *PBGitIndexAmendMessageAvailable = @"PBGitIndexAmendMessageAvailable";
 NSString *PBGitIndexOperationFailed = @"PBGitIndexOperationFailed";
 
+NS_ENUM(NSUInteger, PBGitIndexOperation) {
+	PBGitIndexStageFiles,
+	PBGitIndexUnstageFiles,
+};
+
 @interface PBGitIndex (IndexRefreshMethods)
 
-- (NSArray *)linesFromNotification:(NSNotification *)notification;
 - (NSMutableDictionary *)dictionaryForLines:(NSArray *)lines;
 - (void)addFilesFromDictionary:(NSMutableDictionary *)dictionary staged:(BOOL)staged tracked:(BOOL)tracked;
 
-- (void)indexStepComplete;
-
-- (void)indexRefreshFinished:(NSNotification *)notification;
-- (void)readOtherFiles:(NSNotification *)notification;
-- (void)readUnstagedFiles:(NSNotification *)notification;
-- (void)readStagedFiles:(NSNotification *)notification;
+- (NSArray *)linesFromData:(NSData *)data;
 
 @end
 
-@interface PBGitIndex ()
+@interface PBGitIndex () {
+	dispatch_queue_t _indexRefreshQueue;
+	dispatch_group_t _indexRefreshGroup;
+	BOOL _amend;
+}
 
-// Returns the tree to compare the index to, based
-// on whether amend is set or not.
-- (NSString *) parentTree;
-- (void)postCommitUpdate:(NSString *)update;
-- (void)postCommitFailure:(NSString *)reason;
-- (void)postCommitHookFailure:(NSString *)reason;
-- (void)postIndexChange;
-- (void)postOperationFailed:(NSString *)description;
+@property (retain) NSDictionary *amendEnvironment;
+@property (retain) NSMutableArray *files;
 @end
 
 @implementation PBGitIndex
@@ -63,29 +60,27 @@ NSString *PBGitIndexOperationFailed = @"PBGitIndexOperationFailed";
 
 	NSAssert(theRepository, @"PBGitIndex requires a repository");
 
-	repository = theRepository;
-	NSString* workingPath = theRepository.workingDirectory;
-	if (workingPath)
-	{
-		workingDirectory = [NSURL fileURLWithPath:workingPath];
-	}
-	files = [NSMutableArray array];
+	_repository = theRepository;
+
+	_files = [NSMutableArray array];
+
+	_indexRefreshGroup = dispatch_group_create();
 
 	return self;
 }
 
 - (NSArray *)indexChanges
 {
-	return files;
+	return self.files;
 }
 
 - (void)setAmend:(BOOL)newAmend
 {
-	if (newAmend == amend)
+	if (newAmend == _amend)
 		return;
 	
-	amend = newAmend;
-	amendEnvironment = nil;
+	_amend = newAmend;
+	self.amendEnvironment = nil;
 
 	[self refresh];
 
@@ -95,57 +90,182 @@ NSString *PBGitIndexOperationFailed = @"PBGitIndexOperationFailed";
 	// If we amend, we want to keep the author information for the previous commit
 	// We do this by reading in the previous commit, and storing the information
 	// in a dictionary. This dictionary will then later be read by [self commit:]
-	NSString *message = [repository outputForCommand:@"cat-file commit HEAD"];
-	NSArray *match = [message substringsMatchingRegularExpression:@"\nauthor ([^\n]*) <([^\n>]*)> ([0-9]+[^\n]*)\n" count:3 options:0 ranges:nil error:nil];
-	if (match)
-		amendEnvironment = [NSDictionary dictionaryWithObjectsAndKeys:[match objectAtIndex:1], @"GIT_AUTHOR_NAME",
-							[match objectAtIndex:2], @"GIT_AUTHOR_EMAIL",
-							[match objectAtIndex:3], @"GIT_AUTHOR_DATE",
-							nil];
+	GTReference *headRef = [self.repository.gtRepo headReferenceWithError:NULL];
+	GTCommit *commit = [headRef resolvedTarget];
+	if (commit)
+		self.amendEnvironment = @{
+								  @"GIT_AUTHOR_NAME":  commit.author.name,
+								  @"GIT_AUTHOR_EMAIL": commit.author.email,
+								  @"GIT_AUTHOR_DATE":  commit.commitDate,
+								  };
 
-	// Find the commit message
-	NSRange r = [message rangeOfString:@"\n\n"];
-	if (r.location != NSNotFound) {
-		NSString *commitMessage = [message substringFromIndex:r.location + 2];
-		[[NSNotificationCenter defaultCenter] postNotificationName:PBGitIndexAmendMessageAvailable
-															object: self
-														  userInfo:[NSDictionary dictionaryWithObject:commitMessage forKey:@"message"]];
+	NSDictionary *notifDict = nil;
+	if (commit.message) {
+		notifDict = @{@"message": commit.message};
 	}
-	
+	[[NSNotificationCenter defaultCenter] postNotificationName:PBGitIndexAmendMessageAvailable
+														object:self
+													  userInfo:notifDict];
 }
 
-- (BOOL) amend
+- (BOOL)isAmend
 {
-	return amend;
+	return _amend;
+}
+
+
+- (void)postIndexRefreshFinished {
+	dispatch_async(dispatch_get_main_queue(), ^{
+		[[NSNotificationCenter defaultCenter] postNotificationName:PBGitIndexFinishedIndexRefresh object:self];
+	});
+}
+
+// A multi-purpose notification sender for a refresh operation
+// TODO: make -refresh take a completion handler, an NSError or *anything else*
+- (void)postIndexRefreshSuccess:(BOOL)success message:(nullable NSString *)message {
+	dispatch_async(dispatch_get_main_queue(), ^{
+		if (!success) {
+			[[NSNotificationCenter defaultCenter] postNotificationName:PBGitIndexIndexRefreshFailed
+																object:self
+															  userInfo:@{@"description": message}];
+		} else {
+			[[NSNotificationCenter defaultCenter] postNotificationName:PBGitIndexIndexRefreshStatus
+																object:self
+															  userInfo:@{@"description": message}];
+		}
+	});
+
+	[self postIndexUpdated];
+}
+
+- (void)postIndexUpdated {
+	dispatch_async(dispatch_get_main_queue(), ^{
+		[[NSNotificationCenter defaultCenter] postNotificationName:PBGitIndexIndexUpdated object:self];
+	});
 }
 
 - (void)refresh
 {
-	// If we were already refreshing the index, we don't want
-	// double notifications. As we can't stop the tasks anymore,
-	// just cancel the notifications
-	refreshStatus = 0;
-	NSNotificationCenter *nc = [NSNotificationCenter defaultCenter]; 
-	[nc removeObserver:self]; 
+	dispatch_group_enter(_indexRefreshGroup);
 
 	// Ask Git to refresh the index
-	NSFileHandle *updateHandle = [PBEasyPipe handleForCommand:[PBGitBinary path] 
-													 withArgs:[NSArray arrayWithObjects:@"update-index", @"-q", @"--unmerged", @"--ignore-missing", @"--refresh", nil]
-														inDir:[workingDirectory path]];
+	[PBTask launchTask:[PBGitBinary path]
+			 arguments:@[@"update-index", @"-q", @"--unmerged", @"--ignore-missing", @"--refresh"]
+		   inDirectory:self.repository.workingDirectoryURL.path
+	 completionHandler:^(NSData *readData, NSError *error) {
+				 if (error) {
+					 [self postIndexRefreshSuccess:NO message:@"update-index failed"];
+				 } else {
+					 [self postIndexRefreshSuccess:YES message:@"update-index success"];
+				 }
 
-	[nc addObserver:self
-		   selector:@selector(indexRefreshFinished:)
-			   name:NSFileHandleReadToEndOfFileCompletionNotification
-			 object:updateHandle];
-	[updateHandle readToEndOfFileInBackgroundAndNotify];
+				 dispatch_group_leave(_indexRefreshGroup);
+			 }];
 
+
+	// This block is called when each of the other blocks scheduled are done,
+	// which means we can delete all files previously marked as deletable.
+	// Note, there are scheduled blocks *below* this one ;-).
+	dispatch_group_notify(_indexRefreshGroup, dispatch_get_main_queue(), ^{
+
+		// At this point, all index operations have finished.
+		// We need to find all files that don't have either
+		// staged or unstaged files, and delete them
+
+		NSMutableArray *deleteFiles = [NSMutableArray array];
+		for (PBChangedFile *file in self.files) {
+			if (!file.hasStagedChanges && !file.hasUnstagedChanges)
+				[deleteFiles addObject:file];
+		}
+
+		if ([deleteFiles count]) {
+			[self willChangeValueForKey:@"indexChanges"];
+			for (PBChangedFile *file in deleteFiles)
+				[self.files removeObject:file];
+			[self didChangeValueForKey:@"indexChanges"];
+		}
+
+		[self postIndexRefreshFinished];
+	});
+
+	if ([self.repository isBareRepository])
+	{
+		return;
+	}
+
+	// Other files
+	dispatch_group_enter(_indexRefreshGroup);
+	[PBTask launchTask:[PBGitBinary path]
+			 arguments:@[@"ls-files", @"--others", @"--exclude-standard", @"-z"]
+		   inDirectory:self.repository.workingDirectoryURL.path
+	 completionHandler:^(NSData *readData, NSError *error) {
+		 if (error) {
+			 [self postIndexRefreshSuccess:NO message:@"ls-files failed"];
+		 } else {
+			 NSArray *lines = [self linesFromData:readData];
+			 NSMutableDictionary *dictionary = [[NSMutableDictionary alloc] initWithCapacity:[lines count]];
+			 // Other files are untracked, so we don't have any real index information. Instead, we can just fake it.
+			 // The line below is not used at all, as for these files the commitBlob isn't set
+			 NSArray *fileStatus = [NSArray arrayWithObjects:@":000000", @"100644", @"0000000000000000000000000000000000000000", @"0000000000000000000000000000000000000000", @"A", nil];
+			 for (NSString *path in lines) {
+				 if ([path length] == 0)
+					 continue;
+				 [dictionary setObject:fileStatus forKey:path];
+			 }
+
+			 [self addFilesFromDictionary:dictionary staged:NO tracked:NO];
+		 }
+
+		 [self postIndexRefreshSuccess:YES message:@"ls-files success"];
+		 dispatch_group_leave(_indexRefreshGroup);
+	 }];
+
+	// Staged files
+	dispatch_group_enter(_indexRefreshGroup);
+	[PBTask launchTask:[PBGitBinary path]
+			 arguments:@[@"diff-index", @"--cached", @"-z", [self parentTree]]
+		   inDirectory:self.repository.workingDirectoryURL.path
+	 completionHandler:^(NSData *readData, NSError *error) {
+		 if (error) {
+			 [self postIndexRefreshSuccess:NO message:@"diff-index failed"];
+		 } else {
+			 NSArray *lines = [self linesFromData:readData];
+			 NSMutableDictionary *dic = [self dictionaryForLines:lines];
+			 [self addFilesFromDictionary:dic staged:YES tracked:YES];
+		 }
+
+		 [self postIndexRefreshSuccess:YES message:@"diff-index success"];
+
+		 dispatch_group_leave(_indexRefreshGroup);
+	 }];
+
+
+	// Unstaged files
+	dispatch_group_enter(_indexRefreshGroup);
+	[PBTask launchTask:[PBGitBinary path]
+			 arguments:@[@"diff-files", @"-z"]
+		   inDirectory:self.repository.workingDirectoryURL.path
+	 completionHandler:^(NSData *readData, NSError *error) {
+		 if (error) {
+			 [self postIndexRefreshSuccess:NO message:@"diff-files failed"];
+		 } else {
+			 NSArray *lines = [self linesFromData:readData];
+			 NSMutableDictionary *dic = [self dictionaryForLines:lines];
+			 [self addFilesFromDictionary:dic staged:NO tracked:YES];
+		 }
+		 [self postIndexRefreshSuccess:YES message:@"diff-files success"];
+
+		 dispatch_group_leave(_indexRefreshGroup);
+	 }];
 }
 
+// Returns the tree to compare the index to, based
+// on whether amend is set or not.
 - (NSString *) parentTree
 {
-	NSString *parent = amend ? @"HEAD^" : @"HEAD";
+	NSString *parent = self.amend ? @"HEAD^" : @"HEAD";
 	
-	if (![repository parseReference:parent])
+	if (![self.repository revisionExists:parent])
 		// We don't have a head ref. Return the empty tree.
 		return @"4b825dc642cb6eb9a060e54bf8d69288fbee4904";
 
@@ -163,20 +283,20 @@ NSString *PBGitIndexOperationFailed = @"PBGitIndexOperationFailed";
 		[commitSubject appendString:[commitMessage substringToIndex:newLine.location]];
 	
 	NSString *commitMessageFile;
-	commitMessageFile = [repository.gitURL.path stringByAppendingPathComponent:@"COMMIT_EDITMSG"];
+	commitMessageFile = [self.repository.gitURL.path stringByAppendingPathComponent:@"COMMIT_EDITMSG"];
 	
 	[commitMessage writeToFile:commitMessageFile atomically:YES encoding:NSUTF8StringEncoding error:nil];
 
 	
 	[self postCommitUpdate:@"Creating tree"];
-	NSString *tree = [repository outputForCommand:@"write-tree"];
+	NSString *tree = [self.repository outputForCommand:@"write-tree"];
 	if ([tree length] != 40)
 		return [self postCommitFailure:@"Creating tree failed"];
 	
 	
 	NSMutableArray *arguments = [NSMutableArray arrayWithObjects:@"commit-tree", tree, nil];
-	NSString *parent = amend ? @"HEAD^" : @"HEAD";
-	if ([repository parseReference:parent]) {
+	NSString *parent = self.amend ? @"HEAD^" : @"HEAD";
+	if ([self.repository revisionExists:parent]) {
 		[arguments addObject:@"-p"];
 		[arguments addObject:parent];
 	}
@@ -188,13 +308,13 @@ NSString *PBGitIndexOperationFailed = @"PBGitIndexOperationFailed";
         [self postCommitUpdate:@"Running hooks"];
         NSString *hookFailureMessage = nil;
         NSString *hookOutput = nil;
-        if (![repository executeHook:@"pre-commit" output:&hookOutput]) {
+        if (![self.repository executeHook:@"pre-commit" output:&hookOutput]) {
             hookFailureMessage = [NSString stringWithFormat:@"Pre-commit hook failed%@%@",
                                   [hookOutput length] > 0 ? @":\n" : @"",
                                   hookOutput];
         }
 
-        if (![repository executeHook:@"commit-msg" withArgs:[NSArray arrayWithObject:commitMessageFile] output:nil]) {
+        if (![self.repository executeHook:@"commit-msg" withArgs:[NSArray arrayWithObject:commitMessageFile] output:nil]) {
             hookFailureMessage = [NSString stringWithFormat:@"Commit-msg hook failed%@%@",
                                   [hookOutput length] > 0 ? @":\n" : @"",
                                   hookOutput];
@@ -207,23 +327,23 @@ NSString *PBGitIndexOperationFailed = @"PBGitIndexOperationFailed";
 	
 	commitMessage = [NSString stringWithContentsOfFile:commitMessageFile encoding:NSUTF8StringEncoding error:nil];
 	
-	NSString *commit = [repository outputForArguments:arguments
+	NSString *commit = [self.repository outputForArguments:arguments
 										  inputString:commitMessage
-							   byExtendingEnvironment:amendEnvironment
+							   byExtendingEnvironment:self.amendEnvironment
 											 retValue: &ret];
 	
 	if (ret || [commit length] != 40)
 		return [self postCommitFailure:@"Could not create a commit object"];
 	
 	[self postCommitUpdate:@"Updating HEAD"];
-	[repository outputForArguments:[NSArray arrayWithObjects:@"update-ref", @"-m", commitSubject, @"HEAD", commit, nil]
-						  retValue: &ret];
+	[self.repository outputForArguments:[NSArray arrayWithObjects:@"update-ref", @"-m", commitSubject, @"HEAD", commit, nil]
+                               retValue: &ret];
 	if (ret)
 		return [self postCommitFailure:@"Could not update HEAD"];
 	
 	[self postCommitUpdate:@"Running post-commit hook"];
 	
-	BOOL success = [repository executeHook:@"post-commit" output:nil];
+	BOOL success = [self.repository executeHook:@"post-commit" output:nil];
 	NSMutableDictionary *userInfo = [NSMutableDictionary dictionaryWithObject:[NSNumber numberWithBool:success] forKey:@"success"];
 	NSString *description;  
 	if (success)
@@ -240,10 +360,10 @@ NSString *PBGitIndexOperationFailed = @"PBGitIndexOperationFailed";
 	if (!success)
 		return;
 
-	repository.hasChanged = YES;
+	self.repository.hasChanged = YES;
 
-	amendEnvironment = nil;
-	if (amend)
+	self.amendEnvironment = nil;
+	if (self.amend)
 		self.amend = NO;
 	else
 		[self refresh];
@@ -278,20 +398,20 @@ NSString *PBGitIndexOperationFailed = @"PBGitIndexOperationFailed";
 													  userInfo:[NSDictionary dictionaryWithObject:description forKey:@"description"]];	
 }
 
-- (BOOL)stageFiles:(NSArray *)stageFiles
+- (BOOL)performStageOrUnstage:(BOOL)stage withFiles:(NSArray *)files
 {
 	// Do staging files by chunks of 1000 files each, to prevent program freeze (because NSPipe has limited capacity)
-	
-	int filesCount = [stageFiles count];
-	
+
+	NSUInteger filesCount = files.count;
+	const NSUInteger MAX_FILES_PER_STAGE = 1000;
+
 	// Prepare first iteration
-	int loopFrom = 0;
-	int loopTo = 1000;
+	NSUInteger loopFrom = 0;
+	NSUInteger loopTo = MAX_FILES_PER_STAGE;
 	if (loopTo > filesCount)
 		loopTo = filesCount;
-	int loopCount = 0;
-	int i = 0;
-	
+	NSUInteger loopCount = 0;
+
 	// Staging
 	while (loopCount < filesCount) {
 		// Input string for update-index
@@ -300,111 +420,85 @@ NSString *PBGitIndexOperationFailed = @"PBGitIndexOperationFailed";
 		// "git add -- <files>
 		NSMutableString *input = [NSMutableString string];
 
-		for (i = loopFrom; i < loopTo; i++) {
+		for (NSUInteger i = loopFrom; i < loopTo; i++) {
 			loopCount++;
-			
-			PBChangedFile *file = [stageFiles objectAtIndex:i];
-			
-			[input appendFormat:@"%@\0", file.path];
+
+			PBChangedFile *file = [files objectAtIndex:i];
+
+			if (stage) {
+				[input appendFormat:@"%@\0", file.path];
+			} else {
+				NSString *indexInfo;
+				if (file.status == NEW) {
+					// Index info lies because the file is NEW
+					indexInfo = [NSString stringWithFormat:@"0 0000000000000000000000000000000000000000\t%@\0", file.path];
+				} else {
+					indexInfo = [file indexInfo];
+				}
+				[input appendString:indexInfo];
+			}
 		}
-		
-			
+
 		int ret = 1;
-		[repository outputForArguments:[NSArray arrayWithObjects:@"update-index", @"--add", @"--remove", @"-z", @"--stdin", nil]
-						   inputString:input
-							  retValue:&ret];
+		if (stage) {
+			[self.repository outputForArguments:[NSArray arrayWithObjects:@"update-index", @"--add", @"--remove", @"-z", @"--stdin", nil]
+									inputString:input
+									   retValue:&ret];
+		} else {
+			[self.repository outputForArguments:[NSArray arrayWithObjects:@"update-index", @"-z", @"--index-info", nil]
+									inputString:input
+									   retValue:&ret];
+		}
 
 		if (ret) {
-			[self postOperationFailed:[NSString stringWithFormat:@"Error in staging files. Return value: %i", ret]];
+			[self postOperationFailed:[NSString stringWithFormat:@"Error in %@ files. Return value: %i", (stage ? @"staging" : @"unstaging"), ret]];
 			return NO;
 		}
 
-		for (i = loopFrom; i < loopTo; i++) {
-			PBChangedFile *file = [stageFiles objectAtIndex:i];
-			
-			file.hasUnstagedChanges = NO;
-			file.hasStagedChanges = YES;
+		for (NSUInteger i = loopFrom; i < loopTo; i++) {
+			PBChangedFile *file = [files objectAtIndex:i];
+			file.hasStagedChanges = stage;
+			file.hasUnstagedChanges = !stage;
 		}
-		
+
 		// Prepare next iteration
 		loopFrom = loopCount;
-		loopTo = loopFrom + 1000;
+		loopTo = loopFrom + MAX_FILES_PER_STAGE;
 		if (loopTo > filesCount)
 			loopTo = filesCount;
 	}
 
-	[self postIndexChange];
+	[self postIndexUpdated];
+	
 	return YES;
 }
 
-// TODO: Refactor with above. What's a better name for this?
-- (BOOL)unstageFiles:(NSArray *)unstageFiles
+- (BOOL)stageFiles:(NSArray<PBChangedFile *> *)stageFiles
 {
-	// Do unstaging files by chunks of 1000 files each, to prevent program freeze (because NSPipe has limited capacity)
-	
-	int filesCount = [unstageFiles count];
-	
-	// Prepare first iteration
-	int loopFrom = 0;
-	int loopTo = 1000;
-	if (loopTo > filesCount)
-		loopTo = filesCount;
-	int loopCount = 0;
-	int i = 0;
-	
-	// Unstaging
-	while (loopCount < filesCount) {
-		NSMutableString *input = [NSMutableString string];
-		
-		for (i = loopFrom; i < loopTo; i++) {
-			loopCount++;
-			
-			PBChangedFile *file = [unstageFiles objectAtIndex:i];
-			
-			[input appendString:[file indexInfo]];
-		}
-		
-		int ret = 1;
-		[repository outputForArguments:[NSArray arrayWithObjects:@"update-index", @"-z", @"--index-info", nil]
-						   inputString:input
-							  retValue:&ret];
-		
-		if (ret)
-		{
-			[self postOperationFailed:[NSString stringWithFormat:@"Error in unstaging files. Return value: %i", ret]];
-			return NO;
-		}
-		
-		for (i = loopFrom; i < loopTo; i++) {
-			PBChangedFile *file = [unstageFiles objectAtIndex:i];
-			
-			file.hasUnstagedChanges = YES;
-			file.hasStagedChanges = NO;
-		}
-		
-		// Prepare next iteration
-		loopFrom = loopCount;
-		loopTo = loopFrom + 1000;
-		if (loopTo > filesCount)
-			loopTo = filesCount;
-	}
-
-	[self postIndexChange];
-	return YES;
+	return [self performStageOrUnstage:YES withFiles:stageFiles];
 }
 
-- (void)discardChangesForFiles:(NSArray *)discardFiles
+- (BOOL)unstageFiles:(NSArray<PBChangedFile *> *)unstageFiles
+{
+	return [self performStageOrUnstage:NO withFiles:unstageFiles];
+}
+
+- (void)discardChangesForFiles:(NSArray<PBChangedFile *> *)discardFiles
 {
 	NSArray *paths = [discardFiles valueForKey:@"path"];
 	NSString *input = [paths componentsJoinedByString:@"\0"];
 
-	NSArray *arguments = [NSArray arrayWithObjects:@"checkout-index", @"--index", @"--quiet", @"--force", @"-z", @"--stdin", nil];
+	NSArray *arguments = @[@"checkout-index", @"--index", @"--quiet", @"--force", @"-z", @"--stdin"];
 
-	int ret = 1;
-	[PBEasyPipe outputForCommand:[PBGitBinary path]	withArgs:arguments inDir:[workingDirectory path] inputString:input retValue:&ret];
+	PBTask *task = [PBTask taskWithLaunchPath:[PBGitBinary path]
+									arguments:arguments
+								  inDirectory:self.repository.workingDirectoryURL.path];
+	task.standardInputData = [input dataUsingEncoding:NSUTF8StringEncoding];
 
-	if (ret) {
-		[self postOperationFailed:[NSString stringWithFormat:@"Discarding changes failed with return value %i", ret]];
+	NSError *error = nil;
+	BOOL success = [task launchTask:&error];
+	if (!success) {
+		[self postOperationFailed:[NSString stringWithFormat:@"Discarding changes failed with return value %@", error.userInfo[PBTaskTerminationStatusKey]]];
 		return;
 	}
 
@@ -412,7 +506,7 @@ NSString *PBGitIndexOperationFailed = @"PBGitIndexOperationFailed";
 		if (file.status != NEW)
 			file.hasUnstagedChanges = NO;
 
-	[self postIndexChange];
+	[self postIndexUpdated];
 }
 
 - (BOOL)applyPatch:(NSString *)hunk stage:(BOOL)stage reverse:(BOOL)reverse;
@@ -424,9 +518,9 @@ NSString *PBGitIndexOperationFailed = @"PBGitIndexOperationFailed";
 		[array addObject:@"--reverse"];
 
 	int ret = 1;
-	NSString *error = [repository outputForArguments:array
-										 inputString:hunk
-											retValue:&ret];
+	NSString *error = [self.repository outputForArguments:array
+                                              inputString:hunk
+                                                 retValue:&ret];
 
 	if (ret) {
 		[self postOperationFailed:[NSString stringWithFormat:@"Applying patch failed with return value %i. Error: %@", ret, error]];
@@ -446,32 +540,26 @@ NSString *PBGitIndexOperationFailed = @"PBGitIndexOperationFailed";
 		NSString *indexPath = [@":0:" stringByAppendingString:file.path];
 
 		if (file.status == NEW)
-			return [repository outputForArguments:[NSArray arrayWithObjects:@"show", indexPath, nil]];
+			return [self.repository outputForArguments:[NSArray arrayWithObjects:@"show", indexPath, nil]];
 
-		return [repository outputInWorkdirForArguments:[NSArray arrayWithObjects:@"diff-index", parameter, @"--cached", [self parentTree], @"--", file.path, nil]];
+		return [self.repository outputInWorkdirForArguments:[NSArray arrayWithObjects:@"diff-index", parameter, @"--cached", [self parentTree], @"--", file.path, nil]];
 	}
 
 	// unstaged
 	if (file.status == NEW) {
 		NSStringEncoding encoding;
 		NSError *error = nil;
-		NSString *path = [[repository workingDirectory] stringByAppendingPathComponent:file.path];
-		NSString *contents = [NSString stringWithContentsOfFile:path
-												   usedEncoding:&encoding
-														  error:&error];
+		NSURL *fileURL = [self.repository.workingDirectoryURL URLByAppendingPathComponent:file.path];
+		NSString *contents = [NSString stringWithContentsOfURL:fileURL
+                                                  usedEncoding:&encoding
+                                                         error:&error];
 		if (error)
 			return nil;
 
 		return contents;
 	}
 
-	return [repository outputInWorkdirForArguments:[NSArray arrayWithObjects:@"diff-files", parameter, @"--", file.path, nil]];
-}
-
-- (void)postIndexChange
-{
-	[[NSNotificationCenter defaultCenter] postNotificationName:PBGitIndexIndexUpdated
-														object:self];
+	return [self.repository outputInWorkdirForArguments:[NSArray arrayWithObjects:@"diff-files", parameter, @"--", file.path, nil]];
 }
 
 # pragma mark WebKit Accessibility
@@ -485,90 +573,10 @@ NSString *PBGitIndexOperationFailed = @"PBGitIndexOperationFailed";
 
 @implementation PBGitIndex (IndexRefreshMethods)
 
-- (void)indexRefreshFinished:(NSNotification *)notification
-{
-	if ([(NSNumber *)[(NSDictionary *)[notification userInfo] objectForKey:@"NSFileHandleError"] intValue])
-	{
-		[[NSNotificationCenter defaultCenter] postNotificationName:PBGitIndexIndexRefreshFailed
-															object:self
-														  userInfo:[NSDictionary dictionaryWithObject:@"update-index failed" forKey:@"description"]];
-		return;
-	}
-
-	[[NSNotificationCenter defaultCenter] postNotificationName:PBGitIndexIndexRefreshStatus
-														object:self
-													  userInfo:[NSDictionary dictionaryWithObject:@"update-index success" forKey:@"description"]];
-
-	// Now that the index is refreshed, we need to read the information from the index
-	NSNotificationCenter *nc = [NSNotificationCenter defaultCenter]; 
-
-	if ([repository isBareRepository])
-	{
-		return;
-	}
-	
-	// Other files (not tracked, not ignored)
-	refreshStatus++;
-	NSFileHandle *handle = [PBEasyPipe handleForCommand:[PBGitBinary path] 
-											   withArgs:[NSArray arrayWithObjects:@"ls-files", @"--others", @"--exclude-standard", @"-z", nil]
-												  inDir:[workingDirectory path]];
-	[nc addObserver:self selector:@selector(readOtherFiles:) name:NSFileHandleReadToEndOfFileCompletionNotification object:handle]; 
-	[handle readToEndOfFileInBackgroundAndNotify];
-
-	// Unstaged files
-	refreshStatus++;
-	handle = [PBEasyPipe handleForCommand:[PBGitBinary path] 
-											   withArgs:[NSArray arrayWithObjects:@"diff-files", @"-z", nil]
-												  inDir:[workingDirectory path]];
-	[nc addObserver:self selector:@selector(readUnstagedFiles:) name:NSFileHandleReadToEndOfFileCompletionNotification object:handle]; 
-	[handle readToEndOfFileInBackgroundAndNotify];
-
-	// Staged files
-	refreshStatus++;
-	handle = [PBEasyPipe handleForCommand:[PBGitBinary path] 
-								 withArgs:[NSArray arrayWithObjects:@"diff-index", @"--cached", @"-z", [self parentTree], nil]
-									inDir:[workingDirectory path]];
-	[nc addObserver:self selector:@selector(readStagedFiles:) name:NSFileHandleReadToEndOfFileCompletionNotification object:handle]; 
-	[handle readToEndOfFileInBackgroundAndNotify];
-}
-
-- (void)readOtherFiles:(NSNotification *)notification
-{
-	NSArray *lines = [self linesFromNotification:notification];
-	NSMutableDictionary *dictionary = [[NSMutableDictionary alloc] initWithCapacity:[lines count]];
-	// Other files are untracked, so we don't have any real index information. Instead, we can just fake it.
-	// The line below is not used at all, as for these files the commitBlob isn't set
-	NSArray *fileStatus = [NSArray arrayWithObjects:@":000000", @"100644", @"0000000000000000000000000000000000000000", @"0000000000000000000000000000000000000000", @"A", nil];
-	for (NSString *path in lines) {
-		if ([path length] == 0)
-			continue;
-		[dictionary setObject:fileStatus forKey:path];
-	}
-
-	[self addFilesFromDictionary:dictionary staged:NO tracked:NO];
-	[self indexStepComplete];	
-}
-
-- (void) readStagedFiles:(NSNotification *)notification
-{
-	NSArray *lines = [self linesFromNotification:notification];
-	NSMutableDictionary *dic = [self dictionaryForLines:lines];
-	[self addFilesFromDictionary:dic staged:YES tracked:YES];
-	[self indexStepComplete];
-}
-
-- (void) readUnstagedFiles:(NSNotification *)notification
-{
-	NSArray *lines = [self linesFromNotification:notification];
-	NSMutableDictionary *dic = [self dictionaryForLines:lines];
-	[self addFilesFromDictionary:dic staged:NO tracked:YES];
-	[self indexStepComplete];
-}
-
 - (void) addFilesFromDictionary:(NSMutableDictionary *)dictionary staged:(BOOL)staged tracked:(BOOL)tracked
 {
 	// Iterate over all existing files
-	for (PBChangedFile *file in files) {
+	for (PBChangedFile *file in self.files) {
 		NSArray *fileStatus = [dictionary objectForKey:file.path];
 		// Object found, this is still a cached / uncached thing
 		if (fileStatus) {
@@ -608,7 +616,7 @@ NSString *PBGitIndexOperationFailed = @"PBGitIndexOperationFailed";
 			// Unstaged, untracked dictionary ("Other" files), and file
 			// is indicated as new (which would be untracked), so let's
 			// remove it
-			else if (!tracked && file.status == NEW)
+			else if (!tracked && file.status == NEW && file.commitBlobSHA == nil)
 				file.hasUnstagedChanges = NO;
 		}
 	}
@@ -639,15 +647,14 @@ NSString *PBGitIndexOperationFailed = @"PBGitIndexOperationFailed";
 		file.hasStagedChanges = staged;
 		file.hasUnstagedChanges = !staged;
 
-		[files addObject:file];
+		[self.files addObject:file];
 	}
 	[self didChangeValueForKey:@"indexChanges"];
 }
 
 # pragma mark Utility methods
-- (NSArray *)linesFromNotification:(NSNotification *)notification
+- (NSArray *)linesFromData:(NSData *)data
 {
-	NSData *data = [[notification userInfo] valueForKey:NSFileHandleNotificationDataItem];
 	if (!data)
 		return [NSArray array];
 
@@ -684,40 +691,6 @@ NSString *PBGitIndexOperationFailed = @"PBGitIndexOperationFailed";
 	}
 
 	return dictionary;
-}
-
-// This method is called for each of the three processes from above.
-// If all three are finished (self.busy == 0), then we can delete
-// all files previously marked as deletable
-- (void)indexStepComplete
-{
-	// if we're still busy, do nothing :)
-	if (--refreshStatus) {
-		[self postIndexChange];
-		return;
-	}
-
-	// At this point, all index operations have finished.
-	// We need to find all files that don't have either
-	// staged or unstaged files, and delete them
-
-	NSMutableArray *deleteFiles = [NSMutableArray array];
-	for (PBChangedFile *file in files) {
-		if (!file.hasStagedChanges && !file.hasUnstagedChanges)
-			[deleteFiles addObject:file];
-	}
-	
-	if ([deleteFiles count]) {
-		[self willChangeValueForKey:@"indexChanges"];
-		for (PBChangedFile *file in deleteFiles)
-			[files removeObject:file];
-		[self didChangeValueForKey:@"indexChanges"];
-	}
-
-	[[NSNotificationCenter defaultCenter] postNotificationName:PBGitIndexFinishedIndexRefresh
-														object:self];
-	[self postIndexChange];
-
 }
 
 @end

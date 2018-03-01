@@ -12,6 +12,8 @@
 #import "PBGitWindowController.h"
 #import "PBGitBinary.h"
 #import "PBDiffWindowController.h"
+#import "PBGitRepositoryDocument.h"
+#import "PBError.h"
 
 @implementation PBCLIProxy
 @synthesize connection;
@@ -37,7 +39,7 @@
 	NSURL* url = [NSURL fileURLWithPath:[repositoryPath path]];
 	NSArray* arguments = [NSArray arrayWithArray:args];
 
-	PBGitRepository *document = [[NSDocumentController sharedDocumentController] documentForURL:url];
+	PBGitRepositoryDocument *document = [[NSDocumentController sharedDocumentController] documentForURL:url];
 	if (!document) {
 		if (error) {
 			NSString *suggestion = [PBGitBinary path] ? @"this isn't a git repository" : @"GitX can't find your git binary";
@@ -45,19 +47,18 @@
 			NSDictionary *userInfo = [NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"Could not create document. Perhaps %@", suggestion]
 																 forKey:NSLocalizedFailureReasonErrorKey];
 
-			*error = [NSError errorWithDomain:PBGitRepositoryErrorDomain code:2 userInfo:userInfo];
+			*error = [NSError errorWithDomain:PBGitXErrorDomain code:2 userInfo:userInfo];
 		}
 		return NO;
 	}
 
 	if ([arguments count] > 0 && ([[arguments objectAtIndex:0] isEqualToString:@"--commit"] ||
 		[[arguments objectAtIndex:0] isEqualToString:@"-c"]))
-		[document.windowController showCommitView:self];
+		[document showCommitView:self];
 	else {
 		PBGitRevSpecifier* rev = [[PBGitRevSpecifier alloc] initWithParameters:arguments];
 		rev.workingDirectory = url;
-		document.currentBranch = [document addBranch: rev];
-		[document.windowController showHistoryView:self];
+		[document selectRevisionSpecifier:rev];
 	}
 	[NSApp activateIgnoringOtherApps:YES];
 

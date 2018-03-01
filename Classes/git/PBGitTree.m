@@ -7,10 +7,10 @@
 //
 
 #import "PBGitRepository.h"
+#import "PBGitRepository_PBGitBinarySupport.h"
 #import "PBGitTree.h"
 #import "PBGitCommit.h"
 #import "NSFileHandleExt.h"
-#import "PBEasyPipe.h"
 #import "PBEasyFS.h"
 
 @implementation PBGitTree
@@ -23,7 +23,7 @@
 	PBGitTree* tree = [[self alloc] init];
 	tree.parent = nil;
 	tree.leaf = NO;
-	tree.sha = [c realSha];
+	tree.sha = c.SHA;
 	tree.repository = c.repository;
 	tree.path = @"";
 	return tree;
@@ -78,15 +78,8 @@
 {
 	@try {
 		// First ask git check-attr if the file has a binary attribute custom set
-		NSFileHandle *handle = [repository handleInWorkDirForArguments:
-								[NSArray arrayWithObjects:
-								 @"check-attr",
-								 @"binary",
-								 [self fullPath],
-								 nil]];
-
-		NSData *data = [handle readDataToEndOfFile];
-		NSString *string = [[NSString alloc] initWithData:data encoding:NSISOLatin1StringEncoding];
+		NSError *error = nil;
+		NSString *string = [repository outputOfTaskWithArguments:@[@"check-attr", @"binary", self.fullPath] error:&error];
 		
 		if (!string)
 			return NO;
@@ -123,8 +116,8 @@
 			string = [[NSString alloc] initWithData:data encoding:NSISOLatin1StringEncoding];
 		return string;
 	}
-	
-	return [repository outputForArguments:[NSArray arrayWithObjects:@"show", [self refSpec], nil]];
+
+	return [repository outputOfTaskWithArguments:@[@"show", self.refSpec] error:NULL];
 }
 
 - (NSString *) blame
@@ -137,8 +130,8 @@
 	
 	if ([self fileSize] > 52428800) // ~50MB
 		return [NSString stringWithFormat:@"%@ is too big to be displayed (%lld bytes)", [self fullPath], [self fileSize]];
-	
-	NSString *contents=[repository outputInWorkdirForArguments:[NSArray arrayWithObjects:@"blame", @"-p",  sha, @"--", [self fullPath], nil]];
+
+	NSString *contents = [repository outputOfTaskWithArguments:@[@"blame", @"-p", sha, @"--", self.fullPath] error:NULL];
 	
 	if ([self hasBinaryHeader:contents])
 		return [NSString stringWithFormat:@"%@ appears to be a binary file of %lld bytes", [self fullPath], [self fileSize]];
@@ -158,8 +151,15 @@
 	if ([self fileSize] > 52428800) // ~50MB
 		return [NSString stringWithFormat:@"%@ is too big to be displayed (%lld bytes)", [self fullPath], [self fileSize]];
 
-	NSString *contents=[repository outputInWorkdirForArguments:[NSArray arrayWithObjects:@"log", [NSString stringWithFormat:@"--pretty=format:%@",format], @"--", [self fullPath], nil]];
-	
+	NSArray *arguments = @[
+						   @"log",
+						   [NSString stringWithFormat:@"--pretty=format:%@", format],
+						   @"--follow",
+						   @"--",
+						   [self fullPath],
+						   ];
+	NSString *contents = [repository outputOfTaskWithArguments:arguments error:NULL];
+
 	if ([self hasBinaryHeader:contents])
 		return [NSString stringWithFormat:@"%@ appears to be a binary file of %lld bytes", [self fullPath], [self fileSize]];
 	
@@ -172,8 +172,7 @@
 	if (_fileSize)
 		return _fileSize;
 
-	NSFileHandle *handle = [repository handleForArguments:[NSArray arrayWithObjects:@"cat-file", @"-s", [self refSpec], nil]];
-	NSString *sizeString = [[NSString alloc] initWithData:[handle readDataToEndOfFile] encoding:NSISOLatin1StringEncoding];
+	NSString *sizeString = [repository outputOfTaskWithArguments:@[@"cat-file", @"-s", self.refSpec] error:NULL];
 
 	if (!sizeString)
 		_fileSize = -1;
@@ -207,9 +206,11 @@
 	NSString* newName = [dir stringByAppendingPathComponent:path];
 
 	if (leaf) {
-		NSFileHandle* handle = [repository handleForArguments:[NSArray arrayWithObjects:@"show", [self refSpec], nil]];
-		NSData* data = [handle readDataToEndOfFile];
-		[data writeToFile:newName atomically:YES];
+		PBTask *task = [repository taskWithArguments:@[@"show", self.refSpec]];
+
+		[task launchTask:NULL];
+
+		[task.standardOutputData writeToFile:newName atomically:YES];
 	} else { // Directory
         NSError *error = nil;
 		if (![[NSFileManager defaultManager] createDirectoryAtPath:newName withIntermediateDirectories:YES attributes:nil error:&error]) {
@@ -248,10 +249,13 @@
 	
 	if (!localFileName)
 		localFileName = [[PBEasyFS tmpDirWithPrefix: sha] stringByAppendingPathComponent:path];
-	
-	NSFileHandle* handle = [repository handleForArguments:[NSArray arrayWithObjects:@"show", [self refSpec], nil]];
-	NSData* data = [handle readDataToEndOfFile];
-	[data writeToFile:localFileName atomically:YES];
+
+
+	PBTask *task = [repository taskWithArguments:@[@"show", self.refSpec]];
+
+	[task launchTask:NULL];
+
+	[task.standardOutputData writeToFile:localFileName atomically:YES];
 	
 	NSFileManager* fs = [NSFileManager defaultManager];
 	localMtime = [[fs attributesOfItemAtPath:localFileName error: nil] objectForKey:NSFileModificationDate];

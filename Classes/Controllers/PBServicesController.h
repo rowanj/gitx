@@ -9,11 +9,8 @@
 #import <Cocoa/Cocoa.h>
 
 
-@interface PBServicesController : NSObject {
-
-}
-
-- (NSString *)completeSHA1For:(NSString *)sha;
+@interface PBServicesController : NSObject
 
 - (void)completeSha:(NSPasteboard *)pboard userData:(NSString *)userData error:(NSString **)error;
+
 @end

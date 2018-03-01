@@ -8,24 +8,25 @@
 
 #import <Cocoa/Cocoa.h>
 #import "PBViewController.h"
+#import "PBHistorySearchMode.h"
 
 @class PBSourceViewItem;
 @class PBGitHistoryController;
 @class PBGitCommitController;
 
 @interface PBGitSidebarController : PBViewController<NSOutlineViewDelegate> {
-	IBOutlet NSWindow *window;
-	IBOutlet NSOutlineView *sourceView;
-	IBOutlet NSView *sourceListControlsView;
-	IBOutlet NSPopUpButton *actionButton;
-	IBOutlet NSSegmentedControl *remoteControls;
+	__weak IBOutlet NSWindow *window;
+	__weak IBOutlet NSOutlineView *sourceView;
+	__weak IBOutlet NSView *sourceListControlsView;
+	__weak IBOutlet NSPopUpButton *actionButton;
+	__weak IBOutlet NSSegmentedControl *remoteControls;
 
 	NSMutableArray *items;
 
 	/* Specific things */
 	PBSourceViewItem *stage;
 
-	PBSourceViewItem *branches, *remotes, *tags, *others, *submodules;
+	PBSourceViewItem *branches, *remotes, *tags, *others, *submodules, *stashes;
 
 	PBGitHistoryController *historyViewController;
 	PBGitCommitController *commitViewController;
@@ -39,9 +40,11 @@
 
 - (IBAction) fetchPullPushAction:(id)sender;
 
-- (void)setHistorySearch:(NSString *)searchString mode:(NSInteger)mode;
+- (void)setHistorySearch:(NSString *)searchString mode:(PBHistorySearchMode)mode;
 
 @property(readonly) NSMutableArray *items;
+@property(readonly) PBSourceViewItem *remotes;
+@property(readonly) NSOutlineView *sourceView;
 @property(readonly) NSView *sourceListControlsView;
 @property(readonly) PBGitHistoryController *historyViewController;
 @property(readonly) PBGitCommitController *commitViewController;

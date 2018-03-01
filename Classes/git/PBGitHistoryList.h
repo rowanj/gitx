@@ -22,8 +22,8 @@
 	PBGitRevList *projectRevList;
 	PBGitRevList *currentRevList;
 
-	GTOID *lastSHA;
-	NSSet *lastRefSHAs;
+	GTOID *lastOID;
+	NSSet *lastRefOIDs;
 	NSInteger lastBranchFilter;
 	PBGitRef *lastRemoteRef;
 	BOOL resetCommits;

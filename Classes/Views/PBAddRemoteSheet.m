@@ -9,25 +9,24 @@
 #import "PBAddRemoteSheet.h"
 #import "PBGitWindowController.h"
 #import "PBGitRepository.h"
+#import "PBGitRepositoryDocument.h"
+
 
 @implementation PBAddRemoteSheet
 
 #pragma mark -
 #pragma mark PBAddRemoteSheet
 
-- (id) initWithRepository:(PBGitRepository *)repo
++ (void)beginSheetWithWindowController:(PBGitWindowController *)windowController completionHandler:(RJSheetCompletionHandler)handler
 {
-	self = [super initWithWindowNibName:@"PBAddRemoteSheet" forRepo:repo];
-	if (!self)
-		return nil;
-
-	return self;
+	PBAddRemoteSheet *sheet = [[super alloc] initWithWindowNibName:@"PBAddRemoteSheet" windowController:windowController];
+	[sheet beginSheetWithCompletionHandler:handler];
 }
 
-- (void) show
+- (void)beginSheetWithCompletionHandler:(RJSheetCompletionHandler)handler
 {
 	[self.errorMessage setStringValue:@""];
-	[super show];
+	[super beginSheetWithCompletionHandler:handler];
 }
 
 #pragma mark IBActions
@@ -37,8 +36,8 @@
 	PBAddRemoteSheet *me = self;
 	NSOpenPanel *browseSheet = [NSOpenPanel openPanel];
 
-	[browseSheet setTitle:@"Add remote"];
-    [browseSheet setMessage:@"Select a folder with a git repository"];
+	[browseSheet setTitle:NSLocalizedString(@"Add remote", @"Title of sheet to enter data for a new remote")];
+    [browseSheet setMessage:NSLocalizedString(@"Select a folder with a git repository", @"Title of sheet to enter data for a new remote")];
     [browseSheet setCanChooseFiles:NO];
     [browseSheet setCanChooseDirectories:YES];
     [browseSheet setAllowsMultipleSelection:NO];
@@ -47,7 +46,7 @@
 
 	self.browseSheet = browseSheet;
 	[me hide];
-    [browseSheet beginSheetModalForWindow:me.repoWindow.window
+    [browseSheet beginSheetModalForWindow:self.windowController.window
                         completionHandler:^(NSInteger result) {
                             if (result == NSOKButton) {
                                 NSString* directory = browseSheet.directoryURL.path;
@@ -65,24 +64,22 @@
 	NSString *name = [[self.remoteName stringValue] copy];
 
 	if ([name isEqualToString:@""]) {
-		[self.errorMessage setStringValue:@"Remote name is required"];
+		[self.errorMessage setStringValue:NSLocalizedString(@"Remote name is required", @"Add Remote error message: missing name")];
 		return;
 	}
 
 	if (![self.repository checkRefFormat:[@"refs/remotes/" stringByAppendingString:name]]) {
-		[self.errorMessage setStringValue:@"Invalid remote name"];
+		[self.errorMessage setStringValue:NSLocalizedString(@"Invalid remote name", @"Add Remote error message: invalid name")];
 		return;
 	}
 
 	NSString *url = [[self.remoteURL stringValue] copy];
 	if ([url isEqualToString:@""]) {
-		[self.errorMessage setStringValue:@"Remote URL is required"];
+		[self.errorMessage setStringValue:NSLocalizedString(@"Remote URL is required", @"Add Remote error message: missing URL")];
 		return;
 	}
 
-	PBGitRepository* repo = self.repository;
-	[self hide]; // may deallocate self
-	[repo beginAddRemote:name forURL:url];
+	[self acceptSheet:sender];
 }
 
 - (IBAction) showHideHiddenFiles:(id)sender
@@ -92,8 +89,7 @@
 
 - (IBAction) cancelOperation:(id)sender
 {
-//	[super cancelOperation:sender];
-	[self hide];
+	[self cancelSheet:sender];
 }
 
 @end

@@ -65,7 +65,7 @@
 		[centerStyle setAlignment:NSCenterTextAlignment];
 
 		badgeTextAttributes =  [NSMutableDictionary dictionary];
-		[badgeTextAttributes setObject:[NSFont fontWithName:@"Helvetica-Bold" size:[NSFont systemFontSize] - 2] forKey:NSFontAttributeName];
+		[badgeTextAttributes setObject:[NSFont boldSystemFontOfSize:[NSFont systemFontSize] - 2] forKey:NSFontAttributeName];
 		[badgeTextAttributes setObject:centerStyle forKey:NSParagraphStyleAttributeName];
 	}
 
@@ -86,11 +86,11 @@
 	[badgeTextAttributes setObject:textColor forKey:NSForegroundColorAttributeName];
 	NSAttributedString *badgeString = [[NSAttributedString alloc] initWithString:badge attributes:badgeTextAttributes];
 
-	float imageHeight = ceilf([badgeString size].height);
-	float radius = ceilf(imageHeight / 4) * 2;
-	float minWidth = ceilf(radius * 2.5);
+	CGFloat imageHeight = ceil([badgeString size].height);
+	CGFloat radius = ceil(imageHeight / 4) * 2;
+	CGFloat minWidth = ceil(radius * 2.5);
 
-	float imageWidth = ceilf([badgeString size].width + radius);
+	CGFloat imageWidth = ceil([badgeString size].width + radius);
 	if (imageWidth < minWidth)
 		imageWidth = minWidth;
 	NSRect badgeRect = NSMakeRect(0, 0, imageWidth, imageHeight);

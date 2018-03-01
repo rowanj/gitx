@@ -10,12 +10,11 @@
 
 @class PBGitCommit;
 
-@interface PBDiffWindowController : NSWindowController {
-	NSString *diff;
-}
+@interface PBDiffWindowController : NSWindowController
 
-+ (void) showDiffWindowWithFiles:(NSArray *)filePaths fromCommit:(PBGitCommit *)startCommit diffCommit:(PBGitCommit *)diffCommit;
-- (id) initWithDiff:(NSString *)diff;
++ (void)showDiff:(NSString *)diff;
++ (void)showDiffWindowWithFiles:(NSArray *)filePaths fromCommit:(PBGitCommit *)startCommit diffCommit:(PBGitCommit *)diffCommit;
+- (instancetype)initWithDiff:(NSString *)diff;
 
 @property (readonly) NSString *diff;
 @end

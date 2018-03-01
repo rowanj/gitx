@@ -7,7 +7,6 @@
 //
 
 #import "PBChangedFile.h"
-#import "PBEasyPipe.h"
 
 @implementation PBChangedFile
 

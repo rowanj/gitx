@@ -1,0 +1,67 @@
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="16" height="16">
+    <defs>
+        <linearGradient id="bezel-edge-gradient" x1="0" x2="0" y1="0" y2="1">
+            <stop offset="0%" stop-color="#d2e9ef" />
+            <stop offset="20%" stop-color="#c5d7dc" />
+            <stop offset="35%" stop-color="#b5c3c8" />
+            <stop offset="50%" stop-color="#a4aeb1" />
+            <stop offset="80%" stop-color="#838586" />
+            <stop offset="100%" stop-color="#767574" />
+        </linearGradient>
+        <linearGradient id="bezel-gradient" x1="0" x2="0" y1="0" y2="1">
+            <stop offset="0%" stop-color="#181818" />
+            <stop offset="20%" stop-color="#141414" />
+            <stop offset="50%" stop-color="#0b0b0b" />
+            <stop offset="100%" stop-color="#000000" />
+        </linearGradient>
+        <radialGradient id="screen-gradient">
+            <stop offset="0%" stop-color="#03a6c5" />
+            <stop offset="100%" stop-color="#03a6f7" />
+        </radialGradient>
+        <g id="plus">
+            <rect x="-0.5" y="1" width="3.5" height="1" />
+            <rect x="1" y="0" width="1" height="3" />
+        </g>
+        <g id="minus">
+            <rect x="-0.5" y="0" width="3.5" height="1" />
+        </g>
+        <g id="plus-minus" fill="white">
+            <use x="0" y="0" xlink:href="#plus" />
+            <use x="0" y="5" xlink:href="#minus" />
+        </g>
+        <filter id="shadow">
+            <feOffset in="SourceAlpha" result="offset" dx="0" dy="1" />
+            <feColorMatrix in="offset"
+                           result="colored"
+                           type="matrix"
+                           values="1 0 0 0 0
+                                   0 1 0 0 0
+                                   0 0 1 0 0
+                                   0 0 0 0.2 0" />
+            <feGaussianBlur in="colored" result="blur" stdDeviation="0" />
+            <feBlend in="SourceGraphic" in2="blur" mode="normal" />
+        </filter>
+    </defs>
+    <path d="
+        M1,2
+        l14,0
+        l0,12
+        l-14,0
+        l0,-12
+        Z" fill="url(#bezel-edge-gradient)" filter="url(#shadow)" />
+    <path d="
+        M2,3
+        l12,0
+        l0,10
+        l-12,0
+        l0,-10
+        Z" fill="url(#bezel-gradient)" />
+    <g transform="translate(3, 4)">
+        <rect x="0" y="0" width="10" height="8" fill="url(#screen-gradient)"/>
+
+        <use x="1" y="1" xlink:href="#plus-minus" />
+        <use x="4" y="1" xlink:href="#plus-minus" />
+        <use x="7" y="1" xlink:href="#plus-minus" />
+    </g>
+</svg>

@@ -1,0 +1,6 @@
+language: objective-c
+osx_image: xcode8.3
+before_install:
+ - External/objective-git/script/bootstrap
+script:
+ - xcodebuild -workspace GitX.xcworkspace -scheme GitX build | xcpretty

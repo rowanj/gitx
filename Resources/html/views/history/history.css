@@ -1,0 +1,304 @@
+#commit_header {
+	width: auto;
+	font-size: 12px;
+	padding-left: 5px;
+	padding-right: 5px;
+}
+
+#commit_header tr {
+	vertical-align: top;
+}
+
+#authorTable {
+	margin: -4px;
+}
+
+#rightcontent {
+	position: absolute;
+	right: 5px;
+	top: 5px;
+}
+
+#buttons {
+}
+
+a.servicebutton {
+    display: block;
+    width: 80px;
+    padding: 2px;
+    margin-bottom: 4px;
+
+    border: 1px solid #3465a4;
+    background-color: #cce5ff;
+    color: #204a87;
+
+    font-size: 65%;
+    text-decoration: none;
+    text-align: center;
+
+    -webkit-border-radius: 2px;
+}
+
+a.servicebutton:hover {
+	padding: 1px;
+	border: 2px solid #3465a4;
+}
+
+#gravatar {
+	margin-left: 5px;
+	padding: 2px;
+	width: 60px;
+	height: 60px;
+
+	border: solid gray 1px;
+	-webkit-border-radius: 2px;
+}
+
+.gravatar img {
+	width: 2.9em;
+	height: 2.9em;
+	max-height: 60px;
+	max-width: 60px;
+}
+
+.property_name {
+	width: 6em;
+	color:#7F7F7F;
+	text-align: right;
+	font-weight: bold;
+}
+
+
+#message_files {
+	margin: 5px;
+	padding-left: 1em;
+	width: auto;
+}
+
+#message {
+	font-family: Menlo, Monaco, monospace;
+	font-size: 12px;
+	white-space: pre-wrap;
+	padding: 10px;
+}
+
+.clear_both {
+	clear:both;
+	display:block;
+	height:1px;
+	line-height:0;
+	margin:1em;
+	visibility:hidden;
+}
+
+#details {
+	font-family: Menlo, Monaco, monospace;
+	font-size: 10px;
+	overflow: hidden;
+	width: 600px;
+}
+hr {
+	border: 0;
+	height: 1px;
+	margin: 0 8px;
+	background-color: #DEDEDE;
+	clear: both;
+}
+
+a {
+	color: rgb(20, 79, 174);
+}
+
+.showdiff, #no-commit-message {
+	text-decoration: none;
+	text-align: center;
+	font-size: 1.3em;
+    background-color: #d5d5d5;
+	display: block;
+	padding: 5px 10px;
+	width: 400px;
+	margin: 25px auto 25px auto;
+	-webkit-border-radius: 10px;
+	border: 1px solid #999;
+	-webkit-box-shadow: 1px 1px 2px #DDD;
+}
+.showdiff:hover {
+	background-color: #c4daff;
+}
+
+.refs {
+	font-size: 10px;
+	font-family: -apple-system, "Helvetica Neue", sans-serif;
+	margin-right: 2px;
+	padding: 1px 4px;
+	-webkit-border-radius: 2px;
+}
+
+.refs.head {
+	background-color: #7ad254;
+}
+
+.refs.remote {
+	background-color: #82afef;
+}
+
+.refs.tag {
+	background-color: #fced4f;
+}
+
+.refs.currentBranch {
+	background-color: #fca64f;
+}
+#message_files {
+	margin: 0;
+	padding: 0;
+}
+#message {
+	padding: 10px;
+}
+#files {
+	margin: 10px 0;
+	padding: 0;
+}
+#files ul {
+	margin: 0;
+	padding: 0;
+}
+#files li {
+	list-style-type: none;
+	padding: 4px 10px;
+	color: #000;
+	height: 18px;
+}
+#files li.odd {
+    background-color: #f2f2f2;
+}
+#files li:hover {
+    text-decoration: underline;
+	cursor: pointer;
+}
+#files img.changetype-icon {
+	float: left;
+	margin: 3px 7px;
+}
+#files li .filename {
+	position: relative;
+	top: 2px;
+	font-size: 12px;
+	text-shadow: white 0 0 4px;
+	z-index: 100;
+}
+
+.top-link {
+    text-align: right;
+    margin-top: -5px;
+    margin-right: 20px;
+    padding-bottom: 5px;
+    font-size: 90%;
+}
+
+#files .diffstat-info {
+	padding: 0;
+	position: absolute;
+	right: 30px;
+	display: inline-block;
+}
+#files .changes-bar {
+	height: 6px;
+	display: inline-block;
+	right: 46px;
+	position: absolute;
+	-webkit-border-top-left-radius: 5px;
+	-webkit-border-bottom-left-radius: 5px;
+	-webkit-box-shadow: 0 1px 1px #fff;
+}
+#files .changes-bar.added {
+	background-color: #b2ffaf;
+	border: 1px solid #080;
+}
+#files .changes-bar.removed {
+	top: 10px;
+	background-color: #febfbf;
+	border: 1px solid #B00;
+}
+
+#files .diffstat-numbers {
+	font-size: 12px;
+	font-weight: bold;
+	white-space: nowrap;
+	padding: 1px 5px;
+	position: absolute;
+    height: 16px;
+}
+
+#files .diffstat-numbers.summary {
+    border-left: 1px solid #656565;
+	-webkit-border-top-right-radius: 12px;
+	-webkit-border-bottom-right-radius: 12px;
+	right: 1px;
+	width: 35px;
+}
+#files .diffstat-numbers.details {
+    background-color: black;
+    color: #e3e3e3;
+	-webkit-border-top-left-radius: 12px;
+	-webkit-border-bottom-left-radius: 12px;
+	right: 46px;
+	text-align: right;
+}
+#files .diffstat-numbers.details .added {
+	color: #5db15d;
+}
+#files .diffstat-numbers.details .removed {
+	color: #f34b4e;
+}
+
+#files .diffstat-numbers.binary {
+	display: inline-block;
+	right: 30px;
+}
+
+/*
+div.button
+{
+	color: #666666;
+
+	font-size: 60%;
+	text-align: center;
+
+	width: 70px;
+
+	margin-right: 10px;
+
+	padding: 2px;
+
+	float: left;
+	clear: both;
+
+	border: 1px solid;
+	-webkit-border-radius: 3px;
+}
+
+div.created
+{
+	background-color: #ccffcc;
+	border-color: #66ff66;
+}
+
+div.changed
+{
+	background-color: #ffcc99;
+	border-color: #ff9933;
+}
+
+div.deleted
+{
+	background-color: #ffcccc;
+	border-color: #ff6666;
+}
+
+div.renamed
+{
+	// No colour needed right now.
+}
+*/

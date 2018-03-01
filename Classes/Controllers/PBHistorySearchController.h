@@ -7,34 +7,26 @@
 //
 
 #import <Cocoa/Cocoa.h>
-
-
-typedef enum historySearchModes {
-	kGitXBasicSeachMode = 1,
-	kGitXPickaxeSearchMode,
-	kGitXRegexSearchMode,
-	kGitXPathSearchMode,
-	kGitXMaxSearchMode    // always keep this item last
-} PBHistorySearchMode;
+#import "PBHistorySearchMode.h"
 
 @class PBGitHistoryController;
-
+@class PBTask;
 
 @interface PBHistorySearchController : NSObject {
 	PBHistorySearchMode searchMode;
 	NSIndexSet *results;
 	NSTimer *searchTimer;
-	NSTask *backgroundSearchTask;
+	PBTask *backgroundSearchTask;
 	NSPanel *rewindPanel;
 }
 
-@property (assign) IBOutlet PBGitHistoryController *historyController;
-@property (assign) IBOutlet NSArrayController *commitController;
+@property (weak) IBOutlet PBGitHistoryController *historyController;
+@property (weak) IBOutlet NSArrayController *commitController;
 
-@property (assign) IBOutlet NSSearchField *searchField;
-@property (assign) IBOutlet NSSegmentedControl *stepper;
-@property (assign) IBOutlet NSTextField *numberOfMatchesField;
-@property (assign) IBOutlet NSProgressIndicator *progressIndicator;
+@property (weak) IBOutlet NSSearchField *searchField;
+@property (weak) IBOutlet NSSegmentedControl *stepper;
+@property (weak) IBOutlet NSTextField *numberOfMatchesField;
+@property (weak) IBOutlet NSProgressIndicator *progressIndicator;
 
 @property PBHistorySearchMode searchMode;
 
@@ -51,6 +43,6 @@ typedef enum historySearchModes {
 - (void)clearSearch;
 - (IBAction)updateSearch:(id)sender;
 
-- (void)setHistorySearch:(NSString *)searchString mode:(NSInteger)mode;
+- (void)setHistorySearch:(NSString *)searchString mode:(PBHistorySearchMode)mode;
 
 @end

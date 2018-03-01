@@ -1,0 +1,253 @@
+<!doctype html>
+<style>
+body { margin: 0; }
+#picture { position: absolute; width: 100%; height: 100%; }
+h2 { margin: 1em 0 0 0.75em; border-bottom: 1px solid black; }
+img { margin: -1px 0 0 -1px; border: 1px solid black; transition: background 0.2s; }
+img:hover { background-color: #dedede; }
+</style>
+<h2>16</h2>
+<img src="gitx-16.svg">
+<h2>32</h2>
+<img src="gitx-32.svg">
+<script>
+"use strict";
+
+function P2(x, y) {
+    this.x = x;
+    this.w = x;
+    if (y === undefined) {
+        this.y = x;
+    } else {
+        this.y = y;
+    }
+    this.h = this.y;
+}
+
+P2.prototype.add = function(o) { var o = xy(o); return new P2(this.x + o.x, this.y + o.y); }
+P2.prototype.sub = function(o) { var o = xy(o); return new P2(this.x - o.x, this.y - o.y); }
+P2.prototype.mul = function(o) { var o = xy(o); return new P2(this.x * o.x, this.y * o.y); }
+P2.prototype.div = function(o) { var o = xy(o); return new P2(this.x / o.x, this.y / o.y); }
+P2.prototype.round = function() { return new P2(Math.round(this.x), Math.round(this.y)); }
+
+function xy(x, y) {
+    if (y == undefined && x.x !== undefined && x.y !== undefined) return x;
+    return new P2(x, y);
+}
+function wh(w, h) { return new P2(w, h); }
+
+
+function roundedRect(size, cornerRadius, cornerHandleOffset) {
+    return { size: size, cornerRadius: cornerRadius, cornerHandleOffset: cornerHandleOffset };
+}
+
+function renderIcon(d) {
+    var edgeRect, bezelRect, screenSize, verticalOffset, barSize, symbolSpacing;
+    var iconSize = wh(1024/d, 1024/d);
+
+    var edgeCornerRadius = 46/d;
+    var edgeCornerHandleOffset = 28.5/d;
+    var bezelCornerRadius = 36/d;
+    var bezelCornerHandleOffset = 23.5/d;
+
+    console.log(iconSize);
+    if (iconSize.w >= 1024) {
+        edgeRect = roundedRect(iconSize.sub(wh(71/d, 124/d).mul(2)), edgeCornerRadius, edgeCornerHandleOffset);
+        bezelRect = roundedRect(edgeRect.size.sub(2 * 10 / d), bezelCornerRadius, bezelCornerHandleOffset);
+        screenSize = bezelRect.size.sub(wh(52, 53).mul(2/d)).sub(xy(0, 1));
+        verticalOffset = -4/d;
+
+        barSize = wh(200, 42).div(d).round();
+        symbolSpacing = wh(25, 65).div(d).round();
+    } else if (iconSize.w > 64) {
+
+        var edgeSize, bezelSize;
+        if (iconSize.w >= 512) {
+            edgeSize = iconSize.sub(wh(70/d, 124/d).mul(2));
+            bezelSize = edgeSize.sub(2 * 10 / d);
+        } else if (iconSize.w >= 256) {
+            edgeSize = iconSize.sub(wh(68/d, 124/d).mul(2));
+            bezelSize = edgeSize.sub(2 * 12 / d);
+        } else {
+            edgeSize = iconSize.sub(wh(64/d, 120/d).mul(2));
+            bezelSize = edgeSize.sub(2 * 16 / d);
+        }
+        edgeRect = roundedRect(edgeSize, edgeCornerRadius, edgeCornerHandleOffset);
+        bezelRect = roundedRect(bezelSize, bezelCornerRadius, bezelCornerHandleOffset);
+        if (iconSize.w >= 256) {
+            screenSize = bezelRect.size.sub(wh(52, 53).mul(2/d)).round();
+        } else {
+            screenSize = bezelRect.size.sub(2 * 48/d);
+        }
+        verticalOffset = -4/d;
+
+        barSize = wh(200, 40).div(d).round();
+        symbolSpacing = wh(27, 64).div(d).round();
+    } else {
+        edgeRect = roundedRect(iconSize.sub(wh(4, 8).mul(2)), 46/d, 28.5/d);
+        bezelRect = roundedRect(edgeRect.size.sub(2 * 2), 0.8, 0.8);
+        screenSize = bezelRect.size.sub(2 * 3);
+        verticalOffset = -2;
+
+        barSize = wh(12, 2);
+        symbolSpacing = wh(2, 5);
+    }
+
+    var plusOffset = (barSize.w - barSize.h) / 2;
+    var symbolOffset = function(i) {
+        return screenSize.sub(wh(3 * barSize.w + 2 * symbolSpacing.w, barSize.w + symbolSpacing.h + barSize.h)).div(2)
+            .add(xy(i * (barSize.w + symbolSpacing.w), 0)).round();
+    };
+
+    function centeredOffset(outer, inner) {
+        return outer.sub(inner).div(2);
+    }
+
+    var edgeOffset = centeredOffset(iconSize, edgeRect.size).add(xy(0, verticalOffset)).round();
+    var bezelOffset = centeredOffset(iconSize, bezelRect.size).add(xy(0, verticalOffset)).round();
+    var screenOffset = centeredOffset(iconSize, screenSize).add(xy(0, verticalOffset)).round();
+    if (iconSize.w >= 1024) {
+        screenOffset = screenOffset.sub(xy(0, 1));
+    }
+
+    function roundedRectPath(rect) {
+        var s = rect.size.sub(2 * rect.cornerRadius);
+        var r = rect.cornerRadius;
+        var h = rect.cornerHandleOffset;
+        return `
+            m${r},0
+            l${s.w},0 c${h},0 ${r},${r - h} ${r},${r}
+            l0,${s.h} c0,${h} -${r - h},${r} -${r},${r}
+            l-${s.w},0 c-${h},0 -${r},-${r - h} -${r},-${r}
+            l0,-${s.h} c0,-${h} ${r - h},-${r} ${r},-${r}
+        `;
+    }
+
+    var svg = `
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="${iconSize.w}" height="${iconSize.h}">
+    <defs>
+        <linearGradient id="bezel-edge-gradient" x1="0" x2="0" y1="0" y2="1">
+            <stop offset="0%" stop-color="#d2e9ef" />
+            <stop offset="20%" stop-color="#c5d7dc" />
+            <stop offset="35%" stop-color="#b5c3c8" />
+            <stop offset="50%" stop-color="#a4aeb1" />
+            <stop offset="80%" stop-color="#838586" />
+            <stop offset="100%" stop-color="#767574" />
+        </linearGradient>
+        <linearGradient id="bezel-gradient" x1="0" x2="0" y1="0" y2="1">
+            <stop offset="0%" stop-color="#181818" />
+            <stop offset="20%" stop-color="#141414" />
+            <stop offset="50%" stop-color="#0b0b0b" />
+            <stop offset="100%" stop-color="#000000" />
+        </linearGradient>
+        <radialGradient id="screen-gradient">
+            <stop offset="0%" stop-color="#03a6c5" />
+            <stop offset="100%" stop-color="#03a6f7" />
+        </radialGradient>
+        <g id="plus">
+            <rect x="0" y="${plusOffset}" width="${barSize.w}" height="${barSize.h}" />
+            <rect x="${plusOffset}" y="0" width="${barSize.h}" height="${barSize.w}" />
+        </g>
+        <g id="minus">
+            <rect x="0" y="0" width="${barSize.w}" height="${barSize.h}" />
+        </g>
+        <g id="plus-minus" fill="white">
+            <use x="0" y="0" xlink:href="#plus" />
+            <use x="0" y="${barSize.w + symbolSpacing.h}" xlink:href="#minus" />
+        </g>
+        <filter id="shadow">
+            <feOffset in="SourceAlpha" result="offset" dx="0" dy="${10 / 1024 * iconSize.w}" />
+            <feColorMatrix in="offset"
+                           result="colored"
+                           type="matrix"
+                           values="1 0 0 0 0
+                                   0 1 0 0 0
+                                   0 0 1 0 0
+                                   0 0 0 0.3 0" />
+            <feGaussianBlur in="colored" result="blur" stdDeviation="${12 / 1024 * iconSize.w}" />
+            <feBlend in="SourceGraphic" in2="blur" mode="normal" />
+        </filter>
+    </defs>
+    <g id="icon">
+    <path d="
+        M${edgeOffset.x},${edgeOffset.y}
+        ${roundedRectPath(edgeRect)}
+        Z" fill="url(#bezel-edge-gradient)" filter="url(#shadow)" />
+    <path d="
+        M${bezelOffset.x},${bezelOffset.y}
+        ${roundedRectPath(bezelRect)}
+        Z" fill="url(#bezel-gradient)" />
+    <g transform="translate(${screenOffset.x}, ${screenOffset.y})">
+        <rect x="0" y="0" width="${screenSize.w}" height="${screenSize.h}" fill="url(#screen-gradient)"/>
+
+        <use x="${symbolOffset(0).w}" y="${symbolOffset(0).h}" xlink:href="#plus-minus" />
+        <use x="${symbolOffset(1).w}" y="${symbolOffset(1).h}" xlink:href="#plus-minus" />
+        <use x="${symbolOffset(2).w}" y="${symbolOffset(2).h}" xlink:href="#plus-minus" />
+    </g>
+    </g>
+</svg>
+`;
+    if (false) {
+        var debugSvg = `
+            <image id="original-icon" x="0" y="0" width="${iconSize.w}" height="${iconSize.h}" xlink:href="terminal-${iconSize.w}.png" />
+            <style>
+            svg { background-color: #dedede; }
+            svg:hover #icon { opacity: 0; }
+            #original-icon { opacity: 0; }
+            svg:hover #original-icon { opacity: 1; }
+            </style>`;
+        svg = svg.replace("</svg>", debugSvg + "</svg>");
+    }
+    return svg;
+}
+
+function addIcon(d) {
+    var svg = renderIcon(d);
+    var elem = document.createElement("div");
+    elem.innerHTML = svg;
+    elem = elem.children[0];
+
+    var canvas = document.createElement("canvas");
+    canvas.width = elem.width.baseVal.value;
+    canvas.height = elem.height.baseVal.value;
+    var context = canvas.getContext("2d");
+
+    var header = document.createElement("h2");
+    header.innerText = "" + canvas.width;
+    document.body.appendChild(header);
+
+    var image = new Image;
+    image.src = "data:image/svg+xml;base64," + btoa(svg);
+    document.body.appendChild(image);
+    image.onload = function() {
+        context.drawImage(image, 0, 0);
+
+        var a = document.createElement("a");
+        a.download = `icon_${canvas.width}x${canvas.height}.png`;
+        a.href = canvas.toDataURL("image/png");
+        document.body.insertBefore(a, image);
+        image.parentNode.removeChild(image);
+        a.appendChild(image);
+    };
+
+    image.addEventListener('click', function() {
+        var textarea = document.createElement('textarea');
+        textarea.value = svg;
+        textarea.select();
+        document.body.appendChild(textarea);
+        try {
+            document.execCommand('copy');
+        } catch (e) {
+            console.log('copy failed');
+        }
+        document.body.removeChild(textarea);
+    });
+};
+
+window.onload = function() {
+    for (var i = 4; i >= 0; --i) {
+        addIcon(Math.pow(2, i));
+    }
+};
+</script>

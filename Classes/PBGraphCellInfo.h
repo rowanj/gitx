@@ -11,19 +11,20 @@
 
 @interface PBGraphCellInfo : NSObject
 {
-	int position;
 	struct PBGitGraphLine *lines;
-	int nLines;
-	int numColumns;
+	long nLines;
+	long position;
+	long numColumns;
 	char sign;	
 }
 
 @property struct PBGitGraphLine *lines;
-@property(assign) int nLines;
-@property(assign) int position, numColumns;
+@property(assign) long nLines;
+@property(assign) long position;
+@property(assign) long numColumns;
 @property(assign) char sign;
 
 
-- (id)initWithPosition:(int) p andLines:(struct PBGitGraphLine *) l;
+- (id)initWithPosition:(long)p andLines:(struct PBGitGraphLine *)l;
 
 @end

@@ -13,10 +13,12 @@ extern NSString * const kGitXTagType;
 extern NSString * const kGitXBranchType;
 extern NSString * const kGitXRemoteType;
 extern NSString * const kGitXRemoteBranchType;
+extern NSString * const kGitXStashType;
 
 extern NSString * const kGitXTagRefPrefix;
 extern NSString * const kGitXBranchRefPrefix;
 extern NSString * const kGitXRemoteRefPrefix;
+extern NSString * const kGitXStashRefPrefix;
 
 
 @interface PBGitRef : NSObject <PBGitRefish>
@@ -36,6 +38,7 @@ extern NSString * const kGitXRemoteRefPrefix;
 - (BOOL) isTag;
 - (BOOL) isRemote;
 - (BOOL) isRemoteBranch;
+- (BOOL) isStash;
 
 - (PBGitRef *) remoteRef;
 

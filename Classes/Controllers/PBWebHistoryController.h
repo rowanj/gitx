@@ -18,15 +18,15 @@
 
 
 @interface PBWebHistoryController : PBWebController {
-	IBOutlet PBGitHistoryController* historyController;
-	IBOutlet id<PBRefContextDelegate> contextMenuDelegate;
+	__weak IBOutlet PBGitHistoryController* historyController;
+	__weak IBOutlet id<PBRefContextDelegate> contextMenuDelegate;
 
-	GTOID* currentSha;
+	GTOID *currentOID;
 	NSString* diff;
 }
 
-- (void) changeContentTo: (PBGitCommit *) content;
 - (void) sendKey: (NSString*) key;
 
 @property (readonly) NSString* diff;
+
 @end

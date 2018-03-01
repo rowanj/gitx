@@ -60,14 +60,14 @@
 					  forKey:kShouldCheckoutBranch];
 	[defaultValues setObject:[NSNumber numberWithBool:NO]
                       forKey:kOpenPreviousDocumentsOnLaunch];
-	[defaultValues setObject:[NSNumber numberWithInteger:kGitXBasicSeachMode]
+	[defaultValues setObject:[NSNumber numberWithInteger:PBHistorySearchModeBasic]
                       forKey:kHistorySearchMode];
 	[defaultValues setObject:[NSNumber numberWithBool:YES]
                       forKey:kUseRepositoryWatcher];
 	[[NSUserDefaults standardUserDefaults] registerDefaults:defaultValues];
 }
 
-+ (int) commitMessageViewVerticalLineLength
++ (NSInteger) commitMessageViewVerticalLineLength
 {
 	return [[NSUserDefaults standardUserDefaults] integerForKey:kCommitMessageViewVerticalLineLength];
 }
@@ -77,7 +77,7 @@
 	return [[NSUserDefaults standardUserDefaults] boolForKey:kCommitMessageViewHasVerticalLine];
 }
 
-+ (int) commitMessageViewVerticalBodyLineLength
++ (NSInteger) commitMessageViewVerticalBodyLineLength
 {
 	return [[NSUserDefaults standardUserDefaults] integerForKey:kCommitMessageViewVerticalBodyLineLength];
 }

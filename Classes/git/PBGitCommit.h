@@ -21,21 +21,26 @@ extern NSString * const kGitXCommitType;
 
 @property (nonatomic, weak, readonly) PBGitRepository* repository;
 
-@property (nonatomic, strong, readonly) GTOID *sha;
+@property (nonatomic, strong, readonly) GTCommit *gtCommit;
+@property (nonatomic, strong, readonly) GTOID *OID;
 
 @property (nonatomic, strong, readonly) NSDate *date;
 @property (nonatomic, strong, readonly) NSString *subject;
+@property (nonatomic, strong, readonly) NSString *message;
 @property (nonatomic, strong, readonly) NSString *author;
+@property (nonatomic, strong, readonly) NSString *authorEmail;
+@property (nonatomic, strong, readonly) NSString *authorDate;
 @property (nonatomic, strong, readonly) NSString *committer;
+@property (nonatomic, strong, readonly) NSString *committerEmail;
+@property (nonatomic, strong, readonly) NSString *committerDate;
 @property (nonatomic, strong, readonly) NSString *details;
 @property (nonatomic, strong, readonly) NSString *patch;
-@property (nonatomic, strong, readonly) NSString *realSHA;
+@property (nonatomic, strong, readonly) NSString *SHA;
 @property (nonatomic, strong, readonly) NSString *SVNRevision;
 
-@property (nonatomic, strong, readonly) NSArray *parents;
+@property (nonatomic, copy, readonly) NSArray <GTOID *> *parents;
 @property  NSMutableArray* refs;
 
-@property (nonatomic, assign)	char sign;
 @property (nonatomic, strong) PBGraphCellInfo *lineInfo;
 
 @property (nonatomic, readonly) PBGitTree* tree;
@@ -48,7 +53,7 @@ extern NSString * const kGitXCommitType;
 - (void) removeRef:(id)ref;
 - (BOOL) hasRef:(PBGitRef *)ref;
 
-- (NSString *)realSha;
+- (NSString *)SHA;
 - (BOOL) isOnSameBranchAs:(PBGitCommit *)other;
 - (BOOL) isOnHeadBranch;
 

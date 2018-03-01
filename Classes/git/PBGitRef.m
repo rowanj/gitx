@@ -13,10 +13,12 @@ NSString * const kGitXTagType    = @"tag";
 NSString * const kGitXBranchType = @"branch";
 NSString * const kGitXRemoteType = @"remote";
 NSString * const kGitXRemoteBranchType = @"remote branch";
+NSString * const kGitXStashType  = @"stash";
 
 NSString * const kGitXTagRefPrefix    = @"refs/tags/";
 NSString * const kGitXBranchRefPrefix = @"refs/heads/";
 NSString * const kGitXRemoteRefPrefix = @"refs/remotes/";
+NSString * const kGitXStashRefPrefix  = @"refs/stash@";
 
 @interface PBGitRef ()
 
@@ -68,6 +70,8 @@ NSString * const kGitXRemoteRefPrefix = @"refs/remotes/";
 		return @"tag";
 	if ([self isRemote])
 		return @"remote";
+	if ([self isStash])
+		return @"stash";
 	return nil;
 }
 
@@ -92,6 +96,11 @@ NSString * const kGitXRemoteRefPrefix = @"refs/remotes/";
 		return NO;
 
 	return ([[ref componentsSeparatedByString:@"/"] count] > 3);
+}
+
+- (BOOL) isStash
+{
+	return [ref hasPrefix:kGitXStashRefPrefix];
 }
 
 - (BOOL) isEqualToRef:(PBGitRef *)otherRef
@@ -141,6 +150,8 @@ NSString * const kGitXRemoteRefPrefix = @"refs/remotes/";
 
 - (NSString *) shortName
 {
+    if ([self isStash])
+        return [ref substringFromIndex:5];
 	if ([self type])
 		return [ref substringFromIndex:[[self type] length] + 7];
 	return ref;
@@ -156,6 +167,8 @@ NSString * const kGitXRemoteRefPrefix = @"refs/remotes/";
 		return kGitXRemoteBranchType;
 	if ([self isRemote])
 		return kGitXRemoteType;
+    if ([self isStash])
+        return kGitXStashType;
 	return nil;
 }
 

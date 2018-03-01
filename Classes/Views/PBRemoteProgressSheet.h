@@ -10,53 +10,19 @@
 
 #import "RJModalRepoSheet.h"
 
-extern NSString * const kGitXProgressDescription;
-extern NSString * const kGitXProgressSuccessDescription;
-extern NSString * const kGitXProgressSuccessInfo;
-extern NSString * const kGitXProgressErrorDescription;
-extern NSString * const kGitXProgressErrorInfo;
+NS_ASSUME_NONNULL_BEGIN
 
 @class PBGitWindowController;
-@class PBGitRepository;
 
-@interface PBRemoteProgressSheet : RJModalRepoSheet {
-	NSArray  *arguments;
-	NSString *title;
-	NSString *description;
-	bool hideSuccessScreen;
+typedef NSError * _Nullable (^PBProgressSheetExecutionHandler)(void);
 
-	NSTask    *gitTask;
-	NSInteger  returnCode;
+@interface PBRemoteProgressSheet : RJModalRepoSheet
 
-	NSTextField         *progressDescription;
-	NSProgressIndicator *progressIndicator;
++ (instancetype)progressSheetWithTitle:(NSString *)title description:(NSString *)description windowController:(PBGitWindowController *)windowController;
++ (instancetype)progressSheetWithTitle:(NSString *)title description:(NSString *)description;
 
-	NSTimer *taskTimer;
-}
-
-+ (void) beginRemoteProgressSheetForArguments:(NSArray *)args
-										title:(NSString *)theTitle
-								  description:(NSString *)theDescription
-										inDir:(NSString *)dir
-							 windowController:(PBGitWindowController *)windowController;
-+ (void) beginRemoteProgressSheetForArguments:(NSArray *)args
-										title:(NSString *)theTitle
-								  description:(NSString *)theDescription
-										inDir:(NSString *)dir
-							 windowController:(PBGitWindowController *)windowController 
-							hideSuccessScreen:(bool)hideSucc;
-
-+ (void) beginRemoteProgressSheetForArguments:(NSArray *)args
-										title:(NSString *)theTitle
-								  description:(NSString *)theDescription
-								 inRepository:(PBGitRepository *)repo;
-+ (void) beginRemoteProgressSheetForArguments:(NSArray *)args
-										title:(NSString *)theTitle
-								  description:(NSString *)theDescription
-								 inRepository:(PBGitRepository *)repo
-							hideSuccessScreen:(bool)hideSucc;
-
-@property  IBOutlet NSTextField         *progressDescription;
-@property  IBOutlet NSProgressIndicator *progressIndicator;
+- (void)beginProgressSheetForBlock:(PBProgressSheetExecutionHandler)executionBlock completionHandler:(void (^)(NSError *))completionHandler;
 
 @end
+
+NS_ASSUME_NONNULL_END

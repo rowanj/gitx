@@ -13,14 +13,11 @@
 
 
 @interface PBCommitHookFailedSheet : PBGitXMessageSheet
-{}
 
 + (void)beginWithMessageText:(NSString *)message
 					infoText:(NSString *)info
-			commitController:(PBGitCommitController *)controller;
-
-- (id)initWithWindowNibName:(NSString*)windowNibName
-			  andController:(PBGitCommitController*)controller;
+			commitController:(PBGitCommitController *)controller
+		   completionHandler:(RJSheetCompletionHandler)handler;
 
 - (IBAction)forceCommit:(id)sender;
 

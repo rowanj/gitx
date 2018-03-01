@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="12120" systemVersion="16E195" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+    <dependencies>
+        <deployment identifier="macosx"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="12120"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <customObject id="-2" userLabel="File's Owner" customClass="PBGitWindowController">
+            <connections>
+                <outlet property="contentSplitView" destination="352" id="356"/>
+                <outlet property="progressIndicator" destination="399" id="400"/>
+                <outlet property="sourceListControlsView" destination="393" id="395"/>
+                <outlet property="sourceSplitView" destination="353" id="355"/>
+                <outlet property="splitView" destination="351" id="357"/>
+                <outlet property="statusField" destination="397" id="401"/>
+                <outlet property="window" destination="3" id="292"/>
+            </connections>
+        </customObject>
+        <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
+        <customObject id="-3" userLabel="Application" customClass="NSObject"/>
+        <window title="GitX" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" frameAutosaveName="GitX" animationBehavior="default" id="3" userLabel="Window">
+            <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
+            <windowCollectionBehavior key="collectionBehavior" fullScreenPrimary="YES"/>
+            <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
+            <rect key="contentRect" x="4" y="290" width="890" height="514"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1177"/>
+            <value key="minSize" type="size" width="600" height="450"/>
+            <view key="contentView" id="5">
+                <rect key="frame" x="0.0" y="0.0" width="890" height="514"/>
+                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                <subviews>
+                    <splitView autosaveName="sourceSplitView" dividerStyle="thin" vertical="YES" translatesAutoresizingMaskIntoConstraints="NO" id="351">
+                        <rect key="frame" x="0.0" y="31" width="890" height="483"/>
+                        <subviews>
+                            <customView id="353" userLabel="Source SplitView">
+                                <rect key="frame" x="0.0" y="0.0" width="184" height="483"/>
+                                <autoresizingMask key="autoresizingMask" heightSizable="YES"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="150" id="SeR-ak-Dcd"/>
+                                    <constraint firstAttribute="width" relation="lessThanOrEqual" constant="300" id="d1O-hE-tiX"/>
+                                </constraints>
+                            </customView>
+                            <customView fixedFrame="YES" id="352" userLabel="Content SplitView">
+                                <rect key="frame" x="185" y="0.0" width="705" height="483"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                            </customView>
+                        </subviews>
+                        <holdingPriorities>
+                            <real value="251"/>
+                            <real value="250"/>
+                        </holdingPriorities>
+                    </splitView>
+                    <customView translatesAutoresizingMaskIntoConstraints="NO" id="393" userLabel="Source List Controls View">
+                        <rect key="frame" x="0.0" y="1" width="270" height="31"/>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="270" id="R1X-0L-Y63"/>
+                            <constraint firstAttribute="height" constant="31" id="TO5-KE-aRg"/>
+                        </constraints>
+                    </customView>
+                    <customView translatesAutoresizingMaskIntoConstraints="NO" id="396" userLabel="Status View">
+                        <rect key="frame" x="322" y="0.0" width="246" height="31"/>
+                        <subviews>
+                            <textField verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="NO" translatesAutoresizingMaskIntoConstraints="NO" id="397">
+                                <rect key="frame" x="41" y="8" width="188" height="14"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
+                                <textFieldCell key="cell" controlSize="small" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="left" title="Label" id="398">
+                                    <font key="font" metaFont="smallSystem"/>
+                                    <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <progressIndicator horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" maxValue="100" bezeled="NO" indeterminate="YES" controlSize="small" style="spinning" translatesAutoresizingMaskIntoConstraints="NO" id="399">
+                                <rect key="frame" x="20" y="7" width="16" height="16"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                            </progressIndicator>
+                        </subviews>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="31" id="Bx6-Va-UgP"/>
+                            <constraint firstAttribute="width" constant="246" id="RzT-KH-8gx"/>
+                        </constraints>
+                    </customView>
+                    <customView translatesAutoresizingMaskIntoConstraints="NO" id="443" userLabel="RefreshTermFind View">
+                        <rect key="frame" x="624" y="0.0" width="246" height="31"/>
+                        <subviews>
+                            <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="430">
+                                <rect key="frame" x="110" y="3" width="25" height="25"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <buttonCell key="cell" type="roundTextured" bezelStyle="texturedRounded" image="NSRefreshTemplate" imagePosition="only" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="431">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="refresh:" target="-2" id="432"/>
+                                </connections>
+                            </button>
+                            <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="435">
+                                <rect key="frame" x="143" y="3" width="70" height="25"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <buttonCell key="cell" type="roundTextured" title="Console" alternateTitle="Terminal" bezelStyle="texturedRounded" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="436">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="openInTerminal:" target="-2" id="438"/>
+                                </connections>
+                            </button>
+                            <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="439">
+                                <rect key="frame" x="221" y="3" width="25" height="25"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <buttonCell key="cell" type="roundTextured" alternateTitle="Reveal" bezelStyle="texturedRounded" image="NSRevealFreestandingTemplate" imagePosition="only" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="440">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                    <connections>
+                                        <action selector="revealInFinder:" target="-2" id="442"/>
+                                    </connections>
+                                </buttonCell>
+                            </button>
+                        </subviews>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="246" id="FFQ-Te-DMv"/>
+                            <constraint firstAttribute="height" constant="31" id="kbj-zH-ihc"/>
+                        </constraints>
+                    </customView>
+                </subviews>
+                <constraints>
+                    <constraint firstItem="351" firstAttribute="top" secondItem="5" secondAttribute="top" id="2S1-Si-krf"/>
+                    <constraint firstItem="396" firstAttribute="centerX" secondItem="5" secondAttribute="centerX" id="Cka-4e-2wv"/>
+                    <constraint firstAttribute="bottom" secondItem="393" secondAttribute="bottom" constant="1" id="D3w-hW-Lns"/>
+                    <constraint firstItem="351" firstAttribute="leading" secondItem="5" secondAttribute="leading" id="DVR-Db-T5J"/>
+                    <constraint firstAttribute="bottom" secondItem="443" secondAttribute="bottom" id="QTm-LQ-USz"/>
+                    <constraint firstItem="393" firstAttribute="top" secondItem="351" secondAttribute="bottom" constant="-1" id="TBA-8y-G81"/>
+                    <constraint firstAttribute="trailing" secondItem="351" secondAttribute="trailing" id="VJA-d6-nLw"/>
+                    <constraint firstAttribute="trailing" secondItem="443" secondAttribute="trailing" constant="20" id="atn-Rd-9Ge"/>
+                    <constraint firstItem="393" firstAttribute="leading" secondItem="5" secondAttribute="leading" id="j4W-RV-3aQ"/>
+                    <constraint firstAttribute="bottom" secondItem="396" secondAttribute="bottom" id="pIe-nQ-ntf"/>
+                </constraints>
+            </view>
+            <connections>
+                <outlet property="delegate" destination="-2" id="N8Y-0Q-xZn"/>
+            </connections>
+        </window>
+    </objects>
+    <resources>
+        <image name="NSRefreshTemplate" width="11" height="15"/>
+        <image name="NSRevealFreestandingTemplate" width="14" height="14"/>
+    </resources>
+</document>

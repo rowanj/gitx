@@ -7,6 +7,7 @@
 //
 
 #import "ApplicationController.h"
+#import "PBRepositoryDocumentController.h"
 #import "PBGitRevisionCell.h"
 #import "PBGitWindowController.h"
 #import "PBServicesController.h"
@@ -14,13 +15,16 @@
 #import "PBPrefsWindowController.h"
 #import "PBNSURLPathUserDefaultsTransfomer.h"
 #import "PBGitDefaults.h"
-#import "PBCloneRepositoryPanel.h"
 #import "OpenRecentController.h"
 #import "PBGitBinary.h"
 
 #import <Sparkle/SUUpdater.h>
+#import <Sparkle/SUUpdaterDelegate.h>
 
 static OpenRecentController* recentsDialog = nil;
+
+@interface ApplicationController () <SUUpdaterDelegate>
+@end
 
 @implementation ApplicationController
 
@@ -58,12 +62,31 @@ static OpenRecentController* recentsDialog = nil;
 	[NSApp setServicesProvider:services];
 
 	// Force update the services menu if we have a new services version
-	int serviceVersion = [[NSUserDefaults standardUserDefaults] integerForKey:@"Services Version"];
+	NSInteger serviceVersion = [[NSUserDefaults standardUserDefaults] integerForKey:@"Services Version"];
 	if (serviceVersion < 2)
 	{
 		NSLog(@"Updating services menu…");
 		NSUpdateDynamicServices();
 		[[NSUserDefaults standardUserDefaults] setInteger:2 forKey:@"Services Version"];
+	}
+}
+
+- (void)application:(NSApplication *)sender openFiles:(NSArray <NSString *> *)filenames {
+	PBRepositoryDocumentController * controller = [PBRepositoryDocumentController sharedDocumentController];
+	
+	for (NSString * filename in filenames) {
+		NSURL * repository = [NSURL fileURLWithPath:filename];
+		[controller openDocumentWithContentsOfURL:repository display:YES
+								completionHandler:^void (NSDocument *document, BOOL documentWasAlreadyOpen, NSError *error) {
+									if (!document) {
+										NSLog(@"Error opening repository \"%@\": %@", repository.path, error);
+										[controller presentError:error];
+										[sender replyToOpenOrPrint:NSApplicationDelegateReplyFailure];
+									}
+									else {
+										[sender replyToOpenOrPrint:NSApplicationDelegateReplySuccess];
+									}
+								}];
 	}
 }
 
@@ -106,6 +129,26 @@ static OpenRecentController* recentsDialog = nil;
 	[firstResponder terminate: sender];
 }
 
+//Override the default behavior
+- (IBAction)openDocument:(id)sender {
+	NSOpenPanel* panel = [[NSOpenPanel alloc] init];
+	
+	[panel setCanChooseFiles:false];
+	[panel setCanChooseDirectories:true];
+	
+	[panel beginWithCompletionHandler:^(NSInteger result) {
+		if (result == NSFileHandlingPanelOKButton) {
+			PBRepositoryDocumentController* controller = [PBRepositoryDocumentController sharedDocumentController];
+			[controller openDocumentWithContentsOfURL:panel.URL display:true completionHandler:^(NSDocument * _Nullable document, BOOL documentWasAlreadyOpen, NSError * _Nullable error) {
+				if (!document) {
+					NSLog(@"Error opening repository \"%@\": %@", panel.URL.path, error);
+					[controller presentError:error];
+				}
+			}];
+		}
+	}];
+}
+
 - (IBAction)openPreferencesWindow:(id)sender
 {
 	[[PBPrefsWindowController sharedPrefsWindowController] showWindow:nil];
@@ -125,14 +168,6 @@ static OpenRecentController* recentsDialog = nil;
 	[dict addEntriesFromDictionary:[[NSDictionary alloc] initWithObjectsAndKeys:@"GitX-dev (rowanj fork)", @"ApplicationName", nil]];
 
 	[NSApp orderFrontStandardAboutPanelWithOptions:dict];
-}
-
-- (IBAction) showCloneRepository:(id)sender
-{
-	if (!cloneRepositoryPanel)
-		cloneRepositoryPanel = [PBCloneRepositoryPanel panel];
-
-	[cloneRepositoryPanel showWindow:self];
 }
 
 - (IBAction)installCliTool:(id)sender;
@@ -162,19 +197,15 @@ static OpenRecentController* recentsDialog = nil;
 		}
 	}
 
+	NSAlert * alert = [[NSAlert alloc] init];
 	if (success) {
-		[[NSAlert alertWithMessageText:@"Installation Complete"
-	                    defaultButton:nil
-	                  alternateButton:nil
-	                      otherButton:nil
-	        informativeTextWithFormat:@"The gitx tool has been installed to %@", installationPath] runModal];
+		alert.messageText = NSLocalizedString(@"Installation Complete", @"Headline for successfully completed installation of the command line tool");
+		alert.informativeText = [NSString stringWithFormat:NSLocalizedString(@"The gitx tool has been installed to %@.", @"Informative text for successfully completed installation of the command line tool at the location %@"), installationPath];
 	} else {
-		[[NSAlert alertWithMessageText:@"Installation Failed"
-	                    defaultButton:nil
-	                  alternateButton:nil
-	                      otherButton:nil
-	        informativeTextWithFormat:@"Installation to %@ failed", installationPath] runModal];
+		alert.messageText = NSLocalizedString(@"Installation Failed", @"Headline for failed installation of the command line tool");
+		alert.informativeText = [NSString stringWithFormat:NSLocalizedString(@"Installation to %@ failed.", @"Informative text for successfully completed installation of the command line tool at the location %@"), installationPath];
 	}
+	[alert runModal];
 }
 
 #pragma mark Sparkle delegate methods
@@ -205,17 +236,17 @@ static OpenRecentController* recentsDialog = nil;
 
 - (IBAction)showHelp:(id)sender
 {
-	[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"http://rowanj.github.io/gitx/"]];
+	[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"https://gitx.github.io"]];
 }
 
 - (IBAction)reportAProblem:(id)sender
 {
-    [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"https://github.com/rowanj/gitx/issues"]];
+    [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"https://github.com/gitx/gitx/issues"]];
 }
 
 - (IBAction)showChangeLog:(id)sender
 {
-	[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"http://builds.phere.net/GitX/development/GitX-dev.html"]];
+	[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"https://github.com/gitx/gitx/releases"]];
 }
 
 

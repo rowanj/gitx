@@ -15,6 +15,8 @@
 
 - (void) awakeFromNib
 {
+    [super awakeFromNib];
+
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
 
     [defaults addObserver:self
@@ -33,6 +35,15 @@
                   context:NULL];
 }
 
+- (void)dealloc
+{
+	NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+
+	[defaults removeObserver:self forKeyPath:@"PBCommitMessageViewHasVerticalLine"];
+	[defaults removeObserver:self forKeyPath:@"PBCommitMessageViewVerticalLineLength"];
+	[defaults removeObserver:self forKeyPath:@"PBCommitMessageViewVerticalBodyLineLength"];
+}
+
 -(void) observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
 {
     [self setNeedsDisplay:YES];
@@ -44,11 +55,11 @@
 
     if ([PBGitDefaults commitMessageViewHasVerticalLine]) {
 
-        float characterWidth = [@" " sizeWithAttributes:[self typingAttributes]].width;
-        float lineWidth = characterWidth * [PBGitDefaults commitMessageViewVerticalLineLength];
+        CGFloat characterWidth = [@" " sizeWithAttributes:[self typingAttributes]].width;
+        CGFloat lineWidth = characterWidth * [PBGitDefaults commitMessageViewVerticalLineLength];
         NSRect line;
-        float padding;
-        float textViewHeight = [self bounds].size.height;
+        CGFloat padding;
+        CGFloat textViewHeight = [self bounds].size.height;
 
         // draw a vertical line after the given size (used as an indicator
         // for the first line of the commit message)
